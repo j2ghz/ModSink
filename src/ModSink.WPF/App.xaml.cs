@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using Squirrel;
 using Serilog;
+using SharpRaven;
 
 namespace ModSink.WPF
 {
@@ -25,11 +26,25 @@ namespace ModSink.WPF
             }
             this.log = Log.ForContext<App>();
             log.Information("Starting ModSink ({version})", System.Reflection.Assembly.GetEntryAssembly().GetName().Version);
+            SetupSentry();
             if (!System.Diagnostics.Debugger.IsAttached)
             {
                 CheckUpdates();
             }
             base.OnStartup(e);
+        }
+
+        private void SetupSentry()
+        {
+            var ravenClient = new RavenClient("https://410966a6c264489f8123948949c745c7:61776bfffd384fbf8c3b30c0d3ad90fa@sentry.io/189364");
+            AppDomain.CurrentDomain.UnhandledException += (sender, args) =>
+            {
+                ravenClient.Capture(new SharpRaven.Data.SentryEvent(args.ExceptionObject as Exception));
+            };
+            ravenClient.ErrorOnCapture = exception =>
+            {
+                Log.ForContext<RavenClient>().Error(exception, "Sentry error reporting encountered an exception");
+            };
         }
 
         private void SetupLogging()
