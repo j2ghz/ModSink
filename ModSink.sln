@@ -5,6 +5,8 @@ VisualStudioVersion = 15.0.26430.15
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModSink.WPF", "src\ModSink.WPF\ModSink.WPF.csproj", "{09EF7B2D-08FB-4320-A945-F2276D337509}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModSink.Core", "src\ModSink.Core\ModSink.Core.csproj", "{6AC512B9-2B7F-4870-A44A-85E7CF6D5051}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{09EF7B2D-08FB-4320-A945-F2276D337509}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{09EF7B2D-08FB-4320-A945-F2276D337509}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{09EF7B2D-08FB-4320-A945-F2276D337509}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6AC512B9-2B7F-4870-A44A-85E7CF6D5051}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6AC512B9-2B7F-4870-A44A-85E7CF6D5051}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6AC512B9-2B7F-4870-A44A-85E7CF6D5051}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6AC512B9-2B7F-4870-A44A-85E7CF6D5051}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
