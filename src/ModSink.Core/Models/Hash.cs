@@ -8,33 +8,18 @@ using System.Diagnostics;
 namespace ModSink.Core.Models
 {
     [DebuggerDisplay("{value}")]
-    public struct Hash : IEquatable<Hash>, IFormattable
+    public struct Hash : IEquatable<Hash>
     {
         private readonly byte[] value;
 
-        public bool Equals(Hash other)
-        {
-            return this.value.Equals(other.value);
-        }
+        public bool Equals(Hash other) => this.value.Equals(other.value);
 
-        public Hash(byte[] value)
-        {
-            this.value = value;
-        }
+        public Hash(byte[] value) => this.value = value;
 
-        public Hash(IEnumerable<byte> value)
-        {
-            this.value = value.ToArray();
-        }
+        public Hash(IEnumerable<byte> value) => this.value = value.ToArray();
 
-        public override int GetHashCode()
-        {
-            return this.value.GetHashCode();
-        }
+        public override int GetHashCode() => this.value.GetHashCode();
 
-        public string ToString(string format, IFormatProvider formatProvider)
-        {
-            return Convert.ToBase64String(this.value);
-        }
+        public override string ToString() => Convert.ToBase64String(this.value);
     }
 }

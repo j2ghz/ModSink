@@ -4,8 +4,8 @@ using System.Text;
 
 namespace ModSink.Core.Models.Local
 {
-    interface IManager
+    public interface IManager
     {
-        void LinkFiles(IEnumerable<byte[]>)
+        void LinkFile(Hash hash, string path);
     }
 }
