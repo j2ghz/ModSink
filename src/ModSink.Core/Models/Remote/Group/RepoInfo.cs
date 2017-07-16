@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace ModSink.Core.Models.Online.Group
+namespace ModSink.Core.Models.Remote.Group
 {
     public class RepoInfo
     {

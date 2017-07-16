@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace ModSink.Core.Models.Online.Group
+namespace ModSink.Core.Models.Remote.Group
 {
     public class Group
     {

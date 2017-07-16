@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ModSink.Core.Models.Online.Repo
+namespace ModSink.Core.Models.Remote.Repo
 {
     [Flags]
     public enum ModFlags
