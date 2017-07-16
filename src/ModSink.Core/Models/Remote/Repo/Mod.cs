@@ -1,12 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 
 namespace ModSink.Core.Models.Remote.Repo
 {
     public class Mod
     {
-        public IDictionary<string, byte[]> Files { get; set; }
+        public IDictionary<string, IHash> Files { get; set; }
 
         public string Name { get; set; }
 

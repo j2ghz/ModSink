@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace ModSink.Core.Models.Local
+﻿namespace ModSink.Core.Models.Local
 {
-    class IDownloader
+    internal class IDownloader
     {
     }
 }

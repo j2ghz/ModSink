@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Data.HashFunction;
 
 namespace ModSink.Core.Models.Local
 {
     public interface IManager
     {
-        void LinkFile(Hash hash, string path);
+        void LinkFile(IHash hash, string path);
     }
 }
