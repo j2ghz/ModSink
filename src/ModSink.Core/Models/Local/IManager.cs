@@ -1,8 +1,7 @@
-﻿
-namespace ModSink.Core.Models.Local
+﻿namespace ModSink.Core.Models.Local
 {
     public interface IManager
     {
-        void LinkFile(IHash hash, string path);
+        void LinkFile(IHashValue hash, string path);
     }
 }

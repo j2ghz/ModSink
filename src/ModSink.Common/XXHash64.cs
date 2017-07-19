@@ -18,7 +18,7 @@ namespace ModSink.Common
 
         public bool Equals(XXHash64 other) => this.Value.Equals(other.Value);
 
-        public bool Equals(IHash other) => (other is XXHash64) && (Equals((XXHash64)other));
+        public bool Equals(IHashValue other) => (other is XXHash64) && (Equals((XXHash64)other));
 
         public override int GetHashCode() => this.Value.GetHashCode();
 
