@@ -1,5 +1,4 @@
-﻿using System.Data.HashFunction;
-
+﻿
 namespace ModSink.Core.Models.Local
 {
     public interface IManager

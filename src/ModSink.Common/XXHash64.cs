@@ -2,12 +2,13 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using ModSink.Core.Models;
 
-namespace ModSink.Core.Models
+namespace ModSink.Common
 {
-    [DebuggerDisplay("{Value}")]
     [Serializable]
-    public struct XXHash64 : IHash, IEquatable<XXHash64>
+    [DebuggerDisplay("{Value}")]
+    public struct XXHash64 : IHashValue, IEquatable<XXHash64>
     {
         public XXHash64(byte[] value) => this.Value = value;
 

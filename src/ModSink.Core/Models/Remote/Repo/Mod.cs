@@ -4,7 +4,7 @@ namespace ModSink.Core.Models.Remote.Repo
 {
     public class Mod
     {
-        public IDictionary<string, IHash> Files { get; set; }
+        public IDictionary<string, IHashValue> Files { get; set; }
 
         public string Name { get; set; }
 
