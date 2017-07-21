@@ -5,13 +5,13 @@ using System.Threading.Tasks;
 
 namespace ModSink.Common
 {
-    public class XXHash64 : System.Data.HashFunction.xxHash, IHashFunction<XXHash64Value>
+    public class XXHash64 : System.Data.HashFunction.xxHash, IHashFunction<ByteHashValue>
     {
-        async Task<XXHash64Value> IHashFunction<XXHash64Value>.ComputeHashAsync(Stream data, CancellationToken cancellationToken)
+        async Task<ByteHashValue> IHashFunction<ByteHashValue>.ComputeHashAsync(Stream data, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
             var hash = await base.ComputeHashAsync(data);
-            return new XXHash64Value(hash);
+            return new ByteHashValue(hash);
         }
     }
 }
