@@ -7,7 +7,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModSink.WPF", "ModSink.WPF\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModSink.Core", "ModSink.Core\ModSink.Core.csproj", "{6AC512B9-2B7F-4870-A44A-85E7CF6D5051}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModSink.Common", "ModSink.Common\ModSink.Common.csproj", "{7D13F10F-652B-44F6-8F4B-B6C54675258F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModSink.Common", "ModSink.Common\ModSink.Common.csproj", "{7D13F10F-652B-44F6-8F4B-B6C54675258F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModSink.CLI", "ModSink.CLI\ModSink.CLI.csproj", "{FEF0D59D-0AF5-4943-9BF2-3A3266E844A7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,6 +29,10 @@ Global
 		{7D13F10F-652B-44F6-8F4B-B6C54675258F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7D13F10F-652B-44F6-8F4B-B6C54675258F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7D13F10F-652B-44F6-8F4B-B6C54675258F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FEF0D59D-0AF5-4943-9BF2-3A3266E844A7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FEF0D59D-0AF5-4943-9BF2-3A3266E844A7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FEF0D59D-0AF5-4943-9BF2-3A3266E844A7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FEF0D59D-0AF5-4943-9BF2-3A3266E844A7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
