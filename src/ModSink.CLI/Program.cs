@@ -9,14 +9,54 @@ using System.Threading;
 
 namespace ModSink.CLI
 {
-    public class Program
+    public static class Program
     {
-        public static void Main(string[] args)
+        public static void AddColCheck(this CommandLineApplication app)
         {
-            var app = new CommandLineApplication();
-            app.Name = "ModSink.CLI";
-            app.HelpOption("-?|-h|--help");
+            app.Command("collcheck", (command) =>
+            {
+                command.Description = "Checks files for collisions";
+                command.HelpOption("-?|-h|--help");
+                var pathArg = command.Argument("[path]", "Path to folder");
 
+                command.OnExecute(() =>
+                {
+                    var pathStr = pathArg.Value ?? ".";
+                    var path = Path.Combine(Directory.GetCurrentDirectory(), pathStr);
+
+                    if (!Directory.Exists(path))
+                    {
+                        throw new ArgumentException($"Can't find {path}");
+                    }
+                    Console.WriteLine($"Crawling {path}");
+                    IHashFunction<ByteHashValue> xxhash = new XXHash64();
+                    new DirectoryInfo(path).GetFiles("*", SearchOption.AllDirectories).Select(f =>
+                    {
+                        using (var stream = f.OpenRead())
+                        {
+                            var hash = xxhash.ComputeHashAsync(stream, CancellationToken.None).GetAwaiter().GetResult();
+                            Console.WriteLine($"{(f.Length / (1024L * 1024)).ToString().PadLeft(4)}MB: '{hash}' at {f.FullName}");
+                            return new { f, hash };
+                        }
+                    }).GroupBy((a) => a.hash).ForEach(g =>
+                    {
+                        if (g.Count() < 2) { return; }
+                        Console.WriteLine(g.Key);
+                        foreach (var i in g)
+                        {
+                            Console.WriteLine($"  at {i.f.FullName}");
+                        }
+                        Console.WriteLine();
+                    });
+
+                    Console.WriteLine("Done.");
+                    return 0;
+                });
+            });
+        }
+
+        public static void AddHash(this CommandLineApplication app)
+        {
             app.Command("hash", (command) =>
             {
                 command.Description = "Returns hash(es) of file(s)";
@@ -56,9 +96,18 @@ namespace ModSink.CLI
                     return 0;
                 });
             });
+        }
+
+        public static void Main(string[] args)
+        {
+            var app = new CommandLineApplication();
+            app.Name = "ModSink.CLI";
+            app.HelpOption("-?|-h|--help");
+
+            app.AddHash();
+            app.AddColCheck();
 
             app.Execute(args);
-            Console.ReadKey();
         }
     }
 }
