@@ -30,7 +30,8 @@ namespace ModSink.CLI
                     }
                     Console.WriteLine($"Crawling {path}");
                     IHashFunction<ByteHashValue> xxhash = new XXHash64();
-                    new DirectoryInfo(path).GetFiles("*", SearchOption.AllDirectories).Select(f =>
+                    new DirectoryInfo(path).GetFiles("*", SearchOption.AllDirectories)
+                    .Select(f =>
                     {
                         using (var stream = f.OpenRead())
                         {
@@ -38,13 +39,15 @@ namespace ModSink.CLI
                             Console.WriteLine($"{(f.Length / (1024L * 1024)).ToString().PadLeft(4)}MB: '{hash}' at {f.FullName}");
                             return new { f, hash };
                         }
-                    }).GroupBy((a) => a.hash).ForEach(g =>
+                    })
+                    .GroupBy(a => a.hash.ToString())
+                    .Where(g => g.Count() > 1)
+                    .ForEach(g =>
                     {
-                        if (g.Count() < 2) { return; }
                         Console.WriteLine(g.Key);
                         foreach (var i in g)
                         {
-                            Console.WriteLine($"  at {i.f.FullName}");
+                            Console.WriteLine($"    {i.f.FullName}");
                         }
                         Console.WriteLine();
                     });
