@@ -10,8 +10,8 @@ namespace ModSink.Core.Models
         /// <summary>
         /// String representation of the hash.
         /// </summary>
-        /// <returns>String representation of the hash. Usually <see cref="Convert.ToBase64String(byte[])"/></returns>
-        /// <remarks>Can be used as a filename, so make sure its length is reasonable. It is recommended to use <see cref="Convert.ToBase64String(byte[])"/></remarks>
+        /// <returns>String representation of the hash. Usually <see cref="BitConverter(byte[])"/></returns>
+        /// <remarks>Can be used as a filename, so make sure its length is reasonable and is case-insensitive. It is recommended to use <see cref="Convert.ToBase64String(byte[])"/></remarks>
         string ToString();
     }
 }

@@ -24,6 +24,6 @@ namespace ModSink.Common
 
         public override int GetHashCode() => this.Value.GetHashCode();
 
-        public override string ToString() => Convert.ToBase64String(this.Value);
+        public override string ToString() => BitConverter.ToString(this.Value);
     }
 }
