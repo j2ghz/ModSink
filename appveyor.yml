@@ -1,4 +1,4 @@
-version: {build}
+version: '{build}'
 build_script:
 - ps: ./build.ps1
 artifacts:
