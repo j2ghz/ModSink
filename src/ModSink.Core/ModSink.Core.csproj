@@ -2,10 +2,13 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard1.0</TargetFramework>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
   </PropertyGroup>
 
-  <ItemGroup>
-    <Compile Remove="Models\Game\IGame.cs" />
+  <ItemGroup> 
+    <Compile Include="..\AssemblyInfo.cs">
+      <Link>Properties\SharedAssemblyInfo.cs</Link>
+    </Compile>
   </ItemGroup>
 
   <ItemGroup>
