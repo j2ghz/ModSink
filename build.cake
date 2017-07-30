@@ -7,61 +7,61 @@ var csprojwpf = "src/ModSink.WPF/ModSink.WPF.csproj";
 var csprojcommon = "src/ModSink.Common/ModSink.Common.csproj";
 var csprojcore = "src/ModSink.Core/ModSink.Core.csproj";
 var csprojcli = "src/ModSink.CLI/ModSink.CLI.csproj";
+var SquirrelVersion = "";
+var NuGetVersion = "";
 
-Task("UpdateAssemblyInfo")
-    .Does(() =>
+Setup(context =>
 {
-    GitVersion(new GitVersionSettings {
-        UpdateAssemblyInfo = true,
-        OutputType = GitVersionOutput.BuildServer
+    Information("Getting versions");
+    var v = GitVersion();
+    SquirrelVersion = v.LegacySemVerPadded;
+    Information("Version for Squirrel: " + SquirrelVersion);
+    NuGetVersion = v.NuGetVersionV2;
+    Information("Version for NuGet libraries: " + NuGetVersion);
+    Information("Full version info: "+ v.InformationalVersion);
+
+    Information("Updating version in AssemblyInfo files");
+    GitVersion(new GitVersionSettings { 
+        UpdateAssemblyInfo = true, 
+        OutputType = GitVersionOutput.BuildServer 
     });
 });
 
 Task("Build.WPF")
-    .IsDependentOn("UpdateAssemblyInfo")
     .IsDependentOn("NuGet Restore")
     .WithCriteria(IsRunningOnWindows())
     .Does(() =>
     {
         MSBuild("src/ModSink.WPF/ModSink.WPF.csproj", configurator => configurator.SetConfiguration("Release"));
-        NuGetPack("src/ModSink.WPF/ModSink.WPF.nuspec", new NuGetPackSettings{ BasePath = "src/ModSink.WPF", OutputDirectory = "artifacts" });
-        Squirrel(GetFiles("artifacts/ModSink.WPF.*.nupkg").Last());
+        NuGetPack("src/ModSink.WPF/ModSink.WPF.nuspec", new NuGetPackSettings{ BasePath = "src/ModSink.WPF", OutputDirectory = "src/ModSink.WPF/bin", Version = SquirrelVersion });
+        Squirrel(File("src/ModSink.WPF/bin/ModSink.WPF." + SquirrelVersion + ".nupkg"));
     });
 
 Task("Build.Common")
-    .IsDependentOn("UpdateAssemblyInfo")
     .IsDependentOn("DotNet Restore")
     .Does(() =>
 {
-    DotNetCoreBuild(csprojcommon, new DotNetCoreBuildSettings{ Configuration = "Release" });
     DotNetCorePack(csprojcommon, new DotNetCorePackSettings
      {
          Configuration = "Release",
-         OutputDirectory = "./artifacts/Common"
+         OutputDirectory = "./artifacts",
+         ArgumentCustomization = args=>args.Append("/p:PackageVersion="+NuGetVersion)
      });
 });
 
 Task("Build.Core")
-    .IsDependentOn("UpdateAssemblyInfo")
     .IsDependentOn("DotNet Restore")
     .Does(() =>
 {
-    DotNetCoreBuild(csprojcore, new DotNetCoreBuildSettings{ Configuration = "Release" });
     DotNetCorePack(csprojcore, new DotNetCorePackSettings
      {
          Configuration = "Release",
-         OutputDirectory = "./artifacts/Core"
+         OutputDirectory = "./artifacts",
+         ArgumentCustomization = args=>args.Append("/p:PackageVersion="+NuGetVersion)
      });
 });
 
-Task("Build.CLI")
-    .IsDependentOn("UpdateAssemblyInfo")
-    .IsDependentOn("DotNet Restore")
-    .Does(() =>
-{
-    DotNetCoreBuild(csprojcli, new DotNetCoreBuildSettings{ Configuration = "Release" });
-    DotNetCorePublish(csprojcli, new DotNetCorePublishSettings{ Configuration = "Release", OutputDirectory = "./artifacts/CLI" });
-});
+
 
 Task("NuGet Restore")
     .Does(() => NuGetRestore(solution));
@@ -70,9 +70,8 @@ Task("DotNet Restore")
     .Does(() => DotNetCoreRestore(solution));
 
 Task("Build")
-    .IsDependentOn("Build.WPF")
-    .IsDependentOn("Build.Common")
     .IsDependentOn("Build.Core")
-    .IsDependentOn("Build.CLI");
+    .IsDependentOn("Build.Common")
+    .IsDependentOn("Build.WPF");
 
 RunTarget("Build");
