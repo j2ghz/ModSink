@@ -1,18 +1,20 @@
 #tool "nuget:?package=GitVersion.CommandLine"
+#tool "Squirrel.Windows" 
+#addin Cake.Squirrel
+
 var solution = "ModSink.sln";
 var csprojwpf = "src/ModSink.WPF/ModSink.WPF.csproj";
 var csprojcommon = "src/ModSink.Common/ModSink.Common.csproj";
 var csprojcore = "src/ModSink.Core/ModSink.Core.csproj";
 var csprojcli = "src/ModSink.CLI/ModSink.CLI.csproj";
-string version = "";
 
 Task("UpdateAssemblyInfo")
     .Does(() =>
 {
-    version = GitVersion(new GitVersionSettings {
+    GitVersion(new GitVersionSettings {
         UpdateAssemblyInfo = true,
         OutputType = GitVersionOutput.BuildServer
-    }).LegacySemVer;
+    });
 });
 
 Task("Build.WPF")
@@ -22,7 +24,8 @@ Task("Build.WPF")
     .Does(() =>
     {
         MSBuild("src/ModSink.WPF/ModSink.WPF.csproj", configurator => configurator.SetConfiguration("Release"));
-        NuGetPack("src/ModSink.WPF/ModSink.WPF.nuspec", new NuGetPackSettings{ BasePath = "src/ModSink.WPF", OutputDirectory = "src/ModSink.WPF/bin", Version = version });
+        NuGetPack("src/ModSink.WPF/ModSink.WPF.nuspec", new NuGetPackSettings{ BasePath = "src/ModSink.WPF", OutputDirectory = "artifacts" });
+        Squirrel(GetFiles("artifacts/ModSink.WPF.*.nupkg").Last());
     });
 
 Task("Build.Common")
