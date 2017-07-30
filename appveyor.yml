@@ -1,8 +1,8 @@
-version: 0.0.{build}
+version: {build}
 build_script:
 - ps: ./build.ps1
 artifacts:
-  - path: 'RELEASES\**\*'
+  - path: 'Releases\**\*'
     name: Squirrel
-  - path: 'src\*\bin\**\*'
-    name: Binaries
+  - path: 'artifacts\**\*'
+    name: NugetPackages
