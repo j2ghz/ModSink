@@ -4,5 +4,5 @@ build_script:
 artifacts:
   - path: 'Releases\**\*'
     name: Squirrel
-  - path: 'artifacts\**\*'
+  - path: 'out\nuget\**\*'
     name: NugetPackages
