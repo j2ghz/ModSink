@@ -3,13 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26430.16
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModSink.WPF", "ModSink.WPF\ModSink.WPF.csproj", "{09EF7B2D-08FB-4320-A945-F2276D337509}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModSink.WPF", "src/ModSink.WPF\ModSink.WPF.csproj", "{09EF7B2D-08FB-4320-A945-F2276D337509}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModSink.Core", "ModSink.Core\ModSink.Core.csproj", "{6AC512B9-2B7F-4870-A44A-85E7CF6D5051}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModSink.Core", "src/ModSink.Core\ModSink.Core.csproj", "{6AC512B9-2B7F-4870-A44A-85E7CF6D5051}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModSink.Common", "ModSink.Common\ModSink.Common.csproj", "{7D13F10F-652B-44F6-8F4B-B6C54675258F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModSink.Common", "src/ModSink.Common\ModSink.Common.csproj", "{7D13F10F-652B-44F6-8F4B-B6C54675258F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModSink.CLI", "ModSink.CLI\ModSink.CLI.csproj", "{FEF0D59D-0AF5-4943-9BF2-3A3266E844A7}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModSink.CLI", "src/ModSink.CLI\ModSink.CLI.csproj", "{FEF0D59D-0AF5-4943-9BF2-3A3266E844A7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
