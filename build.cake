@@ -1,12 +1,16 @@
 #tool "nuget:?package=GitVersion.CommandLine"
-#tool "Squirrel.Windows" 
+#tool "Squirrel.Windows"
+#tool "nuget:?package=gitreleasemanager"
+#tool "nuget:?package=GitReleaseNotes"
 #addin "Cake.Squirrel"
+#addin nuget:?package=Cake.Git
 
 var target = Argument("target", "Default");
 var configuration = Argument("Configuration", "Release");
 var key_myget = EnvironmentVariable("MYGET_KEY") ?? "";
 var key_nuget = EnvironmentVariable("NUGET_KEY") ?? "";
 var url_myget_push = EnvironmentVariable("MYGET_URL") ?? "https://www.myget.org/F/modsink/api/v2/package";
+var github_token = EnvironmentVariable("GITHUB_TOKEN") ?? "";
 
 var root = Directory("./");
 var solution = root + File("ModSink.sln");
@@ -28,7 +32,8 @@ var modSinkCli_csproj = modSinkCli_dir + File("ModSink.CLI.csproj");
 
 var output = root + Directory("out");
 var out_nuget = output + Directory("nuget");
-var out_squirrel = output + Directory("squirrel");
+var out_squirrel_nupkg = output + Directory("squirrel");
+var out_squirrel = root + Directory("Releases");
 
 var SquirrelVersion = "";
 var NuGetVersion = "";
@@ -57,10 +62,10 @@ Task("Build.WPF")
     {
         MSBuild(modSinkWpf_csproj, configurator => configurator.SetConfiguration(configuration));
         Information("Pack");
-        CreateDirectory(out_squirrel);
-        NuGetPack(modSinkWpf_nuspec, new NuGetPackSettings{ BasePath = modSinkWpf_dir, OutputDirectory = out_squirrel, Version = SquirrelVersion });
+        CreateDirectory(out_squirrel_nupkg);
+        NuGetPack(modSinkWpf_nuspec, new NuGetPackSettings{ BasePath = modSinkWpf_dir, OutputDirectory = out_squirrel_nupkg, Version = SquirrelVersion });
         Information("Releasify");
-        Squirrel(out_squirrel + File("ModSink.WPF." + SquirrelVersion + ".nupkg"));
+        Squirrel(out_squirrel_nupkg + File("ModSink.WPF." + SquirrelVersion + ".nupkg"));
     });
 
 Task("Build.Common")
@@ -103,7 +108,32 @@ Task("Publish.MyGet")
 Task("Publish")
     .IsDependentOn("Publish.MyGet");
 
-// Task("Release").IsDependentOn("Release.NuGet").IsDependentOn("Release.GitHub");
+Task("Release")
+//    .IsDependentOn("Release.NuGet")
+    .IsDependentOn("Release.GitHub");
+
+Task("Release.GitHub")
+    .IsDependentOn("Build.WPF")
+    .WithCriteria(GitBranchCurrent(root).CanonicalName == "refs/heads/master")
+    .Does(()=>{
+        Information("Releasing version {0} on Github", SquirrelVersion);
+        
+        var files = new List<string>();
+        foreach(var f in GetFiles(out_squirrel.ToString() + "/**/*")){
+            Information("    {0}", f);
+            files.Add(f.FullPath);            
+        }
+        var filesSrt = String.Join(",",files);
+        GitReleaseManagerCreate("j2ghz", github_token, "j2ghz", "modsink", new GitReleaseManagerCreateSettings {
+            Name              = SquirrelVersion,
+            InputFilePath     = "ReleaseNotesTemplate.md",
+            Prerelease        = true,
+            Assets            = filesSrt
+            //TargetCommitish   = "master",
+            //TargetDirectory   = "c:/repo",
+            //LogFilePath       = "c:/temp/grm.log"
+        });
+    });
 
 Task("NuGet Restore")
     .Does(() => NuGetRestore(solution));
