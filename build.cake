@@ -133,6 +133,7 @@ Task("Release.GitHub")
             //TargetDirectory   = "c:/repo",
             //LogFilePath       = "c:/temp/grm.log"
         });
+        GitReleaseManagerPublish("j2ghz", github_token, "j2ghz", "modsink", Version);
     });
 
 Task("NuGet Restore")
