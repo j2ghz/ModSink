@@ -3,7 +3,7 @@
 #tool "nuget:?package=gitreleasemanager"
 #tool "nuget:?package=GitReleaseNotes"
 #addin "Cake.Squirrel"
-#addin nuget:?package=Cake.Git
+#addin "nuget:?package=Cake.Git"
 
 var target = Argument("target", "Default");
 var configuration = Argument("Configuration", "Release");
@@ -37,15 +37,18 @@ var out_squirrel = root + Directory("Releases");
 
 var SquirrelVersion = "";
 var NuGetVersion = "";
+var Version = "";
 
 Setup(context =>
 {
+    Information("Branch: " + GitBranchCurrent(root).CanonicalName);
     Information("Getting versions");
     var v = GitVersion();
     SquirrelVersion = v.LegacySemVerPadded;
     Information("Version for Squirrel: " + SquirrelVersion);
     NuGetVersion = v.NuGetVersionV2;
     Information("Version for NuGet libraries: " + NuGetVersion);
+    Version = v.FullSemVer;
     Information("Full version info: "+ v.InformationalVersion);
 
     Information("Updating version in AssemblyInfo files");
@@ -121,11 +124,11 @@ Task("Release.GitHub")
         var files = new List<string>();
         foreach(var f in GetFiles(out_squirrel.ToString() + "/**/*")){
             Information("    {0}", f);
-            files.Add(f.FullPath);            
+            files.Add(f.FullPath);
         }
         var filesSrt = String.Join(",",files);
         GitReleaseManagerCreate("j2ghz", github_token, "j2ghz", "modsink", new GitReleaseManagerCreateSettings {
-            Name              = SquirrelVersion,
+            Name              = Version,
             InputFilePath     = "ReleaseNotesTemplate.md",
             Prerelease        = true,
             Assets            = filesSrt
