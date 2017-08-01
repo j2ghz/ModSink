@@ -147,6 +147,8 @@ Task("Build")
     .IsDependentOn("Build.WPF");
 
 Task("Default")
-    .IsDependentOn("Build");
+    .IsDependentOn("Build")
+    .IsDependentOn("Publish")
+    .IsDependentOn("Release");
 
 RunTarget(target);

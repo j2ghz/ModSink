@@ -1,6 +1,6 @@
 version: '{build}'
 build_script:
-- ps: ./build.ps1 -Target Publish
+- ps: ./build.ps1
 artifacts:
   - path: 'Releases\**\*'
     name: Squirrel
