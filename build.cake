@@ -1,9 +1,7 @@
 #tool "nuget:?package=GitVersion.CommandLine"
 #tool "Squirrel.Windows"
 #tool "nuget:?package=gitreleasemanager"
-#tool "nuget:?package=GitReleaseNotes"
 #addin "Cake.Squirrel"
-#addin "nuget:?package=Cake.Git"
 
 var target = Argument("target", "Default");
 var configuration = Argument("Configuration", "Release");
@@ -41,7 +39,6 @@ var Version = "";
 
 Setup(context =>
 {
-    Information("Branch: " + GitBranchCurrent(root).CanonicalName);
     Information("Getting versions");
     var v = GitVersion();
     SquirrelVersion = v.LegacySemVerPadded;
@@ -117,7 +114,7 @@ Task("Release")
 
 Task("Release.GitHub")
     .IsDependentOn("Build.WPF")
-    .WithCriteria(GitBranchCurrent(root).CanonicalName == "refs/heads/master")
+    .WithCriteria(BuildSystem.AppVeyor.IsRunningOnAppVeyor && BuildSystem.AppVeyor.Environment.Repository.Branch == "master")
     .Does(()=>{
         Information("Releasing version {0} on Github", SquirrelVersion);
         
