@@ -4,9 +4,9 @@
 
 var target = Argument("target", "Default");
 var configuration = Argument("Configuration", "Release");
-var key_myget = Argument("ApiKeyMyGet","");
-var key_nuget = Argument("ApiKeyNuGet","");
-var url_myget_push = Argument("MyGetUrl", "https://www.myget.org/F/modsink/api/v2/package");
+var key_myget = EnvironmentVariable("MYGET_KEY") ?? "";
+var key_nuget = EnvironmentVariable("NUGET_KEY") ?? "";
+var url_myget_push = EnvironmentVariable("MYGET_URL") ?? "https://www.myget.org/F/modsink/api/v2/package";
 
 var root = Directory("./");
 var solution = root + File("ModSink.sln");
@@ -79,7 +79,7 @@ Task("Build.Core")
     .IsDependentOn("DotNet Restore")
     .Does(() =>
 {
-    DotNetCorePack(modSinkCommon_csproj, new DotNetCorePackSettings
+    DotNetCorePack(modSinkCore_csproj, new DotNetCorePackSettings
      {
          Configuration = "Release",
          OutputDirectory = out_nuget,
@@ -91,7 +91,7 @@ Task("Publish.MyGet")
     .IsDependentOn("Build.Core")
     .IsDependentOn("Build.Common")
     .Does(()=>{
-        foreach(var nupkg in GetFiles(out_nuget.ToString()+"**/*.nupkg")){
+        foreach(var nupkg in GetFiles(out_nuget.ToString()+"/**/*.nupkg")){
             Information("Publishing: {0}", nupkg);
             NuGetPush(nupkg, new NuGetPushSettings {
                 Source = url_myget_push,
@@ -117,7 +117,6 @@ Task("Build")
     .IsDependentOn("Build.WPF");
 
 Task("Default")
-    .IsDependentOn("Build")
-    .IsDependentOn("Publish");
+    .IsDependentOn("Build");
 
 RunTarget(target);
