@@ -1,8 +1,13 @@
 version: '{build}'
 build_script:
-- ps: ./build.ps1
+- ps: ./build.ps1 -Target Publish
 artifacts:
   - path: 'Releases\**\*'
     name: Squirrel
-  - path: 'artifacts\**\*'
+  - path: 'out\nuget\**\*'
     name: NugetPackages
+environment:
+  MYGET_KEY:
+    secure: fjBIR3on0h9DhbjsADq4JmfReuYticuhhcbm8/HTsC9Jah8tu5MZPJukBKWLeO0Z
+  GITHUB_TOKEN:
+    secure: y8xmU7TusUNNO/qIJfFO4969iu9jcRmnRtLkpGu9ijTC5n8r+8ccXaJohi1XjzLj

@@ -6,6 +6,7 @@ using System.Linq;
 using ModSink.Common;
 using ModSink.Core.Models.Local;
 using System.Threading;
+using System.Diagnostics;
 
 namespace ModSink.CLI
 {
@@ -23,22 +24,12 @@ namespace ModSink.CLI
                 {
                     var pathStr = pathArg.Value ?? ".";
                     var path = Path.Combine(Directory.GetCurrentDirectory(), pathStr);
-
-                    if (!Directory.Exists(path))
-                    {
-                        throw new ArgumentException($"Can't find {path}");
-                    }
-                    Console.WriteLine($"Crawling {path}");
                     IHashFunction<ByteHashValue> xxhash = new XXHash64();
-                    new DirectoryInfo(path).GetFiles("*", SearchOption.AllDirectories)
+                    GetFiles(path)
                     .Select(f =>
                     {
-                        using (var stream = f.OpenRead())
-                        {
-                            var hash = xxhash.ComputeHashAsync(stream, CancellationToken.None).GetAwaiter().GetResult();
-                            Console.WriteLine($"{(f.Length / (1024L * 1024)).ToString().PadLeft(4)}MB: '{hash}' at {f.FullName}");
-                            return new { f, hash };
-                        }
+                        var hash = ComputeHash(f, xxhash);
+                        return new { f, hash };
                     })
                     .GroupBy(a => a.hash.ToString())
                     .Where(g => g.Count() > 1)
@@ -71,34 +62,80 @@ namespace ModSink.CLI
                     var pathStr = pathArg.Value ?? ".";
                     var path = Path.Combine(Directory.GetCurrentDirectory(), pathStr);
 
-                    var files = new List<FileInfo>();
-                    if (File.Exists(path))
-                    {
-                        files.Add(new FileInfo(path));
-                    }
-                    else if (Directory.Exists(path))
-                    {
-                        Console.WriteLine($"Crawling {path}");
-                        files.AddRange(new DirectoryInfo(path).GetFiles("*", SearchOption.AllDirectories));
-                    }
-                    else
-                    {
-                        throw new ArgumentException($"Can't find {path}");
-                    }
-
                     IHashFunction<ByteHashValue> hash = new Common.XXHash64();
-                    foreach (var f in files)
+                    foreach (var f in GetFiles(path))
                     {
-                        using (var stream = f.OpenRead())
-                        {
-                            Console.Write($"{(f.Length / (1024L * 1024)).ToString().PadLeft(4)}MB: ");
-                            Console.WriteLine($"'{hash.ComputeHashAsync(stream, CancellationToken.None).GetAwaiter().GetResult()}' at {f.FullName}");
-                        }
+                        ComputeHash(f, hash);
                     }
                     Console.WriteLine("Done.");
                     return 0;
                 });
             });
+        }
+
+        public static ByteHashValue ComputeHash(FileInfo f, IHashFunction<ByteHashValue> hashf)
+        {
+            using (var stream = f.OpenRead())
+            {
+                var sizeMB = f.Length / (1024L * 1024);
+                var start = DateTime.Now;
+                Console.Write($"{sizeMB.ToString().PadLeft(5)}MB: ");
+                var hash = hashf.ComputeHashAsync(stream, CancellationToken.None).GetAwaiter().GetResult();
+                var elapsed = (DateTime.Now - start).TotalSeconds;
+                var speed = (ulong)(f.Length / elapsed) / (1024UL * 1024UL);
+                Console.WriteLine($"'{hash}' @{speed.ToString().PadLeft(5)}MB/s at {f.FullName}");
+                return hash;
+            }
+        }
+
+        public static IEnumerable<FileInfo> GetFiles(string root)
+        {
+            var dirs = new Stack<string>();
+
+            if (!System.IO.Directory.Exists(root))
+            {
+                throw new ArgumentException();
+            }
+            dirs.Push(root);
+
+            while (dirs.Count > 0)
+            {
+                string currentDir = dirs.Pop();
+                try
+                {
+                    System.IO.Directory.GetDirectories(currentDir).ForEach(dirs.Push);
+                }
+                catch (UnauthorizedAccessException e)
+                {
+                    Console.WriteLine(e.Message);
+                    continue;
+                }
+                catch (System.IO.DirectoryNotFoundException e)
+                {
+                    Console.WriteLine(e.Message);
+                    continue;
+                }
+
+                string[] files;
+                try
+                {
+                    files = System.IO.Directory.GetFiles(currentDir);
+                }
+                catch (UnauthorizedAccessException e)
+                {
+                    Console.WriteLine(e.Message);
+                    continue;
+                }
+                catch (System.IO.DirectoryNotFoundException e)
+                {
+                    Console.WriteLine(e.Message);
+                    continue;
+                }
+                foreach (var f in files.Select(f => new FileInfo(f)))
+                {
+                    yield return f;
+                }
+            }
         }
 
         public static void Main(string[] args)
