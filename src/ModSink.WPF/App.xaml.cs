@@ -42,7 +42,7 @@ namespace ModSink.WPF
             new Task(async () =>
             {
                 this.log.Information("Looking for updates");
-                using (var mgr = await UpdateManager.GitHubUpdateManager("https://github.com/j2ghz/ModSink"))
+                using (var mgr = await UpdateManager.GitHubUpdateManager("https://github.com/j2ghz/ModSink", prerelease: true))
                 {
                     this.log.Information("Currently installed: {version}", mgr.CurrentlyInstalledVersion().ToString());
                     var release = await mgr.UpdateApp(p => this.log.Verbose("Checking updates {progress}", p)).ConfigureAwait(false);
@@ -75,6 +75,7 @@ namespace ModSink.WPF
         {
             log.Information("Setting up exception reporting");
             var ravenClient = new RavenClient("https://410966a6c264489f8123948949c745c7:61776bfffd384fbf8c3b30c0d3ad90fa@sentry.io/189364");
+            ravenClient.Release = FullVersion;
             AppDomain.CurrentDomain.UnhandledException += (sender, args) =>
             {
                 ravenClient.Capture(new SharpRaven.Data.SentryEvent(args.ExceptionObject as Exception));
