@@ -63,7 +63,7 @@ Task("Build.WPF")
         MSBuild(modSinkWpf_csproj, configurator => configurator.SetConfiguration(configuration));
         Information("Pack");
         CreateDirectory(out_squirrel_nupkg);
-        NuGetPack(modSinkWpf_nuspec, new NuGetPackSettings{ BasePath = modSinkWpf_dir, OutputDirectory = out_squirrel_nupkg, Version = SquirrelVersion });
+        NuGetPack(modSinkWpf_nuspec, new NuGetPackSettings{ BasePath = modSinkWpf_dir + Directory("bin") + Directory(configuration), OutputDirectory = out_squirrel_nupkg, Version = SquirrelVersion });
         Information("Releasify");
         Squirrel(out_squirrel_nupkg + File("ModSink.WPF." + SquirrelVersion + ".nupkg"));
     });
