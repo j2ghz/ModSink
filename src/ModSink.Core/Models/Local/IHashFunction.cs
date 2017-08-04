@@ -4,9 +4,8 @@ using System.Threading.Tasks;
 
 namespace ModSink.Core.Models.Local
 {
-    public interface IHashFunction<T>
-        where T : IHashValue
+    public interface IHashFunction
     {
-        Task<T> ComputeHashAsync(Stream data, CancellationToken cancellationToken);
+        Task<IHashValue> ComputeHashAsync(Stream data, CancellationToken cancellationToken);
     }
 }

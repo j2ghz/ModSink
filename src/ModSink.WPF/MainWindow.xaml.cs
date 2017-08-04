@@ -25,6 +25,7 @@ namespace ModSink.WPF
         {
             InitializeComponent();
             this.Title = $"Modsink {typeof(App).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion}";
+            var modsink = new Common.Builder().Build();
         }
     }
 }
