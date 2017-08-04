@@ -16,7 +16,7 @@ namespace ModSink.WPF
     {
         private ILogger log;
 
-        private string FullVersion => typeof(App).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion;
+        private string FullVersion => typeof(App).GetTypeInfo().Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion;
 
         protected override void OnStartup(StartupEventArgs e)
         {

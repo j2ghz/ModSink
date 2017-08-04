@@ -24,7 +24,7 @@ namespace ModSink.CLI
                 {
                     var pathStr = pathArg.Value ?? ".";
                     var path = Path.Combine(Directory.GetCurrentDirectory(), pathStr);
-                    IHashFunction<ByteHashValue> xxhash = new XXHash64();
+                    IHashFunction xxhash = new XXHash64();
                     GetFiles(path)
                     .Select(f =>
                     {
@@ -62,7 +62,7 @@ namespace ModSink.CLI
                     var pathStr = pathArg.Value ?? ".";
                     var path = Path.Combine(Directory.GetCurrentDirectory(), pathStr);
 
-                    IHashFunction<ByteHashValue> hash = new Common.XXHash64();
+                    IHashFunction hash = new Common.XXHash64();
                     foreach (var f in GetFiles(path))
                     {
                         ComputeHash(f, hash);
@@ -73,7 +73,7 @@ namespace ModSink.CLI
             });
         }
 
-        public static ByteHashValue ComputeHash(FileInfo f, IHashFunction<ByteHashValue> hashf)
+        public static IHashValue ComputeHash(FileInfo f, IHashFunction hashf)
         {
             using (var stream = f.OpenRead())
             {

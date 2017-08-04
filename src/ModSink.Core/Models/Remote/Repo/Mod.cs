@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using ModSink.Core.Models.Local;
+using System.Collections.Generic;
 
 namespace ModSink.Core.Models.Remote.Repo
 {
