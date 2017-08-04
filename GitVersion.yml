@@ -1,8 +1,4 @@
-assembly-versioning-scheme: MajorMinorPatch
 mode: ContinuousDeployment
-branches:
-  master:
-    mode: ContinuousDeployment
-    tag: ''
+branches: {}
 ignore:
   sha: []
