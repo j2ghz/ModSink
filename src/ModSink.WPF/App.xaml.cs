@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
@@ -81,7 +81,7 @@ namespace ModSink.WPF
         {
             log.Information("Setting up exception reporting");
             var ravenClient = new RavenClient("https://410966a6c264489f8123948949c745c7:61776bfffd384fbf8c3b30c0d3ad90fa@sentry.io/189364");
-            ravenClient.Release = FullVersion;
+            ravenClient.Release = FullVersion.Split("+").First();
             AppDomain.CurrentDomain.UnhandledException += (sender, args) =>
             {
                 ravenClient.Capture(new SharpRaven.Data.SentryEvent(args.ExceptionObject as Exception));
