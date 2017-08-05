@@ -12,12 +12,7 @@ namespace ModSink.Common
     [Export(typeof(IModSink))]
     public class ModSink : IModSink
     {
-        private readonly IHashFunction hashFunction;
-
-        [ImportingConstructor]
-        public ModSink(IHashFunction hashFunction)
-        {
-            this.hashFunction = hashFunction;
-        }
+        [Import]
+        public IHashFunction HashFunction { get; }
     }
 }

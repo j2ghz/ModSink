@@ -14,6 +14,7 @@ namespace ModSink.Common
         public IModSink Build()
         {
             var container = config.CreateContainer();
+
             return container.GetExport<IModSink>();
         }
     }
