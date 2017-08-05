@@ -60,7 +60,7 @@ Task("Build.WPF")
     .WithCriteria(IsRunningOnWindows())
     .Does(() =>
     {
-        MSBuild(modSinkWpf_csproj, configurator => configurator.SetConfiguration(configuration));
+        MSBuild(modSinkWpf_csproj, configurator => configurator.SetConfiguration(configuration).UseToolVersion(MSBuildToolVersion.VS2017));
         Information("Pack");
         CreateDirectory(out_squirrel_nupkg);
         NuGetPack(modSinkWpf_nuspec, new NuGetPackSettings{ BasePath = modSinkWpf_dir + Directory("bin") + Directory(configuration), OutputDirectory = out_squirrel_nupkg, Version = SquirrelVersion });
