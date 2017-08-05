@@ -16,7 +16,7 @@ namespace ModSink.WPF
     {
         private ILogger log;
 
-        private string FullVersion => typeof(App).GetTypeInfo().Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion;
+        private string FullVersion => typeof(App).GetTypeInfo().Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion;
 
         protected override void OnStartup(StartupEventArgs e)
         {
@@ -33,6 +33,7 @@ namespace ModSink.WPF
             {
                 CheckUpdates();
             }
+            LoadPlugins();
             log.Information("Starting UI");
             base.OnStartup(e);
         }
@@ -49,6 +50,11 @@ namespace ModSink.WPF
                     this.log.Information($"New version: {release.Version}");
                 }
             }).Start();
+        }
+
+        private void LoadPlugins()
+        {
+            var modsink = new Common.Builder().Build();
         }
 
         private void SetupLogging()
