@@ -1,4 +1,5 @@
 ﻿using ModSink.WPF.ViewModel;
+using Squirrel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,9 +21,9 @@ namespace ModSink.WPF.View
     /// </summary>
     public partial class UpdatesView : Window
     {
-        public UpdatesView(Updates ViewModel)
+        public UpdatesView()
         {
-            this.ViewModel = ViewModel;
+            this.ViewModel = new Updates();
             InitializeComponent();
             this.DataContext = this.ViewModel;
         }

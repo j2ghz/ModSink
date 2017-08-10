@@ -10,9 +10,9 @@ namespace ModSink.WPF.ViewModel
 {
     public class Updates : ReactiveObject
     {
-        public Updates(UpdateManager mgr)
+        public Updates()
         {
-            this.mgr = mgr;
+            mgr = UpdateManager.GitHubUpdateManager("https://github.com/j2ghz/ModSink", prerelease: true).GetAwaiter().GetResult();
 
             var chk = ReactiveCommand.CreateFromTask(async () => await this.mgr.CheckForUpdate());
             chk.ToProperty(this, x => x.UpdateInfo);
@@ -27,7 +27,8 @@ namespace ModSink.WPF.ViewModel
         public ReactiveCommand Download { get; protected set; }
         public ReactiveCommand CheckUpdate { get; protected set; }
 
+        public Squirrel.UpdateManager mgr { get; set; }
+
         public UpdateInfo UpdateInfo { get; set; }
-        private Squirrel.UpdateManager mgr { get; }
     }
 }

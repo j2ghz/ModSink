@@ -45,24 +45,6 @@ namespace ModSink.WPF
 
         private void CheckUpdates()
         {
-            var task = new Task(async () =>
-            {
-                this.log.Information("Looking for updates");
-                try
-                {
-                    using (var mgr = await UpdateManager.GitHubUpdateManager("https://github.com/j2ghz/ModSink", prerelease: true))
-                    {
-                        var updates = new UpdatesView(new ViewModel.Updates(mgr));
-                        updates.ShowDialog();
-                    }
-                }
-                catch (Exception e)
-                {
-                    Log.ForContext<UpdateManager>().Error(e, "Exception during update checking");
-                    UpdateFailed(this, e);
-                }
-            });
-            task.Start();
         }
 
         private void LoadPlugins()
