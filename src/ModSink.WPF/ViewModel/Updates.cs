@@ -1,4 +1,6 @@
-﻿using System;
+﻿using ReactiveUI;
+using Squirrel;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,43 +8,26 @@ using System.Threading.Tasks;
 
 namespace ModSink.WPF.ViewModel
 {
-    public class Updates : ObservableObject
+    public class Updates : ReactiveObject
     {
-        private readonly ObservableCollection<string> _history = new ObservableCollection<string>();
-        private readonly TextConverter _textConverter = new TextConverter(s => s.ToUpper());
-        private string _someText;
-
-        public ICommand ConvertTextCommand
+        public Updates(UpdateManager mgr)
         {
-            get { return new DelegateCommand(ConvertText); }
+            this.mgr = mgr;
+
+            var chk = ReactiveCommand.CreateFromTask(async () => await this.mgr.CheckForUpdate());
+            chk.ToProperty(this, x => x.UpdateInfo);
+            this.CheckUpdate = chk;
+
+            Download = ReactiveCommand.CreateFromTask<IEnumerable<ReleaseEntry>>(async (releases) => await mgr.DownloadReleases(releases));
+
+            ApplyUpdate = ReactiveCommand.CreateFromTask<UpdateInfo>(async (updateInfo) => await mgr.ApplyReleases(updateInfo));
         }
 
-        public IEnumerable<string> History
-        {
-            get { return _history; }
-        }
+        public ReactiveCommand ApplyUpdate { get; protected set; }
+        public ReactiveCommand Download { get; protected set; }
+        public ReactiveCommand CheckUpdate { get; protected set; }
 
-        public string SomeText
-        {
-            get { return _someText; }
-            set
-            {
-                _someText = value;
-                RaisePropertyChangedEvent("SomeText");
-            }
-        }
-
-        private void AddToHistory(string item)
-        {
-            if (!_history.Contains(item))
-                _history.Add(item);
-        }
-
-        private void ConvertText()
-        {
-            if (string.IsNullOrWhiteSpace(SomeText)) return;
-            AddToHistory(_textConverter.ConvertText(SomeText));
-            SomeText = string.Empty;
-        }
+        public UpdateInfo UpdateInfo { get; set; }
+        private Squirrel.UpdateManager mgr { get; }
     }
 }

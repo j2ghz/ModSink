@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ModSink.WPF.ViewModel;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -15,13 +16,17 @@ using System.Windows.Shapes;
 namespace ModSink.WPF.View
 {
     /// <summary>
-    /// Interaction logic for Updates.xaml
+    /// Interaction logic for UpdatesView.xaml
     /// </summary>
-    public partial class Updates : Window
+    public partial class UpdatesView : Window
     {
-        public Updates()
+        public UpdatesView(Updates ViewModel)
         {
+            this.ViewModel = ViewModel;
             InitializeComponent();
+            this.DataContext = this.ViewModel;
         }
+
+        public ViewModel.Updates ViewModel { get; private set; }
     }
 }
