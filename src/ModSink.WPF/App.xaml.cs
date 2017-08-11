@@ -45,6 +45,7 @@ namespace ModSink.WPF
 
         private void CheckUpdates()
         {
+            new UpdatesView().ShowDialog();
         }
 
         private void LoadPlugins()
