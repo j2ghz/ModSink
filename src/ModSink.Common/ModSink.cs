@@ -14,5 +14,8 @@ namespace ModSink.Common
     {
         [Import]
         public IHashFunction HashFunction { get; }
+
+        [Import]
+        public IManager Manager { get; }
     }
 }

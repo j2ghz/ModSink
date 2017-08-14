@@ -11,10 +11,15 @@ namespace ModSink.Common
     {
         private ContainerConfiguration config = new ContainerConfiguration().WithAssembly(typeof(Builder).GetTypeInfo().Assembly);
 
+        public Builder AddAssembly(Assembly assembly)
+        {
+            config.WithAssembly(assembly);
+            return this;
+        }
+
         public IModSink Build()
         {
             var container = config.CreateContainer();
-
             return container.GetExport<IModSink>();
         }
     }

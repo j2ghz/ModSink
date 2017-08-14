@@ -8,5 +8,7 @@ namespace ModSink.Core.Models
     public interface IModSink
     {
         IHashFunction HashFunction { get; }
+
+        IManager Manager { get; }
     }
 }
