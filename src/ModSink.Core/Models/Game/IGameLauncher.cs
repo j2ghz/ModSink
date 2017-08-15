@@ -1,9 +1,8 @@
 ﻿namespace ModSink.Core.Models.Game
 {
-    public interface IGameLauncher<TConfig>
-        where TConfig : IGameConfig
+    public interface IGameLauncher
     {
-        TConfig Configuration { get; set; }
+        IGameConfig Configuration { get; set; }
 
         string Name { get; }
     }

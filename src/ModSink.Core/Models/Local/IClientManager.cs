@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace ModSink.Core.Models.Local
 {
-    public interface IManager
+    public interface IClientManager
     {
         Task DownloadMissingFiles(Modpack modpack);
 
