@@ -1,18 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using ModSink.WPF.ViewModel;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace ModSink.WPF
 {
@@ -24,7 +12,13 @@ namespace ModSink.WPF
         public MainWindow()
         {
             InitializeComponent();
+
             this.Title = $"Modsink {typeof(App).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion}";
+
+            AppBootstrapper = new AppBootstrapper();
+            DataContext = AppBootstrapper;
         }
+
+        public AppBootstrapper AppBootstrapper { get; protected set; }
     }
 }
