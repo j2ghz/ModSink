@@ -51,8 +51,11 @@ namespace ModSink.WPF
                 {
                     using (var mgr = await UpdateManager.GitHubUpdateManager("https://github.com/j2ghz/ModSink", prerelease: true))
                     {
-                        var release = await mgr.UpdateApp(i => Log.ForContext<UpdateManager>().Debug("Update progress: {progress}", i));
-                        this.log.Debug("New version: {version}", release);
+                        if (mgr.IsInstalledApp)
+                        {
+                            var release = await mgr.UpdateApp(i => Log.ForContext<UpdateManager>().Debug("Update progress: {progress}", i));
+                            this.log.Debug("New version: {version}", release);
+                        }
                     }
                 }
                 catch (Exception e)
@@ -92,7 +95,7 @@ namespace ModSink.WPF
         {
             log.Information("Setting up exception reporting");
             var ravenClient = new RavenClient("https://410966a6c264489f8123948949c745c7:61776bfffd384fbf8c3b30c0d3ad90fa@sentry.io/189364");
-            ravenClient.Release = FullVersion.Split('+').First();
+            ravenClient.Release = FullVersion?.Split('+').First();
             ravenClient.ErrorOnCapture = exception =>
             {
                 Log.ForContext<RavenClient>().Error(exception, "Sentry error reporting encountered an exception");

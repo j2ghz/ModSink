@@ -94,6 +94,9 @@
     <Reference Include="Splat, Version=1.6.2.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Splat.1.6.2\lib\Net45\Splat.dll</HintPath>
     </Reference>
+    <Reference Include="Splat.Serilog, Version=1.0.3.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Splat.Serilog.1.0.3-Beta\lib\net45\Splat.Serilog.dll</HintPath>
+    </Reference>
     <Reference Include="Squirrel, Version=1.7.6.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\..\packages\squirrel.windows.1.7.6\lib\Net45\Squirrel.dll</HintPath>
     </Reference>

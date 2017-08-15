@@ -1,4 +1,5 @@
 ﻿using ModSink.WPF.ViewModel;
+using System.Reflection;
 using System.Windows;
 
 namespace ModSink.WPF
@@ -11,6 +12,8 @@ namespace ModSink.WPF
         public MainWindow()
         {
             InitializeComponent();
+
+            this.Title = $"Modsink {typeof(App).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion}";
 
             AppBootstrapper = new AppBootstrapper();
             DataContext = AppBootstrapper;

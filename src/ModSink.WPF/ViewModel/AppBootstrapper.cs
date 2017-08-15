@@ -22,6 +22,7 @@ namespace ModSink.WPF.ViewModel
             // TODO: This is a good place to set up any other app
             // startup tasks, like setting the logging level
             LogHost.Default.Level = LogLevel.Debug;
+            Splat.Serilog.Registration.Register(Serilog.Log.Logger.ForContext<Splat.ILogger>());
 
             // Navigate to the opening page of the application
             Router.Navigate.Execute(new LibraryViewModel(this));
