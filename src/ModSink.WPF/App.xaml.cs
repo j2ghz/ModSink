@@ -9,7 +9,6 @@ using Squirrel;
 using Serilog;
 using SharpRaven;
 using System.Reflection;
-using ModSink.WPF.View;
 
 namespace ModSink.WPF
 {
@@ -45,7 +44,24 @@ namespace ModSink.WPF
 
         private void CheckUpdates()
         {
-            new UpdatesView().ShowDialog();
+            var task = new Task(async () =>
+            {
+                this.log.Information("Looking for updates");
+                try
+                {
+                    using (var mgr = await UpdateManager.GitHubUpdateManager("https://github.com/j2ghz/ModSink", prerelease: true))
+                    {
+                        var release = await mgr.UpdateApp(i => Log.ForContext<UpdateManager>().Debug("Update progress: {progress}", i));
+                        this.log.Debug("New version: {version}", release);
+                    }
+                }
+                catch (Exception e)
+                {
+                    Log.ForContext<UpdateManager>().Error(e, "Exception during update checking");
+                    UpdateFailed(this, e);
+                }
+            });
+            task.Start();
         }
 
         private void LoadPlugins()

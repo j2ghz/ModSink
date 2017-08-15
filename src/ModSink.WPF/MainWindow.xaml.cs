@@ -1,4 +1,4 @@
-﻿using ModSink.WPF.ViewModels;
+﻿using ModSink.WPF.ViewModel;
 using System.Windows;
 
 namespace ModSink.WPF
