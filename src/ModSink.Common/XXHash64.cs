@@ -12,7 +12,7 @@ namespace ModSink.Common
         {
         }
 
-        async Task<HashValue> IHashFunction.ComputeHashAsync(Stream data, CancellationToken cancellationToken)
+        public async Task<HashValue> ComputeHashAsync(Stream data, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
             var hash = await base.ComputeHashAsync(data);

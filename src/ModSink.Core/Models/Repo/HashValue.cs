@@ -14,7 +14,7 @@ namespace ModSink.Core.Models.Repo
 
         public byte[] Value { get; }
 
-        public bool Equals(HashValue other) => this.Value.Equals(other.Value);
+        public bool Equals(HashValue other) => this.Value.SequenceEqual(other.Value);
 
         public override int GetHashCode() => this.Value.GetHashCode();
 
