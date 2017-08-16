@@ -1,21 +1,12 @@
-﻿using ModSink.Core.Models;
-using ModSink.Core.Models.Local;
-using System;
-using System.Collections.Generic;
-using System.Composition;
-using System.IO;
-using System.Text;
-using System.Threading;
+﻿using ModSink.Core;
+using ModSink.Core.Local;
 
 namespace ModSink.Common
 {
-    [Export(typeof(IModSink))]
     public class ModSink : IModSink
     {
-        [Import]
+        public IClientManager Client { get; }
         public IHashFunction HashFunction { get; }
-
-        [Import]
-        public IClientManager Manager { get; }
+        public IServerManager Server { get; }
     }
 }

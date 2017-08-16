@@ -1,17 +1,19 @@
-﻿using ModSink.Core.Models.Game;
-using ModSink.Core.Models.Remote.Repo;
+﻿using ModSink.Core.Game;
+using ModSink.Core.Models.Repo;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
+using System.Threading.Tasks;
 
-namespace ModSink.Core.Models.Local
+namespace ModSink.Core.Local
 {
     public interface IServerManager
     {
         IEnumerable<IGameLauncher> Games { get; }
 
-        IObservable<(IHashValue, FileInfo)> GetFileHashes(DirectoryInfo directory);
-
         Task<(IHashValue, FileInfo)> GetFileHash(FileInfo file);
+
+        IObservable<(IHashValue, FileInfo)> GetFileHashes(DirectoryInfo directory);
     }
 }

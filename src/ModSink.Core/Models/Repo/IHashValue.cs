@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ModSink.Core.Models.Remote.Repo
+namespace ModSink.Core.Models.Repo
 {
     /// <summary>
     /// Represents a hash

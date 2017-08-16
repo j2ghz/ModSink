@@ -1,5 +1,5 @@
 ﻿using ModSink.Core.Models;
-using ModSink.Core.Models.Local;
+using ModSink.Core.Models.Repo;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;

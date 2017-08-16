@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ModSink.Core.Models.Remote.Group
+namespace ModSink.Core.Models.Group
 {
     public class RepoInfo
     {

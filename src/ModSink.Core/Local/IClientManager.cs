@@ -1,11 +1,10 @@
-﻿using ModSink.Core.Models.Remote.Group;
-using ModSink.Core.Models.Remote.Repo;
+﻿using ModSink.Core.Models.Repo;
 using System;
 using System.Collections;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace ModSink.Core.Models.Local
+namespace ModSink.Core.Local
 {
     public interface IClientManager
     {

@@ -1,10 +1,10 @@
-﻿using ModSink.Core.Models.Remote.Repo;
+﻿using ModSink.Core.Models.Repo;
 using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ModSink.Core.Models.Local
+namespace ModSink.Core.Local
 {
     internal interface IFileSystem
     {

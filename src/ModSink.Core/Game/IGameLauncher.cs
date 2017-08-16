@@ -1,4 +1,4 @@
-﻿namespace ModSink.Core.Models.Game
+﻿namespace ModSink.Core.Game
 {
     public interface IGameLauncher
     {

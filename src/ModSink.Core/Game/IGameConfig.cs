@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace ModSink.Core.Models.Game
+namespace ModSink.Core.Game
 {
     public interface IGameConfig
     {

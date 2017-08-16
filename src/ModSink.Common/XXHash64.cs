@@ -1,13 +1,12 @@
-﻿using ModSink.Core.Models;
-using ModSink.Core.Models.Local;
-using System.Composition;
+﻿using ModSink.Core.Local;
+using ModSink.Core.Models;
+using ModSink.Core.Models.Repo;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace ModSink.Common
 {
-    [Export(typeof(IHashFunction))]
     public class XXHash64 : System.Data.HashFunction.xxHash, IHashFunction
     {
         async Task<IHashValue> IHashFunction.ComputeHashAsync(Stream data, CancellationToken cancellationToken)

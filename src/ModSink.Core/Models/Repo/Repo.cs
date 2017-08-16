@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace ModSink.Core.Models.Remote.Repo
+namespace ModSink.Core.Models.Repo
 {
     public class Repo
     {

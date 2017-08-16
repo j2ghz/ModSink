@@ -1,7 +1,6 @@
-﻿using ModSink.Core.Models.Local;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
-namespace ModSink.Core.Models.Remote.Repo
+namespace ModSink.Core.Models.Repo
 {
     public class Mod
     {
