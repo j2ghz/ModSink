@@ -12,8 +12,8 @@ namespace ModSink.Core
     {
         Task<HashValue> GetFileHash(FileInfo file, CancellationToken cancellationToken);
 
-        IObservable<(HashValue, FileInfo)> GetFileHashes(DirectoryInfo directory);
+        IObservable<(HashValue hash, FileInfo file)> GetFileHashes(DirectoryInfo directory);
 
-        IObservable<(HashValue, FileInfo)> GetFileHashes(IEnumerable<FileInfo> files);
+        IObservable<(HashValue hash, FileInfo file)> GetFileHashes(IEnumerable<FileInfo> files);
     }
 }

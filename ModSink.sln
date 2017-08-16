@@ -11,7 +11,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModSink.Common", "src\ModSi
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModSink.CLI", "src\ModSink.CLI\ModSink.CLI.csproj", "{FEF0D59D-0AF5-4943-9BF2-3A3266E844A7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Modsink.Common.Tests", "Modsink.Common.Tests\Modsink.Common.Tests.csproj", "{E8D1C801-3A45-40CC-B749-119153330660}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Modsink.Common.Tests", "src\Modsink.Common.Tests\Modsink.Common.Tests.csproj", "{E8D1C801-3A45-40CC-B749-119153330660}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

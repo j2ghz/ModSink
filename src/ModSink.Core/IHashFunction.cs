@@ -9,6 +9,8 @@ namespace ModSink.Core
 {
     public interface IHashFunction
     {
+        HashValue HashOfEmpty { get; }
+
         Task<HashValue> ComputeHashAsync(Stream data, CancellationToken cancellationToken);
     }
 }

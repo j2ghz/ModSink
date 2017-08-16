@@ -6,13 +6,14 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.0.0" />
+    <PackageReference Include="Microsoft.Reactive.Testing" Version="3.1.1" />
     <PackageReference Include="xunit" Version="2.2.0" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.2.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\src\ModSink.Common\ModSink.Common.csproj" />
-    <ProjectReference Include="..\src\ModSink.Core\ModSink.Core.csproj" />
+    <ProjectReference Include="..\ModSink.Common\ModSink.Common.csproj" />
+    <ProjectReference Include="..\ModSink.Core\ModSink.Core.csproj" />
   </ItemGroup>
 
   <ItemGroup>
