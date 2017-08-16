@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace ModSink.Core
+namespace ModSink.Core.Server
 {
-    public interface IGameConfig
+    public class ModBuilder
     {
     }
 }

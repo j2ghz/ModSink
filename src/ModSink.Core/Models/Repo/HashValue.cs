@@ -12,8 +12,6 @@ namespace ModSink.Core.Models.Repo
 
         public HashValue(IEnumerable<byte> value) => this.Value = value.ToArray();
 
-        public HashValue(string base64string) => this.Value = Convert.FromBase64String(base64string);
-
         public byte[] Value { get; }
 
         public bool Equals(HashValue other) => this.Value.Equals(other.Value);

@@ -4,50 +4,52 @@ using System.IO;
 using System;
 using System.Linq;
 using ModSink.Common;
-using ModSink.Core.Models.Local;
 using System.Threading;
 using System.Diagnostics;
+using ModSink.Core;
+using System.Reactive;
+using ModSink.Core.Models.Repo;
 
 namespace ModSink.CLI
 {
     public static class Program
     {
-        public static void AddColCheck(this CommandLineApplication app)
-        {
-            app.Command("collcheck", (command) =>
-            {
-                command.Description = "Checks files for collisions";
-                command.HelpOption("-?|-h|--help");
-                var pathArg = command.Argument("[path]", "Path to folder");
+        //public static void AddColCheck(this CommandLineApplication app)
+        //{
+        //    app.Command("collcheck", (command) =>
+        //    {
+        //        command.Description = "Checks files for collisions";
+        //        command.HelpOption("-?|-h|--help");
+        //        var pathArg = command.Argument("[path]", "Path to folder");
 
-                command.OnExecute(() =>
-                {
-                    var pathStr = pathArg.Value ?? ".";
-                    var path = Path.Combine(Directory.GetCurrentDirectory(), pathStr);
-                    IHashFunction xxhash = new XXHash64();
-                    GetFiles(path)
-                    .Select(f =>
-                    {
-                        var hash = ComputeHash(f, xxhash);
-                        return new { f, hash };
-                    })
-                    .GroupBy(a => a.hash.ToString())
-                    .Where(g => g.Count() > 1)
-                    .ForEach(g =>
-                    {
-                        Console.WriteLine(g.Key);
-                        foreach (var i in g)
-                        {
-                            Console.WriteLine($"    {i.f.FullName}");
-                        }
-                        Console.WriteLine();
-                    });
+        //        command.OnExecute(() =>
+        //        {
+        //            var pathStr = pathArg.Value ?? ".";
+        //            var path = Path.Combine(Directory.GetCurrentDirectory(), pathStr);
+        //            IHashFunction xxhash = new XXHash64();
+        //            GetFiles(path)
+        //            .Select(f =>
+        //            {
+        //                var hash = ComputeHash(f, xxhash);
+        //                return new { f, hash };
+        //            })
+        //            .GroupBy(a => a.hash.ToString())
+        //            .Where(g => g.Count() > 1)
+        //            .ForEach(g =>
+        //            {
+        //                Console.WriteLine(g.Key);
+        //                foreach (var i in g)
+        //                {
+        //                    Console.WriteLine($"    {i.f.FullName}");
+        //                }
+        //                Console.WriteLine();
+        //            });
 
-                    Console.WriteLine("Done.");
-                    return 0;
-                });
-            });
-        }
+        //            Console.WriteLine("Done.");
+        //            return 0;
+        //        });
+        //    });
+        //}
 
         public static void AddHash(this CommandLineApplication app)
         {
@@ -62,31 +64,32 @@ namespace ModSink.CLI
                     var pathStr = pathArg.Value ?? ".";
                     var path = Path.Combine(Directory.GetCurrentDirectory(), pathStr);
 
-                    IHashFunction hash = new Common.XXHash64();
-                    foreach (var f in GetFiles(path))
-                    {
-                        ComputeHash(f, hash);
-                    }
+                    var hash = new Hashing(new XXHash64());
+
+                    var hashes = hash.GetFileHashes(new DirectoryInfo(path));
+
+                    hashes.Subscribe(Observer.Create<(HashValue, FileInfo)>(a => Console.WriteLine($"{a.Item1.ToString()} {a.Item2.FullName}")));
+
                     Console.WriteLine("Done.");
                     return 0;
                 });
             });
         }
 
-        public static IHashValue ComputeHash(FileInfo f, IHashFunction hashf)
-        {
-            using (var stream = f.OpenRead())
-            {
-                var sizeMB = f.Length / (1024L * 1024);
-                var start = DateTime.Now;
-                Console.Write($"{sizeMB.ToString().PadLeft(5)}MB: ");
-                var hash = hashf.ComputeHashAsync(stream, CancellationToken.None).GetAwaiter().GetResult();
-                var elapsed = (DateTime.Now - start).TotalSeconds;
-                var speed = (ulong)(f.Length / elapsed) / (1024UL * 1024UL);
-                Console.WriteLine($"'{hash}' @{speed.ToString().PadLeft(5)}MB/s at {f.FullName}");
-                return hash;
-            }
-        }
+        //public static IHashValue ComputeHash(FileInfo f, IHashFunction hashf)
+        //{
+        //    using (var stream = f.OpenRead())
+        //    {
+        //        var sizeMB = f.Length / (1024L * 1024);
+        //        var start = DateTime.Now;
+        //        Console.Write($"{sizeMB.ToString().PadLeft(5)}MB: ");
+        //        var hash = hashf.ComputeHashAsync(stream, CancellationToken.None).GetAwaiter().GetResult();
+        //        var elapsed = (DateTime.Now - start).TotalSeconds;
+        //        var speed = (ulong)(f.Length / elapsed) / (1024UL * 1024UL);
+        //        Console.WriteLine($"'{hash}' @{speed.ToString().PadLeft(5)}MB/s at {f.FullName}");
+        //        return hash;
+        //    }
+        //}
 
         public static IEnumerable<FileInfo> GetFiles(string root)
         {
@@ -145,7 +148,7 @@ namespace ModSink.CLI
             app.HelpOption("-?|-h|--help");
 
             app.AddHash();
-            app.AddColCheck();
+            //app.AddColCheck();
 
             app.Execute(args);
         }
