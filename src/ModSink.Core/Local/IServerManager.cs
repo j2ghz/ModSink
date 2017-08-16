@@ -12,8 +12,8 @@ namespace ModSink.Core.Local
     {
         IEnumerable<IGameLauncher> Games { get; }
 
-        Task<(IHashValue, FileInfo)> GetFileHash(FileInfo file);
+        Task<(HashValue, FileInfo)> GetFileHash(FileInfo file);
 
-        IObservable<(IHashValue, FileInfo)> GetFileHashes(DirectoryInfo directory);
+        IObservable<(HashValue, FileInfo)> GetFileHashes(DirectoryInfo directory);
     }
 }

@@ -7,6 +7,6 @@ namespace ModSink.Core.Local
 {
     public interface IHashFunction
     {
-        Task<IHashValue> ComputeHashAsync(Stream data, CancellationToken cancellationToken);
+        Task<HashValue> ComputeHashAsync(Stream data, CancellationToken cancellationToken);
     }
 }

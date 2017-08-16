@@ -9,11 +9,11 @@ namespace ModSink.Common
 {
     public class XXHash64 : System.Data.HashFunction.xxHash, IHashFunction
     {
-        async Task<IHashValue> IHashFunction.ComputeHashAsync(Stream data, CancellationToken cancellationToken)
+        async Task<HashValue> IHashFunction.ComputeHashAsync(Stream data, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
             var hash = await base.ComputeHashAsync(data);
-            return new ByteHashValue(hash);
+            return new HashValue(hash);
         }
     }
 }

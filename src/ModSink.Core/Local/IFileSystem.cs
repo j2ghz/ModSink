@@ -8,6 +8,6 @@ namespace ModSink.Core.Local
 {
     internal interface IFileSystem
     {
-        Task LinkFile(IHashValue file, string path);
+        Task LinkFile(HashValue file, string path);
     }
 }

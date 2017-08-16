@@ -10,7 +10,7 @@ namespace ModSink.Core.Local
     {
         Task DownloadMissingFiles(Modpack modpack);
 
-        IObservable<IHashValue> GetMissingFiles(Modpack modpack);
+        IObservable<HashValue> GetMissingFiles(Modpack modpack);
 
         IObservable<Modpack> GetModpacks();
     }
