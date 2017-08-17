@@ -69,7 +69,6 @@ namespace ModSink.WPF
 
         private void LoadPlugins()
         {
-            var modsink = new Common.Builder().Build();
         }
 
         private void SetupLogging()
