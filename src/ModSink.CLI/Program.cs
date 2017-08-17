@@ -9,6 +9,7 @@ using System.Diagnostics;
 using ModSink.Core;
 using System.Reactive;
 using ModSink.Core.Models.Repo;
+using System.IO.MemoryMappedFiles;
 
 namespace ModSink.CLI
 {
@@ -76,6 +77,7 @@ namespace ModSink.CLI
             });
         }
 
+
         //public static IHashValue ComputeHash(FileInfo f, IHashFunction hashf)
         //{
         //    using (var stream = f.OpenRead())
@@ -90,6 +92,31 @@ namespace ModSink.CLI
         //        return hash;
         //    }
         //}
+
+        public static IHashValue ComputeHash(FileInfo f, IHashFunction hashf)
+        {
+            try
+            {
+                using (var stream = MemoryMappedFile.CreateFromFile(f.FullName).CreateViewStream())
+                {
+                    var sizeMB = f.Length / (1024L * 1024);
+                    var start = DateTime.Now;
+                    Console.Write($"{sizeMB.ToString().PadLeft(5)}MB: ");
+                    var hash = hashf.ComputeHashAsync(stream, CancellationToken.None).GetAwaiter().GetResult();
+                    var elapsed = (DateTime.Now - start).TotalSeconds;
+                    var speed = (ulong)(f.Length / elapsed) / (1024UL * 1024UL);
+                    Console.WriteLine($"'{hash}' @{speed.ToString().PadLeft(5)}MB/s at {f.FullName}");
+                    return hash;
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine();
+                Console.Error.WriteLine(e.ToString());
+                return new ByteHashValue(new byte[] { 0 });
+            }
+        }
+
 
         public static IEnumerable<FileInfo> GetFiles(string root)
         {

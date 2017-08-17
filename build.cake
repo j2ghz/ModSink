@@ -26,8 +26,13 @@ var modSinkCore_csproj = modSinkCore_dir + File("ModSink.Core.csproj");
 var modSinkCommon_dir = src + Directory("ModSink.Common");
 var modSinkCommon_csproj = modSinkCommon_dir + File("ModSink.Common.csproj");
 
+
 var modSinkCommonTests_dir = src + Directory("ModSink.Common.Tests");
 var modSinkCommonTests_csproj = modSinkCommonTests_dir + File("ModSink.Common.Tests.csproj");
+
+var modSinkServer_dir = src + Directory("ModSink.Server");
+var modSinkServer_csproj = modSinkServer_dir + File("ModSink.Server.csproj");
+
 
 var modSinkCli_dir = src + Directory("ModSink.CLI");
 var modSinkCli_csproj = modSinkCli_dir + File("ModSink.CLI.csproj");
@@ -36,6 +41,7 @@ var output = root + Directory("out");
 var out_nuget = output + Directory("nuget");
 var out_squirrel_nupkg = output + Directory("squirrel");
 var out_squirrel = root + Directory("Releases");
+var out_server = output + Directory("server");
 
 var SquirrelVersion = "";
 var NuGetVersion = "";
@@ -80,6 +86,17 @@ Task("Build.WPF")
         Information("Releasify");
         Squirrel(out_squirrel_nupkg + File("ModSink.WPF." + SquirrelVersion + ".nupkg"));
     });
+
+Task("Build.Server")
+    .IsDependentOn("DotNet Restore")
+    .Does(() =>
+{
+    DotNetCorePublish(modSinkServer_csproj, new DotNetCorePublishSettings
+     {
+         Configuration = "Release",
+         OutputDirectory = out_server
+     });
+});
 
 Task("Build.Common")
     .IsDependentOn("DotNet Restore")
@@ -159,6 +176,7 @@ Task("DotNet Restore")
 Task("Build")
     .IsDependentOn("Build.Core")
     .IsDependentOn("Build.Common")
+    .IsDependentOn("Build.Server")
     .IsDependentOn("Build.WPF");
 
 Task("Default")
