@@ -2,6 +2,7 @@
 #tool "Squirrel.Windows"
 #tool "nuget:?package=gitreleasemanager"
 #addin "Cake.Squirrel"
+#tool "nuget:?package=xunit.runner.console&version=2.2.0"
 
 var target = Argument("target", "Default");
 var configuration = Argument("Configuration", "Release");
@@ -24,6 +25,9 @@ var modSinkCore_csproj = modSinkCore_dir + File("ModSink.Core.csproj");
 
 var modSinkCommon_dir = src + Directory("ModSink.Common");
 var modSinkCommon_csproj = modSinkCommon_dir + File("ModSink.Common.csproj");
+
+var modSinkCommonTests_dir = src + Directory("ModSink.Common.Tests");
+var modSinkCommonTests_csproj = modSinkCommonTests_dir + File("ModSink.Common.Tests.csproj");
 
 var modSinkCli_dir = src + Directory("ModSink.CLI");
 var modSinkCli_csproj = modSinkCli_dir + File("ModSink.CLI.csproj");
@@ -54,6 +58,15 @@ Setup(context =>
         OutputType = GitVersionOutput.BuildServer 
     });
 });
+
+Task("Test")
+    .IsDependentOn("Test.Common");
+
+Task("Test.Common")
+    .IsDependentOn("Build.Common")
+    .Does(()=>{
+        DotNetCoreTest(modSinkCommonTests_csproj);
+    });
 
 Task("Build.WPF")
     .IsDependentOn("NuGet Restore")
@@ -95,6 +108,7 @@ Task("Build.Core")
 Task("Publish.MyGet")
     .IsDependentOn("Build.Core")
     .IsDependentOn("Build.Common")
+    .WithCriteria(!String.IsNullOrWhiteSpace(key_myget))
     .Does(()=>{
         foreach(var nupkg in GetFiles(out_nuget.ToString()+"/**/*.nupkg")){
             Information("Publishing: {0}", nupkg);
@@ -149,6 +163,7 @@ Task("Build")
 
 Task("Default")
     .IsDependentOn("Build")
+    .IsDependentOn("Test")
     .IsDependentOn("Publish")
     .IsDependentOn("Release");
 
