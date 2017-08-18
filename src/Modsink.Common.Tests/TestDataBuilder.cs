@@ -1,8 +1,9 @@
-﻿using FizzWare.NBuilder;
-using ModSink.Core.Models.Repo;
+﻿using ModSink.Core.Models.Repo;
 using System.Linq;
 using System.Collections.Generic;
 using System.Text;
+using Bogus;
+using System;
 
 namespace Modsink.Common.Tests
 {
@@ -10,23 +11,24 @@ namespace Modsink.Common.Tests
     {
         public static Repo Repo()
         {
-            var hashes = Builder<HashValue>.CreateListOfSize(100).Build();
+            var files = new Faker<Tuple<string, HashValue>>()
+                .CustomInstantiator(f => new Tuple<string, HashValue>(f.System.FileName(), new HashValue(f.Random.Bytes(8))))
+                .Generate(1000).ToDictionary(a => a.Item1, a => a.Item2);
 
-            var filehashes = hashes.ToDictionary(h => h, _ => Builder<string>.CreateNew().Build());
+            var mods = new Faker<Mod>()
+                .RuleFor(m => m.Files, f => f.PickRandom(files, 100).ToDictionary(kvp => kvp.Key, kvp => kvp.Value))
+                .RuleFor(m => m.Name, f => f.System.CommonFileName())
+                .RuleFor(m => m.Version, f => f.System.Semver())
+                .Generate(100);
 
-            var mods = Builder<Mod>.CreateListOfSize(100)
-                .All()
-                .With(m => m.Files = Pick.UniqueRandomList.From
+            var modpacks = new Faker<Modpack>()
+                .RuleFor(mp => mp.Mods, f => f.PickRandom(mods, 50).ToDictionary(a => a, a => ModFlags.None))
+                .Generate(10).ToList();
 
-            var modpacks = Builder<Modpack>.CreateListOfSize(100)
-                .All()
-                    .With(m => m.Mods = null);
-
-            return Builder<Repo>
-                .CreateNew()
-                .With(r => r.Files = filehashes)
-                .With(r => r.Modpacks = modpacks)
-                .Build();
+            return new Faker<Repo>()
+                .RuleFor(r => r.Files, _ => files.ToDictionary(kp => kp.Value, kp => kp.Key))
+                .RuleFor(r => r.Modpacks, _ => modpacks)
+                .Generate();
         }
     }
 }

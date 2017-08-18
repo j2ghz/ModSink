@@ -9,6 +9,10 @@ namespace ModSink.Core.Models
 {
     public interface ISerializer
     {
+        Repo.Repo Deserialize(string repo);
+
+        Task<Repo.Repo> Deserialize(Stream stream);
+
         string Serialize(Repo.Repo repo);
 
         Task Serialize(Repo.Repo repo, Stream stream);
