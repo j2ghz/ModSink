@@ -15,42 +15,42 @@ namespace ModSink.CLI
 {
     public static class Program
     {
-        //public static void AddColCheck(this CommandLineApplication app)
-        //{
-        //    app.Command("collcheck", (command) =>
-        //    {
-        //        command.Description = "Checks files for collisions";
-        //        command.HelpOption("-?|-h|--help");
-        //        var pathArg = command.Argument("[path]", "Path to folder");
+        public static void AddColCheck(this CommandLineApplication app)
+        {
+            app.Command("collcheck", (command) =>
+            {
+                command.Description = "Checks files for collisions";
+                command.HelpOption("-?|-h|--help");
+                var pathArg = command.Argument("[path]", "Path to folder");
 
-        //        command.OnExecute(() =>
-        //        {
-        //            var pathStr = pathArg.Value ?? ".";
-        //            var path = Path.Combine(Directory.GetCurrentDirectory(), pathStr);
-        //            IHashFunction xxhash = new XXHash64();
-        //            GetFiles(path)
-        //            .Select(f =>
-        //            {
-        //                var hash = ComputeHash(f, xxhash);
-        //                return new { f, hash };
-        //            })
-        //            .GroupBy(a => a.hash.ToString())
-        //            .Where(g => g.Count() > 1)
-        //            .ForEach(g =>
-        //            {
-        //                Console.WriteLine(g.Key);
-        //                foreach (var i in g)
-        //                {
-        //                    Console.WriteLine($"    {i.f.FullName}");
-        //                }
-        //                Console.WriteLine();
-        //            });
+                command.OnExecute(() =>
+                {
+                    var pathStr = pathArg.Value ?? ".";
+                    var path = Path.Combine(Directory.GetCurrentDirectory(), pathStr);
+                    IHashFunction xxhash = new XXHash64();
+                    GetFiles(path)
+                    .Select(f =>
+                    {
+                        var hash = ComputeHash(f, xxhash);
+                        return new { f, hash };
+                    })
+                    .GroupBy(a => a.hash.ToString())
+                    .Where(g => g.Count() > 1)
+                    .ForEach(g =>
+                    {
+                        Console.WriteLine(g.Key);
+                        foreach (var i in g)
+                        {
+                            Console.WriteLine($"    {i.f.FullName}");
+                        }
+                        Console.WriteLine();
+                    });
 
-        //            Console.WriteLine("Done.");
-        //            return 0;
-        //        });
-        //    });
-        //}
+                    Console.WriteLine("Done.");
+                    return 0;
+                });
+            });
+        }
 
         public static void AddHash(this CommandLineApplication app)
         {
@@ -77,23 +77,7 @@ namespace ModSink.CLI
             });
         }
 
-
-        //public static IHashValue ComputeHash(FileInfo f, IHashFunction hashf)
-        //{
-        //    using (var stream = f.OpenRead())
-        //    {
-        //        var sizeMB = f.Length / (1024L * 1024);
-        //        var start = DateTime.Now;
-        //        Console.Write($"{sizeMB.ToString().PadLeft(5)}MB: ");
-        //        var hash = hashf.ComputeHashAsync(stream, CancellationToken.None).GetAwaiter().GetResult();
-        //        var elapsed = (DateTime.Now - start).TotalSeconds;
-        //        var speed = (ulong)(f.Length / elapsed) / (1024UL * 1024UL);
-        //        Console.WriteLine($"'{hash}' @{speed.ToString().PadLeft(5)}MB/s at {f.FullName}");
-        //        return hash;
-        //    }
-        //}
-
-        public static IHashValue ComputeHash(FileInfo f, IHashFunction hashf)
+        public static HashValue ComputeHash(FileInfo f, IHashFunction hashf)
         {
             try
             {
@@ -113,10 +97,9 @@ namespace ModSink.CLI
             {
                 Console.WriteLine();
                 Console.Error.WriteLine(e.ToString());
-                return new ByteHashValue(new byte[] { 0 });
+                return new HashValue(new byte[] { 0 });
             }
         }
-
 
         public static IEnumerable<FileInfo> GetFiles(string root)
         {
@@ -175,7 +158,7 @@ namespace ModSink.CLI
             app.HelpOption("-?|-h|--help");
 
             app.AddHash();
-            //app.AddColCheck();
+            app.AddColCheck();
 
             app.Execute(args);
         }
