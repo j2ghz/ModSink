@@ -22,7 +22,7 @@ namespace ModSink.WPF.ViewModel
 
         public string UrlPathSegment
         {
-            get { return "welcome"; }
+            get { return "library"; }
         }
     }
 }
