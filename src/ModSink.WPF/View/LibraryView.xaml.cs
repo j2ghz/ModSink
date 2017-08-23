@@ -22,18 +22,15 @@ namespace ModSink.WPF.View
     /// </summary>
     public partial class LibraryView : UserControl, IViewFor<ILibraryViewModel>
     {
-        public static readonly DependencyProperty ViewModelProperty =
-            DependencyProperty.Register("ViewModel", typeof(ILibraryViewModel), typeof(LibraryView), new PropertyMetadata(null));
-
-        public LibraryView()
+        public LibraryView(ILibraryViewModel viewModel)
         {
+            ViewModel = viewModel;
             InitializeComponent();
         }
 
         public ILibraryViewModel ViewModel
         {
-            get { return (ILibraryViewModel)GetValue(ViewModelProperty); }
-            set { SetValue(ViewModelProperty, value); }
+            get; set;
         }
 
         object IViewFor.ViewModel
