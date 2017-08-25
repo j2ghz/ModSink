@@ -46,6 +46,8 @@ Setup(context =>
         UpdateAssemblyInfo = true, 
         OutputType = GitVersionOutput.BuildServer 
     });
+
+    DeleteDirectory(output, true);
 });
 
 Task("Test")
