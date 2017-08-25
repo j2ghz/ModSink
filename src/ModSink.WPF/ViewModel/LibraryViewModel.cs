@@ -11,7 +11,7 @@ namespace ModSink.WPF.ViewModel
     {
     }
 
-    internal class LibraryViewModel : ReactiveObject, ILibraryViewModel
+    public class LibraryViewModel : ReactiveObject, ILibraryViewModel
     {
         public LibraryViewModel(IScreen screen)
         {
@@ -22,7 +22,7 @@ namespace ModSink.WPF.ViewModel
 
         public string UrlPathSegment
         {
-            get { return "welcome"; }
+            get { return "library"; }
         }
     }
 }

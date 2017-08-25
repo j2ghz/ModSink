@@ -34,9 +34,8 @@ namespace ModSink.WPF
             {
                 //Do not report errors during development
                 SetupSentry();
-                //Checking for updates when not installed wit Squirrel will fail
-                CheckUpdates();
             }
+            CheckUpdates();
             LoadPlugins();
             log.Information("Starting UI");
             base.OnStartup(e);
@@ -61,7 +60,7 @@ namespace ModSink.WPF
                 catch (Exception e)
                 {
                     Log.ForContext<UpdateManager>().Error(e, "Exception during update checking");
-                    UpdateFailed(this, e);
+                    UpdateFailed?.Invoke(null, e);
                 }
             });
             task.Start();
