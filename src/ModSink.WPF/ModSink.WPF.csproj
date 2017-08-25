@@ -53,6 +53,9 @@
     <PackageReference Include="Autofac">
       <Version>4.6.1</Version>
     </PackageReference>
+    <PackageReference Include="ModSink.Common">
+      <Version>0.2.1-ci0001</Version>
+    </PackageReference>
     <PackageReference Include="reactiveui-wpf">
       <Version>8.0.0-alpha0034</Version>
     </PackageReference>
@@ -134,16 +137,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\ModSink.Common\ModSink.Common.csproj">
-      <Project>{7d13f10f-652b-44f6-8f4b-b6c54675258f}</Project>
-      <Name>ModSink.Common</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\ModSink.Core\ModSink.Core.csproj">
-      <Project>{6ac512b9-2b7f-4870-a44a-85e7cf6d5051}</Project>
-      <Name>ModSink.Core</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
