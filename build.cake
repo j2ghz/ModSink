@@ -2,8 +2,11 @@
 
 var target = Argument("target", "Default");
 var configuration = Argument("Configuration", "Release");
+
 var key_nuget = EnvironmentVariable("NUGET_KEY") ?? "";
 var url_nuget_push = EnvironmentVariable("NUGET_URL") ?? "https://www.nuget.org/api/v2/package";
+var key_myget = EnvironmentVariable("MYGET_KEY") ?? "";
+var url_myget_push = EnvironmentVariable("MYGET_URL") ?? "https://www.myget.org/F/modsink/api/v2/package";
 
 var root = Directory("./");
 var solution = root + File("ModSink.Common.sln");
@@ -15,7 +18,6 @@ var modSinkCore_csproj = modSinkCore_dir + File("ModSink.Core.csproj");
 
 var modSinkCommon_dir = src + Directory("ModSink.Common");
 var modSinkCommon_csproj = modSinkCommon_dir + File("ModSink.Common.csproj");
-
 
 var modSinkCommonTests_dir = src + Directory("ModSink.Common.Tests");
 var modSinkCommonTests_csproj = modSinkCommonTests_dir + File("ModSink.Common.Tests.csproj");
@@ -76,17 +78,37 @@ Task("Pack.Core")
 });
 
 Task("Publish")
+    .IsDependentOn("Publish.NuGet")
+    .IsDependentOn("Publish.MyGet");
+
+Task("Publish.NuGet")
     .IsDependentOn("Pack.Core")
     .IsDependentOn("Pack.Common")
-    .WithCriteria(!String.IsNullOrWhiteSpace(key_nuget))
+    .WithCriteria(!String.IsNullOrWhiteSpace(key_nuget))    
     .WithCriteria(BuildSystem.AppVeyor.IsRunningOnAppVeyor && BuildSystem.AppVeyor.Environment.Repository.Branch == "master")
     .Does(()=>{
-        foreach(var nupkg in GetFiles(out_nuget.ToString()+"/**/*.nupkg")){
-            Information("Publishing: {0}", nupkg);
-            NuGetPush(nupkg, new NuGetPushSettings {
+        var nugetSettings = new NuGetPushSettings {
                 Source = url_nuget_push,
                 ApiKey = key_nuget
-            });
+        };        
+        foreach(var nupkg in GetFiles(out_nuget.ToString()+"/**/*.nupkg")){
+            Information("Publishing: {0}", nupkg);
+            NuGetPush(nupkg, nugetSettings);
+        }
+    });
+
+Task("Publish.MyGet")
+    .IsDependentOn("Pack.Core")
+    .IsDependentOn("Pack.Common")
+    .WithCriteria(!String.IsNullOrWhiteSpace(key_myget))
+    .Does(()=>{
+        var nugetSettings = new NuGetPushSettings {
+                Source = url_myget_push,
+                ApiKey = key_myget
+        };
+        foreach(var nupkg in GetFiles(out_nuget.ToString()+"/**/*.nupkg")){
+            Information("Publishing: {0}", nupkg);
+            NuGetPush(nupkg, nugetSettings);
         }
     });
 
