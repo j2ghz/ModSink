@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using System.IO;
 using System;
 using System.Linq;
+using System.Reactive;
 using ModSink.Common;
 using System.Threading;
 using System.Diagnostics;
 using ModSink.Core;
-using System.Reactive;
 using ModSink.Core.Models.Repo;
 using System.IO.MemoryMappedFiles;
+using System.Reactive.Linq;
 
 namespace ModSink.CLI
 {
@@ -71,6 +72,42 @@ namespace ModSink.CLI
 
                     hashes.Subscribe(Observer.Create<(HashValue, FileInfo)>(a => Console.WriteLine($"{a.Item1.ToString()} {a.Item2.FullName}")));
 
+                    Console.WriteLine("Done.");
+                    return 0;
+                });
+            });
+        }
+
+        public static void AddSampleRepo(this CommandLineApplication app)
+        {
+            app.Command("sampleRepo", (command) =>
+            {
+                command.Description = "Makes each subfolder of a given folder a mod";
+                command.HelpOption("-?|-h|--help");
+                var pathArg = command.Argument("[path]", "Path to the folder with mods");
+
+                command.OnExecute(async () =>
+                {
+                    var hashing = new Hashing(new XXHash64());
+
+                    var pathStr = pathArg.Value ?? ".";
+                    var path = new DirectoryInfo(Path.Combine(Directory.GetCurrentDirectory(), pathStr));
+                    var pathUri = new Uri(path.FullName);
+                    var repo = new Repo();
+                    repo.Files = new Dictionary<HashValue, Uri>();
+
+                    var modFolders = path.EnumerateDirectories();
+
+                    foreach (var mod in modFolders)
+                    {
+                        var obs = hashing.GetFileHashes(mod);
+                        obs.Subscribe(Observer.Create<(HashValue, FileInfo)>(a => Console.WriteLine($"{a.Item1.ToString()} {a.Item2.FullName}")));
+                        //obs.Subscribe(hf => { repo.Files.Add(hf.hash, new Uri(hf.file.FullName).MakeRelativeUri(pathUri)); });
+                        //Add files to repo.Files
+                        //Add create modpack
+                    }
+
+                    repo.Modpacks = new List<Modpack>{ new Modpack { Name = "Default", Mods = new List<Mod> {  } }
                     Console.WriteLine("Done.");
                     return 0;
                 });

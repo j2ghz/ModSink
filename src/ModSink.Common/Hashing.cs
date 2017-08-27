@@ -7,6 +7,7 @@ using System.IO;
 using System.Threading;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
+using System.Linq;
 
 namespace ModSink.Common
 {
@@ -31,7 +32,7 @@ namespace ModSink.Common
 
         public IObservable<(HashValue hash, FileInfo file)> GetFileHashes(DirectoryInfo directory)
         {
-            return GetFileHashes(directory.EnumerateFiles("*", SearchOption.AllDirectories));
+            return GetFileHashes(directory.EnumerateFiles("*", SearchOption.AllDirectories).Select());
         }
 
         public IObservable<(HashValue hash, FileInfo file)> GetFileHashes(IEnumerable<FileInfo> files)

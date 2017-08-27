@@ -6,8 +6,8 @@ namespace ModSink.Core.Models.Repo
     [Serializable]
     public class Modpack
     {
-        public IDictionary<Mod, ModFlags> Mods { get; set; }
-
+        public IEnumerable<ModEntry> Mods { get; set; }
+        public string Name { get; set; }
         public IEnumerable<IServer> Servers { get; set; }
     }
 }

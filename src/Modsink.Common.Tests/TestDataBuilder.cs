@@ -11,8 +11,8 @@ namespace Modsink.Common.Tests
     {
         public static Repo Repo()
         {
-            var files = new Faker<Tuple<string, HashValue>>()
-                .CustomInstantiator(f => new Tuple<string, HashValue>(f.System.FileName(), new HashValue(f.Random.Bytes(8))))
+            var files = new Faker<Tuple<Uri, HashValue>>()
+                .CustomInstantiator(f => new Tuple<Uri, HashValue>(new Uri(f.System.CommonFileName()), new HashValue(f.Random.Bytes(8))))
                 .Generate(1000).ToDictionary(a => a.Item1, a => a.Item2);
 
             var mods = new Faker<Mod>()
@@ -22,8 +22,8 @@ namespace Modsink.Common.Tests
                 .Generate(100);
 
             var modpacks = new Faker<Modpack>()
-                .RuleFor(mp => mp.Mods, f => f.PickRandom(mods, 50).ToDictionary(a => a, a => ModFlags.None))
-                .Generate(10).ToList();
+                .RuleFor(mp => mp.Mods, f => f.PickRandom(mods, 50).Select(m => new ModEntry() { Mod = m }))
+                .Generate(10);
 
             return new Faker<Repo>()
                 .RuleFor(r => r.Files, _ => files.ToDictionary(kp => kp.Value, kp => kp.Key))
