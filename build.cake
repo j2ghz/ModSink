@@ -79,6 +79,7 @@ Task("Publish")
     .IsDependentOn("Pack.Core")
     .IsDependentOn("Pack.Common")
     .WithCriteria(!String.IsNullOrWhiteSpace(key_nuget))
+    .WithCriteria(BuildSystem.AppVeyor.IsRunningOnAppVeyor && BuildSystem.AppVeyor.Environment.Repository.Branch == "master")
     .Does(()=>{
         foreach(var nupkg in GetFiles(out_nuget.ToString()+"/**/*.nupkg")){
             Information("Publishing: {0}", nupkg);
