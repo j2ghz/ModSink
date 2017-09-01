@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 using Bogus;
 using System;
+using System.IO;
 
 namespace Modsink.Common.Tests
 {
@@ -12,7 +13,7 @@ namespace Modsink.Common.Tests
         public static Repo Repo()
         {
             var files = new Faker<Tuple<Uri, HashValue>>()
-                .CustomInstantiator(f => new Tuple<Uri, HashValue>(new Uri(f.System.CommonFileName()), new HashValue(f.Random.Bytes(8))))
+                .CustomInstantiator(f => new Tuple<Uri, HashValue>(new Uri(Path.GetTempFileName()), new HashValue(f.Random.Bytes(8))))
                 .Generate(1000).ToDictionary(a => a.Item1, a => a.Item2);
 
             var mods = new Faker<Mod>()
@@ -22,13 +23,14 @@ namespace Modsink.Common.Tests
                 .Generate(100);
 
             var modpacks = new Faker<Modpack>()
-                .RuleFor(mp => mp.Mods, f => f.PickRandom(mods, 50).Select(m => new ModEntry() { Mod = m }))
-                .Generate(10);
+                .RuleFor(mp => mp.Mods, f => f.PickRandom(mods, 50).Select(m => new ModEntry() { Mod = m }).ToList())
+                .Generate(10).ToList();
 
-            return new Faker<Repo>()
-                .RuleFor(r => r.Files, _ => files.ToDictionary(kp => kp.Value, kp => kp.Key))
-                .RuleFor(r => r.Modpacks, _ => modpacks)
-                .Generate();
+            return new Repo
+            {
+                Files = files.ToDictionary(kp => kp.Value, kp => kp.Key),
+                Modpacks = modpacks
+            };
         }
     }
 }

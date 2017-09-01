@@ -11,6 +11,8 @@ using ModSink.Core;
 using ModSink.Core.Models.Repo;
 using System.IO.MemoryMappedFiles;
 using System.Reactive.Linq;
+using System.Collections.Concurrent;
+using System.Runtime.Serialization.Formatters.Binary;
 
 namespace ModSink.CLI
 {
@@ -86,29 +88,46 @@ namespace ModSink.CLI
                 command.HelpOption("-?|-h|--help");
                 var pathArg = command.Argument("[path]", "Path to the folder with mods");
 
-                command.OnExecute(async () =>
+                command.OnExecute(() =>
                 {
                     var hashing = new Hashing(new XXHash64());
 
                     var pathStr = pathArg.Value ?? ".";
                     var path = new DirectoryInfo(Path.Combine(Directory.GetCurrentDirectory(), pathStr));
                     var pathUri = new Uri(path.FullName);
-                    var repo = new Repo();
-                    repo.Files = new Dictionary<HashValue, Uri>();
 
-                    var modFolders = path.EnumerateDirectories();
+                    var files = new Dictionary<HashValue, Uri>();
+                    var mods = new List<ModEntry>();
 
-                    foreach (var mod in modFolders)
+                    foreach (var modFolder in path.EnumerateDirectories())
                     {
-                        var obs = hashing.GetFileHashes(mod);
-                        obs.Subscribe(Observer.Create<(HashValue, FileInfo)>(a => Console.WriteLine($"{a.Item1.ToString()} {a.Item2.FullName}")));
-                        //obs.Subscribe(hf => { repo.Files.Add(hf.hash, new Uri(hf.file.FullName).MakeRelativeUri(pathUri)); });
-                        //Add files to repo.Files
-                        //Add create modpack
+                        Console.WriteLine($"Processing {modFolder.FullName}");
+                        var obs = hashing.GetFileHashes(modFolder).ToEnumerable();
+                        var mod = new Mod
+                        {
+                            Files = new Dictionary<Uri, HashValue>(),
+                            Name = modFolder.Name,
+                            Version = "1.0"
+                        };
+                        foreach (var file in obs)
+                        {
+                            Console.WriteLine($"Processing {file.file.FullName}");
+                            mod.Files.Add(new Uri(modFolder.FullName).MakeRelativeUri(new Uri(file.file.FullName)), file.hash);
+                            files.Add(file.hash, pathUri.MakeRelativeUri(new Uri(file.file.FullName)));
+                        }
+                        mods.Add(new ModEntry { Mod = mod });
                     }
 
-                    repo.Modpacks = new List<Modpack>{ new Modpack { Name = "Default", Mods = new List<Mod> {  } }
-                    Console.WriteLine("Done.");
+                    var repo = new Repo
+                    {
+                        Files = files,
+                        Modpacks = new List<Modpack>() { new Modpack { Mods = mods } }
+                    };
+
+                    var fileName = Path.GetTempFileName();
+                    new BinaryFormatter().Serialize(new FileInfo(fileName).OpenWrite(), repo);
+                    Console.WriteLine($"Written to {fileName}");
+
                     return 0;
                 });
             });
@@ -196,6 +215,7 @@ namespace ModSink.CLI
 
             app.AddHash();
             app.AddColCheck();
+            app.AddSampleRepo();
 
             app.Execute(args);
         }

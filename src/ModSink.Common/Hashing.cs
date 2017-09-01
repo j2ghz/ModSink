@@ -22,8 +22,6 @@ namespace ModSink.Common
 
         public async Task<HashValue> GetFileHash(FileInfo file, CancellationToken cancel)
         {
-            Console.WriteLine("Opening " + file.FullName);
-
             using (var stream = file.OpenRead())
             {
                 return await this.hashFunction.ComputeHashAsync(stream, cancel);
@@ -32,7 +30,7 @@ namespace ModSink.Common
 
         public IObservable<(HashValue hash, FileInfo file)> GetFileHashes(DirectoryInfo directory)
         {
-            return GetFileHashes(directory.EnumerateFiles("*", SearchOption.AllDirectories).Select());
+            return GetFileHashes(directory.EnumerateFiles("*", SearchOption.AllDirectories));
         }
 
         public IObservable<(HashValue hash, FileInfo file)> GetFileHashes(IEnumerable<FileInfo> files)

@@ -11,6 +11,6 @@ namespace ModSink.Core.Models.Repo
         /// </summary>
         public IDictionary<HashValue, Uri> Files { get; set; }
 
-        public IEnumerable<Modpack> Modpacks { get; set; }
+        public ICollection<Modpack> Modpacks { get; set; }
     }
 }
