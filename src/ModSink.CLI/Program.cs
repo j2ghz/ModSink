@@ -72,7 +72,7 @@ namespace ModSink.CLI
 
                     var hashes = hash.GetFileHashes(new DirectoryInfo(path));
 
-                    hashes.Subscribe(Observer.Create<(HashValue, FileInfo)>(a => Console.WriteLine($"{a.Item1.ToString()} {a.Item2.FullName}")));
+                    hashes.Subscribe(Observer.Create<FileWithHash>(a => Console.WriteLine(a.ToString())));
 
                     Console.WriteLine("Done.");
                     return 0;
@@ -109,11 +109,11 @@ namespace ModSink.CLI
                             Name = modFolder.Name,
                             Version = "1.0"
                         };
-                        foreach (var file in obs)
+                        foreach (var fileHash in obs)
                         {
-                            Console.WriteLine($"Processing {file.file.FullName}");
-                            mod.Files.Add(new Uri(modFolder.FullName).MakeRelativeUri(new Uri(file.file.FullName)), file.hash);
-                            files.Add(file.hash, pathUri.MakeRelativeUri(new Uri(file.file.FullName)));
+                            Console.WriteLine($"Processing {fileHash.File.FullName}");
+                            mod.Files.Add(new Uri(modFolder.FullName).MakeRelativeUri(new Uri(fileHash.File.FullName)), fileHash.Hash);
+                            files.Add(fileHash.Hash, pathUri.MakeRelativeUri(new Uri(fileHash.File.FullName)));
                         }
                         mods.Add(new ModEntry { Mod = mod });
                     }
@@ -124,8 +124,8 @@ namespace ModSink.CLI
                         Modpacks = new List<Modpack>() { new Modpack { Mods = mods } }
                     };
 
-                    var fileName = Path.GetTempFileName();
-                    new BinaryFormatter().Serialize(new FileInfo(fileName).OpenWrite(), repo);
+                    var fileName = Path.Combine(pathUri.LocalPath, "repo.bin");
+                    new BinaryFormatter().Serialize(new FileInfo(fileName).Create(), repo);
                     Console.WriteLine($"Written to {fileName}");
 
                     return 0;

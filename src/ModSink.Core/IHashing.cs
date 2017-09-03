@@ -10,10 +10,10 @@ namespace ModSink.Core
 {
     public interface IHashing
     {
-        Task<HashValue> GetFileHash(FileInfo file, CancellationToken cancellationToken);
+        Task<HashValue> GetFileHash(FileInfo file, CancellationToken cancel);
 
-        IObservable<(HashValue hash, FileInfo file)> GetFileHashes(DirectoryInfo directory);
+        IObservable<FileWithHash> GetFileHashes(DirectoryInfo directory);
 
-        IObservable<(HashValue hash, FileInfo file)> GetFileHashes(IEnumerable<FileInfo> files);
+        IObservable<FileInfo> GetFiles(DirectoryInfo directory);
     }
 }

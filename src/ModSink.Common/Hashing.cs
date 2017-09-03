@@ -8,6 +8,7 @@ using System.Threading;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using System.Linq;
+using System.Reactive.Disposables;
 
 namespace ModSink.Common
 {
@@ -28,17 +29,31 @@ namespace ModSink.Common
             }
         }
 
-        public IObservable<(HashValue hash, FileInfo file)> GetFileHashes(DirectoryInfo directory)
+        public IObservable<FileWithHash> GetFileHashes(DirectoryInfo directory)
         {
-            return GetFileHashes(directory.EnumerateFiles("*", SearchOption.AllDirectories));
+            return GetFiles(directory)
+                .Select(fi => Observable.DeferAsync(async token => Observable.Return(new FileWithHash(fi, await GetFileHash(fi, token))))).Switch();
         }
 
-        public IObservable<(HashValue hash, FileInfo file)> GetFileHashes(IEnumerable<FileInfo> files)
+        public IObservable<FileInfo> GetFiles(DirectoryInfo directory)
         {
-            return files
-                .ToObservable()
-                .SelectMany(f => Observable.FromAsync(cancel => GetFileHash(f, cancel))
-                .Select(res => (res, f)));
+            return Observable.Create((IObserver<FileInfo> observer) =>
+            {
+                var directoryStack = new Stack<DirectoryInfo>();
+                directoryStack.Push(directory);
+
+                while (directoryStack.Count > 0)
+                {
+                    var dir = directoryStack.Pop();
+
+                    dir.EnumerateDirectories().ForEach(directoryStack.Push);
+
+                    dir.EnumerateFiles().ForEach(observer.OnNext);
+                }
+
+                observer.OnCompleted();
+                return Disposable.Empty;
+            });
         }
     }
 }
