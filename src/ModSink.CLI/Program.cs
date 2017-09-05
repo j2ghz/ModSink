@@ -210,14 +210,16 @@ namespace ModSink.CLI
         public static void Main(string[] args)
         {
             var app = new CommandLineApplication();
-            app.Name = "ModSink.CLI";
+            app.Name = "modsink";
+            app.FullName = "ModSink.CLI";
             app.HelpOption("-?|-h|--help");
+            app.ShortVersionGetter = () => typeof(Program).Assembly.GetName().Version.ToString();
 
             app.AddHash();
             app.AddColCheck();
             app.AddSampleRepo();
 
-            app.Execute(args);
+            app.Execute(args.Length > 0 ? args : new string[] { "--help" });
         }
     }
 }
