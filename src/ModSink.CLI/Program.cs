@@ -55,6 +55,29 @@ namespace ModSink.CLI
             });
         }
 
+        public static void AddDownload(this CommandLineApplication app)
+        {
+            app.Command("download", (command) =>
+            {
+                command.Description = "Downloads a file";
+                command.HelpOption("-?|-h|--help");
+                var uriArg = command.Argument("[uri]", "Uri to file to download");
+
+                command.OnExecute(() =>
+                {
+                    var uriStr = uriArg.Value;
+                    var uri = new Uri(uriStr);
+
+                    var client = new HttpClientDownloader();
+                    var obs = client.Download(uri, new FileInfo(Path.GetTempFileName()).OpenWrite());
+                    obs.Subscribe(prog => Console.WriteLine($"{prog.Size} {prog.Downloaded} {prog.State}"), () => Console.WriteLine("Done"));
+                    obs.Wait();
+
+                    return 0;
+                });
+            });
+        }
+
         public static void AddHash(this CommandLineApplication app)
         {
             app.Command("hash", (command) =>
@@ -218,6 +241,7 @@ namespace ModSink.CLI
             app.AddHash();
             app.AddColCheck();
             app.AddSampleRepo();
+            app.AddDownload();
 
             app.Execute(args.Length > 0 ? args : new string[] { "--help" });
         }
