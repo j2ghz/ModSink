@@ -19,9 +19,11 @@ namespace ModSink.Common
         {
             return Observable.Create<DownloadProgress>(async (observer, cancel) =>
             {
+                //Get response
                 observer.OnNext(new DownloadProgress(0, 0, DownloadProgress.DownloadState.AwaitingResponse));
                 var response = await this.client.GetAsync(source, HttpCompletionOption.ResponseHeadersRead, cancel);
 
+                //Read response
                 observer.OnNext(new DownloadProgress(0, 0, DownloadProgress.DownloadState.ReadingResponse));
                 response.EnsureSuccessStatusCode();
                 var length = (ulong)response.Content.Headers.ContentLength.Value;
@@ -32,6 +34,7 @@ namespace ModSink.Common
                 byte[] buffer = new byte[16 * 1024];
                 var read = 0;
 
+                //Download
                 observer.OnNext(new DownloadProgress(0, length, DownloadProgress.DownloadState.Downloading));
                 while ((read = await input.ReadAsync(buffer, 0, buffer.Length, cancel)) > 0)
                 {
@@ -39,10 +42,10 @@ namespace ModSink.Common
                     totalRead += (ulong)read;
                     observer.OnNext(new DownloadProgress(length, totalRead, DownloadProgress.DownloadState.Downloading));
                 }
+
+                //Finish
                 observer.OnNext(new DownloadProgress(length, totalRead, DownloadProgress.DownloadState.Finished));
-
                 observer.OnCompleted();
-
                 return Disposable.Empty;
             });
         }
