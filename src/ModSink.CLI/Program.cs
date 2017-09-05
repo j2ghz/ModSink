@@ -70,9 +70,10 @@ namespace ModSink.CLI
 
                     var client = new HttpClientDownloader();
                     var obs = client.Download(uri, new FileInfo(Path.GetTempFileName()).OpenWrite());
-                    obs.Subscribe(prog => Console.WriteLine($"{prog.Size} {prog.Downloaded} {prog.State}"), () => Console.WriteLine("Done"));
-                    obs.Wait();
+                    obs.Sample(TimeSpan.FromMilliseconds(100))
+                       .Subscribe(prog => Console.WriteLine($"{prog.Size} {prog.Downloaded} {prog.State}"), ex => Console.WriteLine(ex.ToString()), () => Console.WriteLine("Done"));
 
+                    obs.Wait();
                     return 0;
                 });
             });
