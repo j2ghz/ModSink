@@ -47,7 +47,7 @@ namespace ModSink.Common
                 observer.OnNext(new DownloadProgress(length, totalRead, DownloadProgress.DownloadState.Finished));
                 observer.OnCompleted();
                 return Disposable.Empty;
-            });
+            }).Publish().RefCount();
         }
     }
 }
