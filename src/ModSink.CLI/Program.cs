@@ -13,6 +13,7 @@ using System.IO.MemoryMappedFiles;
 using System.Reactive.Linq;
 using System.Collections.Concurrent;
 using System.Runtime.Serialization.Formatters.Binary;
+using ModSink.Core.Client;
 
 namespace ModSink.CLI
 {
@@ -71,7 +72,12 @@ namespace ModSink.CLI
                     var client = new HttpClientDownloader();
                     var obs = client.Download(uri, new FileInfo(Path.GetTempFileName()).OpenWrite());
                     obs.Sample(TimeSpan.FromMilliseconds(100))
-                       .Subscribe(prog => Console.WriteLine($"{prog.Size} {prog.Downloaded} {prog.State}"), ex => Console.WriteLine(ex.ToString()), () => Console.WriteLine("Done"));
+                       .Buffer(2, 1)
+                       .Subscribe(progList =>
+                       {
+                           var prog = new DownloadProgressCombined(progList.Last(), progList.First());
+                           Console.WriteLine($"{prog.Current.Size}b {prog.Current.Downloaded}b {prog.Speed}b/s {prog.Current.State}");
+                       }, ex => Console.WriteLine(ex.ToString()), () => Console.WriteLine("Done"));
 
                     obs.Wait();
                     return 0;
@@ -203,7 +209,7 @@ namespace ModSink.CLI
                     Console.WriteLine(e.Message);
                     continue;
                 }
-                catch (System.IO.DirectoryNotFoundException e)
+                catch (DirectoryNotFoundException e)
                 {
                     Console.WriteLine(e.Message);
                     continue;
@@ -219,7 +225,7 @@ namespace ModSink.CLI
                     Console.WriteLine(e.Message);
                     continue;
                 }
-                catch (System.IO.DirectoryNotFoundException e)
+                catch (DirectoryNotFoundException e)
                 {
                     Console.WriteLine(e.Message);
                     continue;

@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace ModSink.Core.Client
 {
@@ -9,12 +7,14 @@ namespace ModSink.Core.Client
         public readonly ulong Downloaded;
         public readonly ulong Size;
         public readonly DownloadState State;
+        public readonly DateTime Timestamp;
 
         public DownloadProgress(ulong size, ulong downloaded, DownloadState state)
         {
-            Size = size;
-            Downloaded = downloaded;
-            State = state;
+            this.Size = size;
+            this.Downloaded = downloaded;
+            this.State = state;
+            this.Timestamp = DateTime.Now;
         }
 
         public enum DownloadState
@@ -25,6 +25,6 @@ namespace ModSink.Core.Client
             Finished
         }
 
-        public ulong Remaining => Size - Downloaded;
+        public ulong Remaining => this.Size - this.Downloaded;
     }
 }
