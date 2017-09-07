@@ -2,7 +2,7 @@
 using System;
 using System.IO;
 
-namespace ModSink.Core.Local
+namespace ModSink.Core.Client
 {
     public interface IDownloader
     {

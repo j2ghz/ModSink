@@ -110,6 +110,35 @@ namespace ModSink.CLI
             });
         }
 
+        public static void AddImport(this CommandLineApplication app)
+        {
+            app.Command("import", (command) =>
+            {
+                command.Description = "Copies every file in the folder and renames it to its hash";
+                command.HelpOption("-?|-h|--help");
+                var pathArg = command.Argument("[path]", "Path to file to hash. If folder is provided, all files inside will be hashed");
+
+                command.OnExecute(() =>
+                {
+                    var pathStr = pathArg.Value ?? ".";
+                    var path = Path.Combine(Directory.GetCurrentDirectory(), pathStr);
+
+                    var hash = new Hashing(new XXHash64());
+
+                    hash.GetFileHashes(new DirectoryInfo(path))
+                    .Do(fwh =>
+                    {
+                        Console.Write(fwh.ToString());
+                        fwh.File.OpenRead().CopyToAsync(new FileInfo(@"D:\hashed\" + fwh.Hash.ToString()).OpenWrite()).GetAwaiter().GetResult();
+                        Console.WriteLine(" Done.");
+                    }).Wait();
+
+                    Console.WriteLine("Done.");
+                    return 0;
+                });
+            });
+        }
+
         public static void AddSampleRepo(this CommandLineApplication app)
         {
             app.Command("sampleRepo", (command) =>
@@ -249,6 +278,7 @@ namespace ModSink.CLI
             app.AddColCheck();
             app.AddSampleRepo();
             app.AddDownload();
+            app.AddImport();
 
             app.Execute(args.Length > 0 ? args : new string[] { "--help" });
         }

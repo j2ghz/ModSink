@@ -19,7 +19,7 @@ namespace ModSink.Core
 
         public override string ToString()
         {
-            return $"{Hash} {File}";
+            return $"{Hash} {File.FullName}";
         }
     }
 }
