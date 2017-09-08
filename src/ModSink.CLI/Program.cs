@@ -85,30 +85,30 @@ namespace ModSink.CLI
             });
         }
 
-        public static void AddHash(this CommandLineApplication app)
-        {
-            app.Command("hash", (command) =>
-            {
-                command.Description = "Returns hash(es) of file(s)";
-                command.HelpOption("-?|-h|--help");
-                var pathArg = command.Argument("[path]", "Path to file to hash. If folder is provided, all files inside will be hashed");
+        //public static void AddHash(this CommandLineApplication app)
+        //{
+        //    app.Command("hash", (command) =>
+        //    {
+        //        command.Description = "Returns hash(es) of file(s)";
+        //        command.HelpOption("-?|-h|--help");
+        //        var pathArg = command.Argument("[path]", "Path to file to hash. If folder is provided, all files inside will be hashed");
 
-                command.OnExecute(() =>
-                {
-                    var pathStr = pathArg.Value ?? ".";
-                    var path = Path.Combine(Directory.GetCurrentDirectory(), pathStr);
+        //        command.OnExecute(() =>
+        //        {
+        //            var pathStr = pathArg.Value ?? ".";
+        //            var path = Path.Combine(Directory.GetCurrentDirectory(), pathStr);
 
-                    var hash = new Hashing(new XXHash64());
+        //            var hash = new Hashing(new XXHash64());
 
-                    var hashes = hash.GetFileHashes(new DirectoryInfo(path));
+        //            var hashes = hash.GetFileHashes(new DirectoryInfo(path));
 
-                    hashes.Subscribe(Observer.Create<FileWithHash>(a => Console.WriteLine(a.ToString())));
+        //            hashes.Subscribe(Observer.Create<FileWithHash>(a => Console.WriteLine(a.ToString())));
 
-                    Console.WriteLine("Done.");
-                    return 0;
-                });
-            });
-        }
+        //            Console.WriteLine("Done.");
+        //            return 0;
+        //        });
+        //    });
+        //}
 
         public static void AddImport(this CommandLineApplication app)
         {
@@ -116,24 +116,52 @@ namespace ModSink.CLI
             {
                 command.Description = "Copies every file in the folder and renames it to its hash";
                 command.HelpOption("-?|-h|--help");
-                var pathArg = command.Argument("[path]", "Path to file to hash. If folder is provided, all files inside will be hashed");
+                var pathArg = command.Argument("[path]", "");
+                var pathDestArg = command.Argument("[dest path]", "");
 
-                command.OnExecute(() =>
+                command.OnExecute(async () =>
                 {
                     var pathStr = pathArg.Value ?? ".";
+                    var pathDestStr = pathDestArg.Value ?? "./hashed";
                     var path = Path.Combine(Directory.GetCurrentDirectory(), pathStr);
+                    var pathDest = Path.Combine(Directory.GetCurrentDirectory(), pathDestStr);
 
-                    var hash = new Hashing(new XXHash64());
+                    var hashing = new Hashing(new XXHash64());
 
-                    hash.GetFileHashes(new DirectoryInfo(path))
-                    .Do(fwh =>
+                    foreach (var file in hashing.GetFiles(new DirectoryInfo(path)))
                     {
-                        Console.Write(fwh.ToString());
-                        fwh.File.OpenRead().CopyToAsync(new FileInfo(@"D:\hashed\" + fwh.Hash.ToString()).OpenWrite()).GetAwaiter().GetResult();
-                        Console.WriteLine(" Done.");
-                    }).Wait();
-
-                    Console.WriteLine("Done.");
+                        if (file.Length <= 0) continue;
+                        Console.Write($"{(file.Length / (1024 * 1024)).ToString().PadLeft(5)}MB: ");
+                        using (var mmfile = MemoryMappedFile.CreateFromFile(file.FullName, FileMode.Open))
+                        using (var src = mmfile.CreateViewStream())
+                        {
+                            var start = DateTime.Now;
+                            var hash = await hashing.GetFileHash(src, CancellationToken.None);
+                            var filehash = new FileWithHash(file, hash);
+                            var elapsed = (DateTime.Now - start).TotalSeconds;
+                            var speed = (ulong)(file.Length / elapsed) / (1024UL * 1024UL);
+                            Console.Write($"{hash} {speed.ToString().PadLeft(5)}MB/s(hash) | ");
+                            var fileDest = Path.Combine(pathDest, filehash.Hash.ToString());
+                            try
+                            {
+                                using (var dest = new FileStream(fileDest, FileMode.Create, FileAccess.Write))
+                                {
+                                    start = DateTime.Now;
+                                    using (var src2 = mmfile.CreateViewStream())
+                                    {
+                                        await src2.CopyToAsync(dest);
+                                    }
+                                    Console.Write($"{((ulong)(file.Length / (DateTime.Now - start).TotalSeconds) / (1024UL * 1024UL)).ToString().PadLeft(5)}MB/s(copy) | {file.FullName}");
+                                }
+                            }
+                            catch (IOException ex)
+                            {
+                                Console.WriteLine();
+                                Console.WriteLine(ex.ToString());
+                            }
+                        }
+                        Console.WriteLine();
+                    }
                     return 0;
                 });
             });
@@ -147,7 +175,7 @@ namespace ModSink.CLI
                 command.HelpOption("-?|-h|--help");
                 var pathArg = command.Argument("[path]", "Path to the folder with mods");
 
-                command.OnExecute(() =>
+                command.OnExecute(async () =>
                 {
                     var hashing = new Hashing(new XXHash64());
 
@@ -161,15 +189,16 @@ namespace ModSink.CLI
                     foreach (var modFolder in path.EnumerateDirectories())
                     {
                         Console.WriteLine($"Processing {modFolder.FullName}");
-                        var obs = hashing.GetFileHashes(modFolder).ToEnumerable();
+                        var obs = hashing.GetFileHashes(modFolder, CancellationToken.None);
                         var mod = new Mod
                         {
                             Files = new Dictionary<Uri, HashValue>(),
                             Name = modFolder.Name,
                             Version = "1.0"
                         };
-                        foreach (var fileHash in obs)
+                        foreach (var lazy in obs)
                         {
+                            var fileHash = await lazy.Value;
                             Console.WriteLine($"Processing {fileHash.File.FullName}");
                             mod.Files.Add(new Uri(modFolder.FullName).MakeRelativeUri(new Uri(fileHash.File.FullName)), fileHash.Hash);
                             files.Add(fileHash.Hash, pathUri.MakeRelativeUri(new Uri(fileHash.File.FullName)));
@@ -274,7 +303,7 @@ namespace ModSink.CLI
             app.HelpOption("-?|-h|--help");
             app.ShortVersionGetter = () => typeof(Program).Assembly.GetName().Version.ToString();
 
-            app.AddHash();
+            //app.AddHash();
             app.AddColCheck();
             app.AddSampleRepo();
             app.AddDownload();

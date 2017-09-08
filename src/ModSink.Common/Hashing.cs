@@ -29,31 +29,38 @@ namespace ModSink.Common
             }
         }
 
-        public IObservable<FileWithHash> GetFileHashes(DirectoryInfo directory)
+        public async Task<HashValue> GetFileHash(Stream stream, CancellationToken cancel)
         {
-            return GetFiles(directory)
-                .Select(fi => Observable.DeferAsync(async token => Observable.Return(new FileWithHash(fi, await GetFileHash(fi, token))))).Switch();
+            return await this.hashFunction.ComputeHashAsync(stream, cancel);
         }
 
-        public IObservable<FileInfo> GetFiles(DirectoryInfo directory)
+        public IEnumerable<Lazy<Task<FileWithHash>>> GetFileHashes(DirectoryInfo directory, CancellationToken token)
         {
-            return Observable.Create((IObserver<FileInfo> observer) =>
+            foreach (var file in GetFiles(directory))
             {
-                var directoryStack = new Stack<DirectoryInfo>();
-                directoryStack.Push(directory);
-
-                while (directoryStack.Count > 0)
+                token.ThrowIfCancellationRequested();
+                yield return new Lazy<Task<FileWithHash>>(async () =>
                 {
-                    var dir = directoryStack.Pop();
+                    var hash = await GetFileHash(file, token);
+                    return new FileWithHash(file, hash);
+                });
+            }
+        }
 
-                    dir.EnumerateDirectories().ForEach(directoryStack.Push);
+        public IEnumerable<FileInfo> GetFiles(DirectoryInfo directory)
+        {
+            var directoryStack = new Stack<DirectoryInfo>();
+            directoryStack.Push(directory);
 
-                    dir.EnumerateFiles().ForEach(observer.OnNext);
+            while (directoryStack.Count > 0)
+            {
+                var dir = directoryStack.Pop();
+                dir.EnumerateDirectories().ForEach(directoryStack.Push);
+                foreach (var file in dir.EnumerateFiles())
+                {
+                    yield return file;
                 }
-
-                observer.OnCompleted();
-                return Disposable.Empty;
-            });
+            }
         }
     }
 }
