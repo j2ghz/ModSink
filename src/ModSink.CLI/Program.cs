@@ -32,7 +32,8 @@ namespace ModSink.CLI
                     var pathStr = pathArg.Value ?? ".";
                     var path = Path.Combine(Directory.GetCurrentDirectory(), pathStr);
                     IHashFunction xxhash = new XXHash64();
-                    GetFiles(path)
+                    var hashing = new Hashing(xxhash);
+                    hashing.GetFiles(new DirectoryInfo(path))
                     .Select(f =>
                     {
                         var hash = ComputeHash(f, xxhash);
@@ -245,61 +246,13 @@ namespace ModSink.CLI
             }
         }
 
-        public static IEnumerable<FileInfo> GetFiles(string root)
-        {
-            var dirs = new Stack<string>();
-
-            if (!System.IO.Directory.Exists(root))
-            {
-                throw new ArgumentException();
-            }
-            dirs.Push(root);
-
-            while (dirs.Count > 0)
-            {
-                string currentDir = dirs.Pop();
-                try
-                {
-                    System.IO.Directory.GetDirectories(currentDir).ForEach(dirs.Push);
-                }
-                catch (UnauthorizedAccessException e)
-                {
-                    Console.WriteLine(e.Message);
-                    continue;
-                }
-                catch (DirectoryNotFoundException e)
-                {
-                    Console.WriteLine(e.Message);
-                    continue;
-                }
-
-                string[] files;
-                try
-                {
-                    files = System.IO.Directory.GetFiles(currentDir);
-                }
-                catch (UnauthorizedAccessException e)
-                {
-                    Console.WriteLine(e.Message);
-                    continue;
-                }
-                catch (DirectoryNotFoundException e)
-                {
-                    Console.WriteLine(e.Message);
-                    continue;
-                }
-                foreach (var f in files.Select(f => new FileInfo(f)))
-                {
-                    yield return f;
-                }
-            }
-        }
-
         public static void Main(string[] args)
         {
-            var app = new CommandLineApplication();
-            app.Name = "modsink";
-            app.FullName = "ModSink.CLI";
+            var app = new CommandLineApplication
+            {
+                Name = "modsink",
+                FullName = "ModSink.CLI"
+            };
             app.HelpOption("-?|-h|--help");
             app.ShortVersionGetter = () => typeof(Program).Assembly.GetName().Version.ToString();
 
