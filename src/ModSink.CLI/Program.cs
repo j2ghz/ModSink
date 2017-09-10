@@ -133,8 +133,8 @@ namespace ModSink.CLI
                     {
                         if (file.Length <= 0) continue;
                         Console.Write($"{(file.Length / (1024 * 1024)).ToString().PadLeft(5)}MB: ");
-                        using (var mmfile = MemoryMappedFile.CreateFromFile(file.FullName, FileMode.Open))
-                        using (var src = mmfile.CreateViewStream())
+                        using (var mmfile = MemoryMappedFile.CreateFromFile(file.FullName, FileMode.Open, null, 0, MemoryMappedFileAccess.Read))
+                        using (var src = mmfile.CreateViewStream(0, 0, MemoryMappedFileAccess.Read))
                         {
                             var start = DateTime.Now;
                             var hash = await hashing.GetFileHash(src, CancellationToken.None);
@@ -145,14 +145,21 @@ namespace ModSink.CLI
                             var fileDest = Path.Combine(pathDest, filehash.Hash.ToString());
                             try
                             {
-                                using (var dest = new FileStream(fileDest, FileMode.Create, FileAccess.Write))
+                                if (new FileInfo(fileDest).Exists)
                                 {
-                                    start = DateTime.Now;
-                                    using (var src2 = mmfile.CreateViewStream())
+                                    Console.Write($"    File exists | {file.FullName}");
+                                }
+                                else
+                                {
+                                    using (var dest = new FileStream(fileDest, FileMode.Create, FileAccess.Write))
                                     {
-                                        await src2.CopyToAsync(dest);
+                                        start = DateTime.Now;
+                                        using (var src2 = mmfile.CreateViewStream(0, 0, MemoryMappedFileAccess.Read))
+                                        {
+                                            await src2.CopyToAsync(dest);
+                                        }
+                                        Console.Write($"{((ulong)(file.Length / (DateTime.Now - start).TotalSeconds) / (1024UL * 1024UL)).ToString().PadLeft(5)}MB/s(copy) | {file.FullName}");
                                     }
-                                    Console.Write($"{((ulong)(file.Length / (DateTime.Now - start).TotalSeconds) / (1024UL * 1024UL)).ToString().PadLeft(5)}MB/s(copy) | {file.FullName}");
                                 }
                             }
                             catch (IOException ex)
