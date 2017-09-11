@@ -48,13 +48,16 @@ namespace ModSink.Common.Client
             throw new KeyNotFoundException($"Key {hash} was not found in a Files dictionary of any Repo");
         }
 
-        public async Task<Repo> LoadRepo(Uri uri, IObserver<DownloadProgress> progress)
+        public IObservable<DownloadProgress> LoadRepo(Uri uri)
         {
-            var stream = new MemoryStream();
-            var obs = this.Downloader.Download(uri, stream);
-            obs.Subscribe(progress);
-            await obs;
-            return this.SerializationFormatter.Deserialize(stream) as Repo;
+            return Observable.Create<DownloadProgress>(async o =>
+            {
+                var stream = new MemoryStream();
+                var obs = this.Downloader.Download(uri, stream);
+                obs.Subscribe(o);
+                await obs;
+                this.Repos.Add(this.SerializationFormatter.Deserialize(stream) as Repo);
+            });
         }
     }
 }

@@ -14,6 +14,7 @@ using System.Reactive.Linq;
 using System.Collections.Concurrent;
 using System.Runtime.Serialization.Formatters.Binary;
 using ModSink.Core.Client;
+using ModSink.Common.Client;
 
 namespace ModSink.CLI
 {
@@ -64,52 +65,29 @@ namespace ModSink.CLI
                 command.Description = "Downloads a file";
                 command.HelpOption("-?|-h|--help");
                 var uriArg = command.Argument("[uri]", "Uri to file to download");
+                var pathArg = command.Argument("[path]", "Path to local repo");
 
                 command.OnExecute(() =>
                 {
                     var uriStr = uriArg.Value;
                     var uri = new Uri(uriStr);
+                    var localStr = pathArg.Value;
+                    var localUri = new Uri(localStr);
 
-                    var client = new HttpClientDownloader();
-                    var obs = client.Download(uri, new FileInfo(Path.GetTempFileName()).OpenWrite());
-                    obs.Sample(TimeSpan.FromMilliseconds(100))
-                       .Buffer(2, 1)
-                       .Subscribe(progList =>
-                       {
-                           var prog = new DownloadProgressCombined(progList.Last(), progList.First());
-                           Console.WriteLine($"{prog.Current.Size}b {prog.Current.Downloaded}b {prog.Speed}b/s {prog.Current.State}");
-                       }, ex => Console.WriteLine(ex.ToString()), () => Console.WriteLine("Done"));
+                    var client = new ClientManager(null, new LocalRepoManager(localUri), new HttpClientDownloader(), new BinaryFormatter());
 
-                    obs.Wait();
+                    var repoDown = client.LoadRepo(uri);
+                    DumpDownloadProgress(repoDown);
+                    repoDown.Wait();
+
+                    client.Modpacks.ForEach(client.DownloadMissingFiles);
+
+                    //START client.DownloadManager
+
                     return 0;
                 });
             });
         }
-
-        //public static void AddHash(this CommandLineApplication app)
-        //{
-        //    app.Command("hash", (command) =>
-        //    {
-        //        command.Description = "Returns hash(es) of file(s)";
-        //        command.HelpOption("-?|-h|--help");
-        //        var pathArg = command.Argument("[path]", "Path to file to hash. If folder is provided, all files inside will be hashed");
-
-        //        command.OnExecute(() =>
-        //        {
-        //            var pathStr = pathArg.Value ?? ".";
-        //            var path = Path.Combine(Directory.GetCurrentDirectory(), pathStr);
-
-        //            var hash = new Hashing(new XXHash64());
-
-        //            var hashes = hash.GetFileHashes(new DirectoryInfo(path));
-
-        //            hashes.Subscribe(Observer.Create<FileWithHash>(a => Console.WriteLine(a.ToString())));
-
-        //            Console.WriteLine("Done.");
-        //            return 0;
-        //        });
-        //    });
-        //}
 
         public static void AddImport(this CommandLineApplication app)
         {
@@ -175,6 +153,11 @@ namespace ModSink.CLI
             });
         }
 
+        //            Console.WriteLine("Done.");
+        //            return 0;
+        //        });
+        //    });
+        //}
         public static void AddSampleRepo(this CommandLineApplication app)
         {
             app.Command("sampleRepo", (command) =>
@@ -229,6 +212,7 @@ namespace ModSink.CLI
             });
         }
 
+        //            hashes.Subscribe(Observer.Create<FileWithHash>(a => Console.WriteLine(a.ToString())));
         public static HashValue ComputeHash(FileInfo f, IHashFunction hashf)
         {
             try
@@ -253,6 +237,33 @@ namespace ModSink.CLI
             }
         }
 
+        public static void DumpDownloadProgress(IObservable<DownloadProgress> obs)
+        {
+            obs.Sample(TimeSpan.FromMilliseconds(100))
+                       .Buffer(2, 1)
+                       .Subscribe(progList =>
+                       {
+                           var prog = new DownloadProgressCombined(progList.Last(), progList.First());
+                           Console.WriteLine($"{prog.Current.Size}b {prog.Current.Downloaded}b {prog.Speed}b/s {prog.Current.State}");
+                       }, ex => Console.WriteLine(ex.ToString()), () => Console.WriteLine("Done"));
+        }
+
+        //public static void AddHash(this CommandLineApplication app)
+        //{
+        //    app.Command("hash", (command) =>
+        //    {
+        //        command.Description = "Returns hash(es) of file(s)";
+        //        command.HelpOption("-?|-h|--help");
+        //        var pathArg = command.Argument("[path]", "Path to file to hash. If folder is provided, all files inside will be hashed");
+
+        //        command.OnExecute(() =>
+        //        {
+        //            var pathStr = pathArg.Value ?? ".";
+        //            var path = Path.Combine(Directory.GetCurrentDirectory(), pathStr);
+
+        //            var hash = new Hashing(new XXHash64());
+
+        //            var hashes = hash.GetFileHashes(new DirectoryInfo(path));
         public static void Main(string[] args)
         {
             var app = new CommandLineApplication

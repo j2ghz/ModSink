@@ -20,6 +20,6 @@ namespace ModSink.Core.Client
 
         Uri GetDownloadUri(HashValue hash);
 
-        Task<Repo> LoadRepo(Uri uri, IObserver<DownloadProgress> progress);
+        public IObservable<DownloadProgress> LoadRepo(Uri uri)
     }
 }

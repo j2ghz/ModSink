@@ -8,12 +8,12 @@ namespace ModSink.Core.Client
 {
     public interface ILocalRepoManager
     {
-        Stream Create(HashValue hash);
-
         Uri GetFileUri(HashValue hash);
 
         bool IsFileAvailable(HashValue hash);
 
-        Stream Open(HashValue hash);
+        Stream Read(HashValue hash);
+
+        Stream Write(HashValue hash);
     }
 }
