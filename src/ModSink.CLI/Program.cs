@@ -62,9 +62,9 @@ namespace ModSink.CLI
         {
             app.Command("download", (command) =>
             {
-                command.Description = "Downloads a file";
+                command.Description = "Downloads a missing files from a repo";
                 command.HelpOption("-?|-h|--help");
-                var uriArg = command.Argument("[uri]", "Uri to file to download");
+                var uriArg = command.Argument("[uri]", "Uri to repo to download");
                 var pathArg = command.Argument("[path]", "Path to local repo");
 
                 command.OnExecute(() =>
@@ -73,16 +73,24 @@ namespace ModSink.CLI
                     var uri = new Uri(uriStr);
                     var localStr = pathArg.Value;
                     var localUri = new Uri(localStr);
+                    var downloader = new HttpClientDownloader();
+                    var client = new ClientManager(new DownloadManager(downloader), new LocalRepoManager(localUri), downloader, new BinaryFormatter());
 
-                    var client = new ClientManager(null, new LocalRepoManager(localUri), new HttpClientDownloader(), new BinaryFormatter());
-
+                    Console.WriteLine("Downloading repo");
                     var repoDown = client.LoadRepo(uri);
                     DumpDownloadProgress(repoDown);
                     repoDown.Wait();
-
-                    client.Modpacks.ForEach(client.DownloadMissingFiles);
-
-                    //START client.DownloadManager
+                    foreach (var modpack in client.Modpacks)
+                    {
+                        Console.WriteLine($"Scheduling {modpack.Name} [{modpack.Mods.Count} mods]");
+                        client.DownloadMissingFiles(modpack);
+                    }
+                    client.DownloadManager.DownloadStarted += (sender, d) => DumpDownloadProgress(d.Progress);
+                    foreach (var d in client.DownloadManager.Downloads)
+                    {
+                        Console.WriteLine($"{d.Source} {d.State}");
+                    }
+                    client.DownloadManager.CheckDownloadsToStart();
 
                     return 0;
                 });
@@ -153,11 +161,6 @@ namespace ModSink.CLI
             });
         }
 
-        //            Console.WriteLine("Done.");
-        //            return 0;
-        //        });
-        //    });
-        //}
         public static void AddSampleRepo(this CommandLineApplication app)
         {
             app.Command("sampleRepo", (command) =>
@@ -212,7 +215,6 @@ namespace ModSink.CLI
             });
         }
 
-        //            hashes.Subscribe(Observer.Create<FileWithHash>(a => Console.WriteLine(a.ToString())));
         public static HashValue ComputeHash(FileInfo f, IHashFunction hashf)
         {
             try
@@ -281,6 +283,7 @@ namespace ModSink.CLI
             app.AddImport();
 
             app.Execute(args.Length > 0 ? args : new string[] { "--help" });
+            Console.ReadKey();
         }
     }
 }

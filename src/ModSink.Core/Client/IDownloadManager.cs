@@ -6,6 +6,10 @@ namespace ModSink.Core.Client
 {
     public interface IDownloadManager
     {
-        ICollection<IDownload> Downloads { get; }
+        event EventHandler<IDownload> DownloadStarted;
+
+        IList<IDownload> Downloads { get; }
+
+        void CheckDownloadsToStart();
     }
 }

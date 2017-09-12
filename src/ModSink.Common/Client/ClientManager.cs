@@ -32,8 +32,12 @@ namespace ModSink.Common.Client
         {
             var files = modpack.Mods.SelectMany(mod => mod.Mod.Files.Select(f => f.Value));
             var filesToDownload = files.Where(f => !this.LocalRepoManager.IsFileAvailable(f));
-            var downloads = filesToDownload.Select(f => new Download(GetDownloadUri(f), new Lazy<System.IO.Stream>(() => this.LocalRepoManager.Create(f))));
-            downloads.ForEach(this.DownloadManager.Downloads.Add);
+            var downloads = filesToDownload.Select(f => new Download(GetDownloadUri(f), new Lazy<Stream>(() => this.LocalRepoManager.Write(f))));
+            foreach (var download in downloads)
+            {
+                Console.WriteLine(download.Source);
+                this.DownloadManager.Downloads.Add(download);
+            }
         }
 
         public Uri GetDownloadUri(HashValue hash)
@@ -50,14 +54,18 @@ namespace ModSink.Common.Client
 
         public IObservable<DownloadProgress> LoadRepo(Uri uri)
         {
-            return Observable.Create<DownloadProgress>(async o =>
+            var obs = Observable.Create<DownloadProgress>(async o =>
             {
                 var stream = new MemoryStream();
-                var obs = this.Downloader.Download(uri, stream);
-                obs.Subscribe(o);
-                await obs;
-                this.Repos.Add(this.SerializationFormatter.Deserialize(stream) as Repo);
-            });
+                var progress = this.Downloader.Download(uri, stream);
+                progress.Subscribe(o.OnNext, o.OnError, () => { });
+                await progress;
+                stream.Position = 0;
+                this.Repos.Add((Repo)this.SerializationFormatter.Deserialize(stream));
+                o.OnCompleted();
+            }).Publish();
+            obs.Connect();
+            return obs;
         }
     }
 }
