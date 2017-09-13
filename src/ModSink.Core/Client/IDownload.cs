@@ -7,7 +7,7 @@ namespace ModSink.Core.Client
 {
     public enum DownloadState
     {
-        Stopped,
+        Queued,
         Downloading,
         Errored,
         Finished
@@ -16,6 +16,7 @@ namespace ModSink.Core.Client
     public interface IDownload
     {
         Lazy<Stream> Destination { get; }
+        string Name { get; }
         IObservable<DownloadProgress> Progress { get; }
         Uri Source { get; }
         DownloadState State { get; }

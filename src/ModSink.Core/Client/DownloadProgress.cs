@@ -1,15 +1,16 @@
-﻿using System;
+﻿using Humanizer.Bytes;
+using System;
 
 namespace ModSink.Core.Client
 {
     public struct DownloadProgress
     {
-        public readonly ulong Downloaded;
-        public readonly ulong Size;
-        public readonly DownloadState State;
+        public readonly ByteSize Downloaded;
+        public readonly ByteSize Size;
+        public readonly TransferState State;
         public readonly DateTime Timestamp;
 
-        public DownloadProgress(ulong size, ulong downloaded, DownloadState state)
+        public DownloadProgress(ByteSize size, ByteSize downloaded, TransferState state)
         {
             this.Size = size;
             this.Downloaded = downloaded;
@@ -17,7 +18,7 @@ namespace ModSink.Core.Client
             this.Timestamp = DateTime.Now;
         }
 
-        public enum DownloadState
+        public enum TransferState
         {
             AwaitingResponse,
             ReadingResponse,
@@ -25,6 +26,6 @@ namespace ModSink.Core.Client
             Finished
         }
 
-        public ulong Remaining => this.Size - this.Downloaded;
+        public ByteSize Remaining => this.Size.Subtract(this.Downloaded);
     }
 }

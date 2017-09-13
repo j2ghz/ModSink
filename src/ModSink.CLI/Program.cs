@@ -3,18 +3,16 @@ using System.Collections.Generic;
 using System.IO;
 using System;
 using System.Linq;
-using System.Reactive;
 using ModSink.Common;
 using System.Threading;
-using System.Diagnostics;
 using ModSink.Core;
 using ModSink.Core.Models.Repo;
 using System.IO.MemoryMappedFiles;
 using System.Reactive.Linq;
-using System.Collections.Concurrent;
 using System.Runtime.Serialization.Formatters.Binary;
 using ModSink.Core.Client;
 using ModSink.Common.Client;
+using Humanizer;
 
 namespace ModSink.CLI
 {
@@ -67,7 +65,7 @@ namespace ModSink.CLI
                 var uriArg = command.Argument("[uri]", "Uri to repo to download");
                 var pathArg = command.Argument("[path]", "Path to local repo");
 
-                command.OnExecute(() =>
+                command.OnExecute(async () =>
                 {
                     var uriStr = uriArg.Value;
                     var uri = new Uri(uriStr);
@@ -78,20 +76,20 @@ namespace ModSink.CLI
 
                     Console.WriteLine("Downloading repo");
                     var repoDown = client.LoadRepo(uri);
-                    DumpDownloadProgress(repoDown);
-                    repoDown.Wait();
+                    DumpDownloadProgress(repoDown, "Repo");
+                    await repoDown;
                     foreach (var modpack in client.Modpacks)
                     {
                         Console.WriteLine($"Scheduling {modpack.Name} [{modpack.Mods.Count} mods]");
                         client.DownloadMissingFiles(modpack);
                     }
-                    client.DownloadManager.DownloadStarted += (sender, d) => DumpDownloadProgress(d.Progress);
-                    foreach (var d in client.DownloadManager.Downloads)
+                    client.DownloadManager.DownloadStarted += (sender, d) =>
                     {
-                        Console.WriteLine($"{d.Source} {d.State}");
-                    }
+                        Console.WriteLine($"Starting {d.Source}");
+                        DumpDownloadProgress(d.Progress, d.Name);
+                    };
                     client.DownloadManager.CheckDownloadsToStart();
-
+                    Console.ReadKey();
                     return 0;
                 });
             });
@@ -122,7 +120,7 @@ namespace ModSink.CLI
 
                         Console.WriteLine("Downloading repo");
                         var repoDown = client.LoadRepo(uri);
-                        DumpDownloadProgress(repoDown);
+                        DumpDownloadProgress(repoDown, "Repo");
                         repoDown.Wait();
                         foreach (var repo in client.Repos)
                         {
@@ -156,22 +154,22 @@ namespace ModSink.CLI
                     foreach (var file in hashing.GetFiles(new DirectoryInfo(path)))
                     {
                         if (file.Length <= 0) continue;
-                        Console.Write($"{(file.Length / (1024 * 1024)).ToString().PadLeft(5)}MB: ");
+                        var size = file.Length.Bytes();
+                        Console.Write($"{size.Humanize("#").PadLeft(10)}: ");
                         using (var mmfile = MemoryMappedFile.CreateFromFile(file.FullName, FileMode.Open, null, 0, MemoryMappedFileAccess.Read))
                         using (var src = mmfile.CreateViewStream(0, 0, MemoryMappedFileAccess.Read))
                         {
                             var start = DateTime.Now;
                             var hash = await hashing.GetFileHash(src, CancellationToken.None);
                             var filehash = new FileWithHash(file, hash);
-                            var elapsed = (DateTime.Now - start).TotalSeconds;
-                            var speed = (ulong)(file.Length / elapsed) / (1024UL * 1024UL);
-                            Console.Write($"{hash} {speed.ToString().PadLeft(5)}MB/s(hash) | ");
+                            var speed = size.Per((DateTime.Now - start));
+                            Console.Write($"{hash} {speed.Humanize("#").PadLeft(10)}(hash) | ");
                             var fileDest = Path.Combine(pathDest, filehash.Hash.ToString());
                             try
                             {
                                 if (new FileInfo(fileDest).Exists)
                                 {
-                                    Console.Write($"    File exists | {file.FullName}");
+                                    Console.Write($"                 | {file.FullName}");
                                 }
                                 else
                                 {
@@ -182,7 +180,7 @@ namespace ModSink.CLI
                                         {
                                             await src2.CopyToAsync(dest);
                                         }
-                                        Console.Write($"{((ulong)(file.Length / (DateTime.Now - start).TotalSeconds) / (1024UL * 1024UL)).ToString().PadLeft(5)}MB/s(copy) | {file.FullName}");
+                                        Console.Write($"{size.Per((DateTime.Now - start)).Humanize("#").PadLeft(10)}(copy) | {file.FullName}");
                                     }
                                 }
                             }
@@ -264,7 +262,7 @@ namespace ModSink.CLI
                     Console.Write($"{sizeMB.ToString().PadLeft(5)}MB: ");
                     var hash = hashf.ComputeHashAsync(stream, CancellationToken.None).GetAwaiter().GetResult();
                     var elapsed = (DateTime.Now - start).TotalSeconds;
-                    var speed = (ulong)(f.Length / elapsed) / (1024UL * 1024UL);
+                    var speed = (long)(f.Length / elapsed) / (1024L * 1024L);
                     Console.WriteLine($"'{hash}' @{speed.ToString().PadLeft(5)}MB/s at {f.FullName}");
                     return hash;
                 }
@@ -277,18 +275,20 @@ namespace ModSink.CLI
             }
         }
 
-        public static void DumpDownloadProgress(IObservable<DownloadProgress> obs)
+        public static void DumpDownloadProgress(IObservable<DownloadProgress> obs, string name)
         {
-            obs.Sample(TimeSpan.FromMilliseconds(100))
+            obs.Sample(TimeSpan.FromMilliseconds(250))
                        .Buffer(2, 1)
                        .Subscribe(progList =>
                        {
                            var prog = new DownloadProgressCombined(progList.Last(), progList.First());
-                           Console.WriteLine($"{prog.Current.Size}b {prog.Current.Downloaded}b {prog.Speed}b/s {prog.Current.State}");
+                           var dbl = prog.Current.Remaining.Bytes / prog.Speed.Size.Bytes;
+                           if (Double.IsNaN(dbl)) dbl = 0;
+                           var eta = prog.Speed.Interval.Multiply(dbl);
+                           Console.WriteLine($"\t{prog.Current.State} {name.PadRight(23)} {prog.Current.Remaining.Humanize("#.#").PadLeft(8)} left @ {prog.Speed.Humanize("#.#").PadLeft(10)} ETA: {eta.Humanize(2)}");
                        }, ex => Console.WriteLine(ex.ToString()), () => Console.WriteLine("Done"));
         }
 
-        //            var hashes = hash.GetFileHashes(new DirectoryInfo(path));
         public static void Main(string[] args)
         {
             var app = new CommandLineApplication
@@ -299,12 +299,12 @@ namespace ModSink.CLI
             app.HelpOption("-?|-h|--help");
             app.ShortVersionGetter = () => typeof(Program).Assembly.GetName().Version.ToString();
 
-            //app.AddHash();
             app.AddColCheck();
             app.AddSampleRepo();
             app.AddDownload();
             app.AddImport();
             app.AddDump();
+            //TODO: Add hashed folder recheck
 
             app.Execute(args.Length > 0 ? args : new string[] { "--help" });
         }
@@ -329,20 +329,5 @@ namespace ModSink.CLI
                 }
             }
         }
-
-        //public static void AddHash(this CommandLineApplication app)
-        //{
-        //    app.Command("hash", (command) =>
-        //    {
-        //        command.Description = "Returns hash(es) of file(s)";
-        //        command.HelpOption("-?|-h|--help");
-        //        var pathArg = command.Argument("[path]", "Path to file to hash. If folder is provided, all files inside will be hashed");
-
-        //        command.OnExecute(() =>
-        //        {
-        //            var pathStr = pathArg.Value ?? ".";
-        //            var path = Path.Combine(Directory.GetCurrentDirectory(), pathStr);
-
-        //            var hash = new Hashing(new XXHash64());
     }
 }

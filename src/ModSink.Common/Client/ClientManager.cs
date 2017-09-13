@@ -8,6 +8,7 @@ using System.Linq;
 using System.IO;
 using System.Reactive.Linq;
 using System.Runtime.Serialization;
+using System.IO.MemoryMappedFiles;
 
 namespace ModSink.Common.Client
 {
@@ -32,10 +33,9 @@ namespace ModSink.Common.Client
         {
             var files = modpack.Mods.SelectMany(mod => mod.Mod.Files.Select(f => f.Value));
             var filesToDownload = files.Where(f => !this.LocalRepoManager.IsFileAvailable(f));
-            var downloads = filesToDownload.Select(f => new Download(GetDownloadUri(f), new Lazy<Stream>(() => this.LocalRepoManager.Write(f))));
+            var downloads = filesToDownload.Select(f => new Download(GetDownloadUri(f), new Lazy<Stream>(() => this.LocalRepoManager.Write(f)), f.ToString()));
             foreach (var download in downloads)
             {
-                Console.WriteLine(download.Source);
                 this.DownloadManager.Downloads.Add(download);
             }
         }
@@ -56,11 +56,12 @@ namespace ModSink.Common.Client
         {
             var obs = Observable.Create<DownloadProgress>(async o =>
             {
-                var stream = new MemoryStream();
-                var progress = this.Downloader.Download(uri, stream);
+                var tempFile = Path.GetTempFileName();
+                var stream = new FileStream(tempFile, FileMode.Create);
+                var progress = this.Downloader.Download(uri, stream, "Repo");
                 progress.Subscribe(o.OnNext, o.OnError, () => { });
                 await progress;
-                stream.Position = 0;
+                stream = new FileStream(tempFile, FileMode.Open, FileAccess.Read);
                 var repo = (Repo)this.SerializationFormatter.Deserialize(stream);
                 repo.BaseUri = new Uri(uri, ".");
                 this.Repos.Add(repo);

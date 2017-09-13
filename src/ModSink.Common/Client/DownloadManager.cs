@@ -19,23 +19,24 @@ namespace ModSink.Common.Client
 
         public event EventHandler<IDownload> DownloadStarted;
 
-        public ICollection<IDownload> Downloads => new List<IDownload>();
+        public ICollection<IDownload> Downloads { get; } = new List<IDownload>();
 
         public void CheckDownloadsToStart()
         {
-            var toStart = this.Downloads.Count(d => d.State == DownloadState.Downloading) - this.simultaneousDownloads;
+            var toStart = this.simultaneousDownloads - this.Downloads.Count(d => d.State == DownloadState.Downloading);
             for (int i = 0; i < toStart; i++)
             {
                 var d = NextDownload();
-                var obs = this.downloader.Download(d);
-                DownloadStarted(this, d);
-                obs.Subscribe(null, _ => CheckDownloadsToStart(), () => CheckDownloadsToStart());
+                if (d == null) break;
+                d.Start(this.downloader);
+                d.Progress.Subscribe(_ => { }, _ => CheckDownloadsToStart(), () => CheckDownloadsToStart());
+                OnDownloadStarted(d);
             }
         }
 
         private IDownload NextDownload()
         {
-            return this.Downloads.First();
+            return this.Downloads.Where(d => d.State == DownloadState.Queued).FirstOrDefault();
         }
 
         private void OnDownloadStarted(IDownload e) => DownloadStarted?.Invoke(this, e);
