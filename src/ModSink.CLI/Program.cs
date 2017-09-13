@@ -97,6 +97,51 @@ namespace ModSink.CLI
             });
         }
 
+        public static void AddDump(this CommandLineApplication app)
+        {
+            app.Command("dump", (command) =>
+            {
+                command.Description = "Writes out the contents of a repo";
+                command.HelpOption("-?|-h|--help");
+                var uriArg = command.Argument("[uri]", "Uri to repo to download");
+
+                command.OnExecute(() =>
+                {
+                    var uriStr = uriArg.Value;
+                    var uri = new Uri(uriStr);
+                    var downloader = new HttpClientDownloader();
+                    var client = new ClientManager(new DownloadManager(downloader), null, downloader, new BinaryFormatter());
+
+                    Console.WriteLine("Downloading repo");
+                    var repoDown = client.LoadRepo(uri);
+                    DumpDownloadProgress(repoDown);
+                    repoDown.Wait();
+                    foreach (var repo in client.Repos)
+                    {
+                        Console.WriteLine($"Repo at {repo.BaseUri}");
+                        Console.WriteLine($"Files:");
+                        foreach (var file in repo.Files)
+                        {
+                            Console.WriteLine($"\t{file.Key} at {new Uri(repo.BaseUri, file.Value)}");
+                        }
+
+                        Console.WriteLine($"ModPacks:");
+                        foreach (var modpack in repo.Modpacks)
+                        {
+                            Console.WriteLine($"\tModpack '{modpack.Name}'");
+                            Console.WriteLine($"\tMods:");
+                            foreach (var mod in modpack.Mods)
+                            {
+                                Console.WriteLine($"\t\tMod: '{mod.Mod.Name}' [{mod.Mod.Files.Count} files]");
+                            }
+                        }
+                    }
+
+                    return 0;
+                });
+            });
+        }
+
         public static void AddImport(this CommandLineApplication app)
         {
             app.Command("import", (command) =>
@@ -281,6 +326,7 @@ namespace ModSink.CLI
             app.AddSampleRepo();
             app.AddDownload();
             app.AddImport();
+            app.AddDump();
 
             app.Execute(args.Length > 0 ? args : new string[] { "--help" });
         }
