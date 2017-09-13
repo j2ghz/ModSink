@@ -109,31 +109,24 @@ namespace ModSink.CLI
                 {
                     var uriStr = uriArg.Value;
                     var uri = new Uri(uriStr);
-                    var downloader = new HttpClientDownloader();
-                    var client = new ClientManager(new DownloadManager(downloader), null, downloader, new BinaryFormatter());
-
-                    Console.WriteLine("Downloading repo");
-                    var repoDown = client.LoadRepo(uri);
-                    DumpDownloadProgress(repoDown);
-                    repoDown.Wait();
-                    foreach (var repo in client.Repos)
+                    if (uri.IsFile)
                     {
-                        Console.WriteLine($"Repo at {repo.BaseUri}");
-                        Console.WriteLine($"Files:");
-                        foreach (var file in repo.Files)
-                        {
-                            Console.WriteLine($"\t{file.Key} at {new Uri(repo.BaseUri, file.Value)}");
-                        }
+                        var repo = (Repo)(new BinaryFormatter()).Deserialize(new FileInfo(uri.LocalPath).OpenRead());
+                        repo.BaseUri = new Uri("http://base.uri/repo/");
+                        DumpRepo(repo);
+                    }
+                    else
+                    {
+                        var downloader = new HttpClientDownloader();
+                        var client = new ClientManager(new DownloadManager(downloader), null, downloader, new BinaryFormatter());
 
-                        Console.WriteLine($"ModPacks:");
-                        foreach (var modpack in repo.Modpacks)
+                        Console.WriteLine("Downloading repo");
+                        var repoDown = client.LoadRepo(uri);
+                        DumpDownloadProgress(repoDown);
+                        repoDown.Wait();
+                        foreach (var repo in client.Repos)
                         {
-                            Console.WriteLine($"\tModpack '{modpack.Name}'");
-                            Console.WriteLine($"\tMods:");
-                            foreach (var mod in modpack.Mods)
-                            {
-                                Console.WriteLine($"\t\tMod: '{mod.Mod.Name}' [{mod.Mod.Files.Count} files]");
-                            }
+                            DumpRepo(repo);
                         }
                     }
 
@@ -295,21 +288,6 @@ namespace ModSink.CLI
                        }, ex => Console.WriteLine(ex.ToString()), () => Console.WriteLine("Done"));
         }
 
-        //public static void AddHash(this CommandLineApplication app)
-        //{
-        //    app.Command("hash", (command) =>
-        //    {
-        //        command.Description = "Returns hash(es) of file(s)";
-        //        command.HelpOption("-?|-h|--help");
-        //        var pathArg = command.Argument("[path]", "Path to file to hash. If folder is provided, all files inside will be hashed");
-
-        //        command.OnExecute(() =>
-        //        {
-        //            var pathStr = pathArg.Value ?? ".";
-        //            var path = Path.Combine(Directory.GetCurrentDirectory(), pathStr);
-
-        //            var hash = new Hashing(new XXHash64());
-
         //            var hashes = hash.GetFileHashes(new DirectoryInfo(path));
         public static void Main(string[] args)
         {
@@ -330,5 +308,41 @@ namespace ModSink.CLI
 
             app.Execute(args.Length > 0 ? args : new string[] { "--help" });
         }
+
+        private static void DumpRepo(Repo repo)
+        {
+            Console.WriteLine($"Repo at {repo.BaseUri}");
+            Console.WriteLine($"Files:");
+            foreach (var file in repo.Files)
+            {
+                Console.WriteLine($"\t{file.Key} at {new Uri(repo.BaseUri, file.Value)}");
+            }
+
+            Console.WriteLine($"ModPacks:");
+            foreach (var modpack in repo.Modpacks)
+            {
+                Console.WriteLine($"\tModpack '{modpack.Name}'");
+                Console.WriteLine($"\tMods:");
+                foreach (var mod in modpack.Mods)
+                {
+                    Console.WriteLine($"\t\tMod: '{mod.Mod.Name}' [{mod.Mod.Files.Count} files]");
+                }
+            }
+        }
+
+        //public static void AddHash(this CommandLineApplication app)
+        //{
+        //    app.Command("hash", (command) =>
+        //    {
+        //        command.Description = "Returns hash(es) of file(s)";
+        //        command.HelpOption("-?|-h|--help");
+        //        var pathArg = command.Argument("[path]", "Path to file to hash. If folder is provided, all files inside will be hashed");
+
+        //        command.OnExecute(() =>
+        //        {
+        //            var pathStr = pathArg.Value ?? ".";
+        //            var path = Path.Combine(Directory.GetCurrentDirectory(), pathStr);
+
+        //            var hash = new Hashing(new XXHash64());
     }
 }
