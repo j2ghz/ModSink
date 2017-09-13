@@ -44,9 +44,9 @@ namespace ModSink.Common.Client
         {
             foreach (var repo in this.Repos)
             {
-                if (repo.Files.TryGetValue(hash, out Uri uri))
+                if (repo.Files.TryGetValue(hash, out Uri relativeUri))
                 {
-                    return uri;
+                    return new Uri(repo.BaseUri, relativeUri);
                 }
             }
             throw new KeyNotFoundException($"Key {hash} was not found in a Files dictionary of any Repo");
@@ -61,7 +61,9 @@ namespace ModSink.Common.Client
                 progress.Subscribe(o.OnNext, o.OnError, () => { });
                 await progress;
                 stream.Position = 0;
-                this.Repos.Add((Repo)this.SerializationFormatter.Deserialize(stream));
+                var repo = (Repo)this.SerializationFormatter.Deserialize(stream);
+                repo.BaseUri = new Uri(uri, ".");
+                this.Repos.Add(repo);
                 o.OnCompleted();
             }).Publish();
             obs.Connect();

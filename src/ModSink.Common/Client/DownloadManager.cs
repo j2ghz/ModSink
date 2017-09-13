@@ -19,7 +19,7 @@ namespace ModSink.Common.Client
 
         public event EventHandler<IDownload> DownloadStarted;
 
-        public IList<IDownload> Downloads => new List<IDownload>();
+        public ICollection<IDownload> Downloads => new List<IDownload>();
 
         public void CheckDownloadsToStart()
         {

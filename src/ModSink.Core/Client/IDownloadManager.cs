@@ -8,7 +8,7 @@ namespace ModSink.Core.Client
     {
         event EventHandler<IDownload> DownloadStarted;
 
-        IList<IDownload> Downloads { get; }
+        ICollection<IDownload> Downloads { get; }
 
         void CheckDownloadsToStart();
     }
