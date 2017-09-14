@@ -24,7 +24,7 @@ namespace Modsink.Common.Tests
 
             var modpacks = new Faker<Modpack>()
                 .RuleFor(mp => mp.Mods, f => f.PickRandom(mods, 50).Select(m => new ModEntry() { Mod = m }).ToList())
-                .Generate(10).ToList();
+                .Generate(10);
 
             return new Repo
             {

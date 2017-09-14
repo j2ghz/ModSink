@@ -7,7 +7,6 @@ using ModSink.Common;
 using System.Threading;
 using ModSink.Core;
 using ModSink.Core.Models.Repo;
-using System.IO.MemoryMappedFiles;
 using System.Reactive.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
 using ModSink.Core.Client;
@@ -140,7 +139,7 @@ namespace ModSink.CLI
             {
                 command.Description = "Checks that every file in the folder is named as its hash and deletes if it's not";
                 command.HelpOption("-?|-h|--help");
-                var pathArg = command.Argument("[path]", "");
+                var pathArg = command.Argument("[path]", "Path to folder to check");
 
                 command.OnExecute(async () =>
                 {
@@ -161,8 +160,7 @@ namespace ModSink.CLI
                         var hashFromName = Path.GetFileNameWithoutExtension(file.FullName);
                         Console.Write($"{size.Humanize("#").PadLeft(10)}: {hashFromName} | ");
                         HashValue hash;
-                        using (var mmfile = MemoryMappedFile.CreateFromFile(file.FullName, FileMode.Open, null, 0, MemoryMappedFileAccess.Read))
-                        using (var src = mmfile.CreateViewStream(0, 0, MemoryMappedFileAccess.Read))
+                        using (var src = file.OpenRead())
                         {
                             var start = DateTime.Now;
                             hash = await hashing.GetFileHash(src, CancellationToken.None);
@@ -188,8 +186,8 @@ namespace ModSink.CLI
             {
                 command.Description = "Copies every file in the folder and renames it to its hash";
                 command.HelpOption("-?|-h|--help");
-                var pathArg = command.Argument("[path]", "");
-                var pathDestArg = command.Argument("[dest path]", "");
+                var pathArg = command.Argument("[path]", "Path to folder to look for files in");
+                var pathDestArg = command.Argument("[dest path]", "Path in which to copy the files");
 
                 command.OnExecute(async () =>
                 {
@@ -205,8 +203,7 @@ namespace ModSink.CLI
                         if (file.Length <= 0) continue;
                         var size = file.Length.Bytes();
                         Console.Write($"{size.Humanize("#").PadLeft(10)}: ");
-                        using (var mmfile = MemoryMappedFile.CreateFromFile(file.FullName, FileMode.Open, null, 0, MemoryMappedFileAccess.Read))
-                        using (var src = mmfile.CreateViewStream(0, 0, MemoryMappedFileAccess.Read))
+                        using (var src = file.OpenRead())
                         {
                             var start = DateTime.Now;
                             var hash = await hashing.GetFileHash(src, CancellationToken.None);
@@ -225,10 +222,8 @@ namespace ModSink.CLI
                                     using (var dest = new FileStream(fileDest, FileMode.Create, FileAccess.Write))
                                     {
                                         start = DateTime.Now;
-                                        using (var src2 = mmfile.CreateViewStream(0, 0, MemoryMappedFileAccess.Read))
-                                        {
-                                            await src2.CopyToAsync(dest);
-                                        }
+                                        src.Position = 0;
+                                        await src.CopyToAsync(dest);
                                         Console.Write($"{size.Per((DateTime.Now - start)).Humanize("#").PadLeft(10)}(copy) | {file.FullName}");
                                     }
                                 }

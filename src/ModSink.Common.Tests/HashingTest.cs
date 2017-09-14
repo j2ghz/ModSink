@@ -11,6 +11,7 @@ using System.Reactive.Linq;
 using System.Text;
 using System.Threading;
 using Xunit;
+using FluentAssertions;
 
 namespace Modsink.Common.Tests
 {

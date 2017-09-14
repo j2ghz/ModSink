@@ -8,7 +8,6 @@ using System.Linq;
 using System.IO;
 using System.Reactive.Linq;
 using System.Runtime.Serialization;
-using System.IO.MemoryMappedFiles;
 
 namespace ModSink.Common.Client
 {

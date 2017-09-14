@@ -23,9 +23,16 @@ namespace ModSink.Common
 
         public async Task<HashValue> GetFileHash(FileInfo file, CancellationToken cancel)
         {
-            using (var stream = file.OpenRead())
+            if (file.Length > 0)
             {
-                return await this.hashFunction.ComputeHashAsync(stream, cancel);
+                using (var stream = file.OpenRead())
+                {
+                    return await this.hashFunction.ComputeHashAsync(stream, cancel);
+                }
+            }
+            else
+            {
+                return this.hashFunction.HashOfEmpty;
             }
         }
 
