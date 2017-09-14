@@ -35,7 +35,8 @@ namespace ModSink.CLI
                     hashing.GetFiles(new DirectoryInfo(path))
                     .Select(f =>
                     {
-                        var hash = ComputeHash(f, xxhash);
+                        var hash = hashing.GetFileHash(f, CancellationToken.None).GetAwaiter().GetResult();
+                        Console.WriteLine($"{hash} {Path.GetRelativePath(path, f.FullName)}");
                         return new { f, hash };
                     })
                     .GroupBy(a => a.hash.ToString())
@@ -128,6 +129,54 @@ namespace ModSink.CLI
                         }
                     }
 
+                    return 0;
+                });
+            });
+        }
+
+        public static void AddCheck(this CommandLineApplication app)
+        {
+            app.Command("check", (command) =>
+            {
+                command.Description = "Checks that every file in the folder is named as its hash and deletes if it's not";
+                command.HelpOption("-?|-h|--help");
+                var pathArg = command.Argument("[path]", "");
+
+                command.OnExecute(async () =>
+                {
+                    var pathStr = pathArg.Value ?? "./hashed";
+                    var path = Path.Combine(Directory.GetCurrentDirectory(), pathStr);
+
+                    var hashing = new Hashing(new XXHash64());
+                    var client = new ClientManager(null, new LocalRepoManager(new Uri(path)), null, null);
+
+                    foreach (var file in hashing.GetFiles(new DirectoryInfo(path)).OrderBy(f => f.Length))
+                    {
+                        if (file.Length <= 0)
+                        {
+                            file.Delete();
+                            continue;
+                        }
+                        var size = file.Length.Bytes();
+                        var hashFromName = Path.GetFileNameWithoutExtension(file.FullName);
+                        Console.Write($"{size.Humanize("#").PadLeft(10)}: {hashFromName} | ");
+                        HashValue hash;
+                        using (var mmfile = MemoryMappedFile.CreateFromFile(file.FullName, FileMode.Open, null, 0, MemoryMappedFileAccess.Read))
+                        using (var src = mmfile.CreateViewStream(0, 0, MemoryMappedFileAccess.Read))
+                        {
+                            var start = DateTime.Now;
+                            hash = await hashing.GetFileHash(src, CancellationToken.None);
+                            var filehash = new FileWithHash(file, hash);
+                            var speed = size.Per((DateTime.Now - start));
+                            Console.Write($"{hash} | {speed.Humanize("#").PadLeft(10)} | ");
+                        }
+                        if (hash.ToString() != hashFromName)
+                        {
+                            Console.Write("DELETE");
+                            file.Delete();
+                        }
+                        Console.WriteLine();
+                    }
                     return 0;
                 });
             });
@@ -251,30 +300,6 @@ namespace ModSink.CLI
             });
         }
 
-        public static HashValue ComputeHash(FileInfo f, IHashFunction hashf)
-        {
-            try
-            {
-                using (var stream = MemoryMappedFile.CreateFromFile(f.FullName).CreateViewStream())
-                {
-                    var sizeMB = f.Length / (1024L * 1024);
-                    var start = DateTime.Now;
-                    Console.Write($"{sizeMB.ToString().PadLeft(5)}MB: ");
-                    var hash = hashf.ComputeHashAsync(stream, CancellationToken.None).GetAwaiter().GetResult();
-                    var elapsed = (DateTime.Now - start).TotalSeconds;
-                    var speed = (long)(f.Length / elapsed) / (1024L * 1024L);
-                    Console.WriteLine($"'{hash}' @{speed.ToString().PadLeft(5)}MB/s at {f.FullName}");
-                    return hash;
-                }
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine();
-                Console.Error.WriteLine(e.ToString());
-                return new HashValue(new byte[] { 0 });
-            }
-        }
-
         public static void DumpDownloadProgress(IObservable<DownloadProgress> obs, string name)
         {
             obs.Sample(TimeSpan.FromMilliseconds(250))
@@ -285,7 +310,7 @@ namespace ModSink.CLI
                            var dbl = prog.Current.Remaining.Bytes / prog.Speed.Size.Bytes;
                            if (Double.IsNaN(dbl)) dbl = 0;
                            var eta = prog.Speed.Interval.Multiply(dbl);
-                           Console.WriteLine($"\t{prog.Current.State} {name.PadRight(23)} {prog.Current.Remaining.Humanize("#.#").PadLeft(8)} left @ {prog.Speed.Humanize("#.#").PadLeft(10)} ETA: {eta.Humanize(2)}");
+                           Console.WriteLine($"\t{prog.Current.State} {name.PadRight(23)} {prog.Current.Remaining.Humanize("#.#").PadLeft(8)} left @ {prog.Speed.Humanize("#.#").PadLeft(10)} ETA: {eta.Humanize()}");
                        }, ex => Console.WriteLine(ex.ToString()), () => Console.WriteLine("Done"));
         }
 
@@ -304,7 +329,7 @@ namespace ModSink.CLI
             app.AddDownload();
             app.AddImport();
             app.AddDump();
-            //TODO: Add hashed folder recheck
+            app.AddCheck();
 
             app.Execute(args.Length > 0 ? args : new string[] { "--help" });
         }

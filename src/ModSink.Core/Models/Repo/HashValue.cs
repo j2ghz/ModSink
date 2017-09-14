@@ -6,7 +6,6 @@ using System.Linq;
 namespace ModSink.Core.Models.Repo
 {
     [Serializable]
-    [DebuggerDisplay("{Value}")]
     public struct HashValue : IEquatable<HashValue>
     {
         public HashValue(byte[] value) => this.Value = value;
