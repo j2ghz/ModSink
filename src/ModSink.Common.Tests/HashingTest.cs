@@ -18,22 +18,13 @@ namespace Modsink.Common.Tests
     public class HashingTest
     {
         [Fact]
-        public void GetFileHashesEmpty()
+        public async System.Threading.Tasks.Task GetHashOfEmptyAsync()
         {
             var hashF = new XXHash64();
             var hashing = new Hashing(hashF);
-            var files = Enumerable.Range(0, 3).Select(_ => Path.GetTempFileName()).Select(path => new FileInfo(path));
-
-            var obs = files.ToObservable().SelectMany(async fi => new FileWithHash(fi, await hashing.GetFileHash(fi, CancellationToken.None)));
-            obs.Subscribe(Observer.Create<FileWithHash>(t => Assert.Equal(hashF.HashOfEmpty, t.Hash)));
-            obs.Wait();
-            var result = obs.ToEnumerable();
-            Assert.Equal(3, result.Count());
-            foreach (var pair in result)
-            {
-                Assert.Equal(hashF.HashOfEmpty, pair.Hash);
-                Assert.Equal(0, pair.File.Length);
-            }
+            var stream = new MemoryStream(new byte[] { });
+            var hash = await hashing.GetFileHash(stream, CancellationToken.None);
+            hash.ShouldBeEquivalentTo(hashF.HashOfEmpty);
         }
     }
 }

@@ -8,6 +8,8 @@ namespace ModSink.Core.Client
 {
     public interface ILocalRepoManager
     {
+        void Delete(HashValue hash);
+
         Uri GetFileUri(HashValue hash);
 
         bool IsFileAvailable(HashValue hash);

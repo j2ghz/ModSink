@@ -18,6 +18,11 @@ namespace ModSink.Common.Client
             this.localDir = new DirectoryInfo(localPath.LocalPath);
         }
 
+        public void Delete(HashValue hash)
+        {
+            GetFileInfo(hash).Delete();
+        }
+
         public Uri GetFileUri(HashValue hash)
         {
             return new Uri(this.localPath, hash.ToString());
@@ -25,7 +30,7 @@ namespace ModSink.Common.Client
 
         public bool IsFileAvailable(HashValue hash)
         {
-            return new FileInfo(GetFileUri(hash).LocalPath).Exists;
+            return GetFileInfo(hash).Exists;
         }
 
         public Stream Read(HashValue hash)
@@ -40,6 +45,11 @@ namespace ModSink.Common.Client
             var uri = GetFileUri(hash);
             var file = new FileInfo(uri.LocalPath);
             return file.Open(FileMode.Create, FileAccess.Write);
+        }
+
+        private FileInfo GetFileInfo(HashValue hash)
+        {
+            return new FileInfo(GetFileUri(hash).LocalPath);
         }
     }
 }

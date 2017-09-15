@@ -13,7 +13,7 @@ namespace Modsink.Common.Tests
         public static Repo Repo()
         {
             var files = new Faker<Tuple<Uri, HashValue>>()
-                .CustomInstantiator(f => new Tuple<Uri, HashValue>(new Uri(Path.GetTempFileName()), new HashValue(f.Random.Bytes(8))))
+                .CustomInstantiator(f => new Tuple<Uri, HashValue>(new Uri(Path.GetFullPath(f.System.FilePath())), new HashValue(f.Random.Bytes(8))))
                 .Generate(1000).ToDictionary(a => a.Item1, a => a.Item2);
 
             var mods = new Faker<Mod>()
