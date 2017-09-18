@@ -9,3 +9,5 @@ artifacts:
 environment:
   NUGET_KEY:
     secure: Ob5EBMb27Otq2AJxXRNMa/2ziJQ3fqQuy9gjg8fCk2/MtaX09owlCfYAXHDnW6DB
+  MYGET_KEY:
+    secure: fjBIR3on0h9DhbjsADq4JmfReuYticuhhcbm8/HTsC9Jah8tu5MZPJukBKWLeO0Z

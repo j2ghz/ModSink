@@ -5,11 +5,13 @@ using System;
 using System.Linq;
 using ModSink.Common;
 using System.Threading;
-using System.Diagnostics;
 using ModSink.Core;
-using System.Reactive;
 using ModSink.Core.Models.Repo;
-using System.IO.MemoryMappedFiles;
+using System.Reactive.Linq;
+using System.Runtime.Serialization.Formatters.Binary;
+using ModSink.Core.Client;
+using ModSink.Common.Client;
+using Humanizer;
 
 namespace ModSink.CLI
 {
@@ -28,10 +30,12 @@ namespace ModSink.CLI
                     var pathStr = pathArg.Value ?? ".";
                     var path = Path.Combine(Directory.GetCurrentDirectory(), pathStr);
                     IHashFunction xxhash = new XXHash64();
-                    GetFiles(path)
+                    var hashing = new Hashing(xxhash);
+                    hashing.GetFiles(new DirectoryInfo(path))
                     .Select(f =>
                     {
-                        var hash = ComputeHash(f, xxhash);
+                        var hash = hashing.GetFileHash(f, CancellationToken.None).GetAwaiter().GetResult();
+                        Console.WriteLine($"{hash} {Path.GetRelativePath(path, f.FullName)}");
                         return new { f, hash };
                     })
                     .GroupBy(a => a.hash.ToString())
@@ -52,115 +56,298 @@ namespace ModSink.CLI
             });
         }
 
-        public static void AddHash(this CommandLineApplication app)
+        public static void AddDownload(this CommandLineApplication app)
         {
-            app.Command("hash", (command) =>
+            app.Command("download", (command) =>
             {
-                command.Description = "Returns hash(es) of file(s)";
+                command.Description = "Downloads a missing files from a repo";
                 command.HelpOption("-?|-h|--help");
-                var pathArg = command.Argument("[path]", "Path to file to hash. If folder is provided, all files inside will be hashed");
+                var uriArg = command.Argument("[uri]", "Uri to repo to download");
+                var pathArg = command.Argument("[path]", "Path to local repo");
 
-                command.OnExecute(() =>
+                command.OnExecute(async () =>
                 {
-                    var pathStr = pathArg.Value ?? ".";
-                    var path = Path.Combine(Directory.GetCurrentDirectory(), pathStr);
+                    var uriStr = uriArg.Value;
+                    var uri = new Uri(uriStr);
+                    var localStr = pathArg.Value;
+                    var localUri = new Uri(localStr);
+                    var downloader = new HttpClientDownloader();
+                    var client = new ClientManager(new DownloadManager(downloader), new LocalRepoManager(localUri), downloader, new BinaryFormatter());
 
-                    var hash = new Hashing(new XXHash64());
-
-                    var hashes = hash.GetFileHashes(new DirectoryInfo(path));
-
-                    hashes.Subscribe(Observer.Create<(HashValue, FileInfo)>(a => Console.WriteLine($"{a.Item1.ToString()} {a.Item2.FullName}")));
-
-                    Console.WriteLine("Done.");
+                    Console.WriteLine("Downloading repo");
+                    var repoDown = client.LoadRepo(uri);
+                    DumpDownloadProgress(repoDown, "Repo");
+                    await repoDown;
+                    foreach (var modpack in client.Modpacks)
+                    {
+                        Console.WriteLine($"Scheduling {modpack.Name} [{modpack.Mods.Count} mods]");
+                        client.DownloadMissingFiles(modpack);
+                    }
+                    client.DownloadManager.DownloadStarted += (sender, d) =>
+                    {
+                        Console.WriteLine($"Starting {d.Source}");
+                        DumpDownloadProgress(d.Progress, d.Name);
+                    };
+                    client.DownloadManager.CheckDownloadsToStart();
+                    Console.ReadKey();
                     return 0;
                 });
             });
         }
 
-        public static HashValue ComputeHash(FileInfo f, IHashFunction hashf)
+        public static void AddDump(this CommandLineApplication app)
         {
-            try
+            app.Command("dump", (command) =>
             {
-                using (var stream = MemoryMappedFile.CreateFromFile(f.FullName).CreateViewStream())
+                command.Description = "Writes out the contents of a repo";
+                command.HelpOption("-?|-h|--help");
+                var uriArg = command.Argument("[uri]", "Uri to repo to download");
+
+                command.OnExecute(() =>
                 {
-                    var sizeMB = f.Length / (1024L * 1024);
-                    var start = DateTime.Now;
-                    Console.Write($"{sizeMB.ToString().PadLeft(5)}MB: ");
-                    var hash = hashf.ComputeHashAsync(stream, CancellationToken.None).GetAwaiter().GetResult();
-                    var elapsed = (DateTime.Now - start).TotalSeconds;
-                    var speed = (ulong)(f.Length / elapsed) / (1024UL * 1024UL);
-                    Console.WriteLine($"'{hash}' @{speed.ToString().PadLeft(5)}MB/s at {f.FullName}");
-                    return hash;
-                }
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine();
-                Console.Error.WriteLine(e.ToString());
-                return new HashValue(new byte[] { 0 });
-            }
+                    var uriStr = uriArg.Value;
+                    var uri = new Uri(uriStr);
+                    if (uri.IsFile)
+                    {
+                        var repo = (Repo)(new BinaryFormatter()).Deserialize(new FileInfo(uri.LocalPath).OpenRead());
+                        repo.BaseUri = new Uri("http://base.uri/repo/");
+                        DumpRepo(repo);
+                    }
+                    else
+                    {
+                        var downloader = new HttpClientDownloader();
+                        var client = new ClientManager(new DownloadManager(downloader), null, downloader, new BinaryFormatter());
+
+                        Console.WriteLine("Downloading repo");
+                        var repoDown = client.LoadRepo(uri);
+                        DumpDownloadProgress(repoDown, "Repo");
+                        repoDown.Wait();
+                        foreach (var repo in client.Repos)
+                        {
+                            DumpRepo(repo);
+                        }
+                    }
+
+                    return 0;
+                });
+            });
         }
 
-        public static IEnumerable<FileInfo> GetFiles(string root)
+        public static void AddCheck(this CommandLineApplication app)
         {
-            var dirs = new Stack<string>();
-
-            if (!System.IO.Directory.Exists(root))
+            app.Command("check", (command) =>
             {
-                throw new ArgumentException();
-            }
-            dirs.Push(root);
+                command.Description = "Checks that every file in the folder is named as its hash and deletes if it's not";
+                command.HelpOption("-?|-h|--help");
+                var pathArg = command.Argument("[path]", "Path to folder to check");
 
-            while (dirs.Count > 0)
+                command.OnExecute(async () =>
+                {
+                    var pathStr = pathArg.Value ?? "./hashed";
+                    var path = Path.Combine(Directory.GetCurrentDirectory(), pathStr);
+
+                    var hashing = new Hashing(new XXHash64());
+                    var client = new ClientManager(null, new LocalRepoManager(new Uri(path)), null, null);
+
+                    foreach (var file in hashing.GetFiles(new DirectoryInfo(path)).OrderBy(f => f.Length))
+                    {
+                        if (file.Length <= 0)
+                        {
+                            file.Delete();
+                            continue;
+                        }
+                        var size = file.Length.Bytes();
+                        var hashFromName = Path.GetFileNameWithoutExtension(file.FullName);
+                        Console.Write($"{size.Humanize("#").PadLeft(10)}: {hashFromName} | ");
+                        HashValue hash;
+                        using (var src = file.OpenRead())
+                        {
+                            var start = DateTime.Now;
+                            hash = await hashing.GetFileHash(src, CancellationToken.None);
+                            var filehash = new FileWithHash(file, hash);
+                            var speed = size.Per((DateTime.Now - start));
+                            Console.Write($"{hash} | {speed.Humanize("#").PadLeft(10)} | ");
+                        }
+                        if (hash.ToString() != hashFromName)
+                        {
+                            Console.Write("DELETE");
+                            file.Delete();
+                        }
+                        Console.WriteLine();
+                    }
+                    return 0;
+                });
+            });
+        }
+
+        public static void AddImport(this CommandLineApplication app)
+        {
+            app.Command("import", (command) =>
             {
-                string currentDir = dirs.Pop();
-                try
-                {
-                    System.IO.Directory.GetDirectories(currentDir).ForEach(dirs.Push);
-                }
-                catch (UnauthorizedAccessException e)
-                {
-                    Console.WriteLine(e.Message);
-                    continue;
-                }
-                catch (System.IO.DirectoryNotFoundException e)
-                {
-                    Console.WriteLine(e.Message);
-                    continue;
-                }
+                command.Description = "Copies every file in the folder and renames it to its hash";
+                command.HelpOption("-?|-h|--help");
+                var pathArg = command.Argument("[path]", "Path to folder to look for files in");
+                var pathDestArg = command.Argument("[dest path]", "Path in which to copy the files");
 
-                string[] files;
-                try
+                command.OnExecute(async () =>
                 {
-                    files = System.IO.Directory.GetFiles(currentDir);
-                }
-                catch (UnauthorizedAccessException e)
+                    var pathStr = pathArg.Value ?? ".";
+                    var pathDestStr = pathDestArg.Value ?? "./hashed";
+                    var path = Path.Combine(Directory.GetCurrentDirectory(), pathStr);
+                    var pathDest = Path.Combine(Directory.GetCurrentDirectory(), pathDestStr);
+
+                    var hashing = new Hashing(new XXHash64());
+
+                    foreach (var file in hashing.GetFiles(new DirectoryInfo(path)))
+                    {
+                        if (file.Length <= 0) continue;
+                        var size = file.Length.Bytes();
+                        Console.Write($"{size.Humanize("#").PadLeft(10)}: ");
+                        using (var src = file.OpenRead())
+                        {
+                            var start = DateTime.Now;
+                            var hash = await hashing.GetFileHash(src, CancellationToken.None);
+                            var filehash = new FileWithHash(file, hash);
+                            var speed = size.Per((DateTime.Now - start));
+                            Console.Write($"{hash} {speed.Humanize("#").PadLeft(10)}(hash) | ");
+                            var fileDest = Path.Combine(pathDest, filehash.Hash.ToString());
+                            try
+                            {
+                                if (new FileInfo(fileDest).Exists)
+                                {
+                                    Console.Write($"                 | {file.FullName}");
+                                }
+                                else
+                                {
+                                    using (var dest = new FileStream(fileDest, FileMode.Create, FileAccess.Write))
+                                    {
+                                        start = DateTime.Now;
+                                        src.Position = 0;
+                                        await src.CopyToAsync(dest);
+                                        Console.Write($"{size.Per((DateTime.Now - start)).Humanize("#").PadLeft(10)}(copy) | {file.FullName}");
+                                    }
+                                }
+                            }
+                            catch (IOException ex)
+                            {
+                                Console.WriteLine();
+                                Console.WriteLine(ex.ToString());
+                            }
+                        }
+                        Console.WriteLine();
+                    }
+                    return 0;
+                });
+            });
+        }
+
+        public static void AddSampleRepo(this CommandLineApplication app)
+        {
+            app.Command("sampleRepo", (command) =>
+            {
+                command.Description = "Makes each subfolder of a given folder a mod";
+                command.HelpOption("-?|-h|--help");
+                var pathArg = command.Argument("[path]", "Path to the folder with mods");
+
+                command.OnExecute(async () =>
                 {
-                    Console.WriteLine(e.Message);
-                    continue;
-                }
-                catch (System.IO.DirectoryNotFoundException e)
-                {
-                    Console.WriteLine(e.Message);
-                    continue;
-                }
-                foreach (var f in files.Select(f => new FileInfo(f)))
-                {
-                    yield return f;
-                }
-            }
+                    var hashing = new Hashing(new XXHash64());
+
+                    var pathStr = pathArg.Value ?? ".";
+                    var path = new DirectoryInfo(Path.Combine(Directory.GetCurrentDirectory(), pathStr));
+                    var pathUri = new Uri(path.FullName);
+
+                    var files = new Dictionary<HashValue, Uri>();
+                    var mods = new List<ModEntry>();
+
+                    foreach (var modFolder in path.EnumerateDirectories())
+                    {
+                        Console.WriteLine($"Processing {modFolder.FullName}");
+                        var obs = hashing.GetFileHashes(modFolder, CancellationToken.None);
+                        var mod = new Mod
+                        {
+                            Files = new Dictionary<Uri, HashValue>(),
+                            Name = modFolder.Name,
+                            Version = "1.0"
+                        };
+                        foreach (var lazy in obs)
+                        {
+                            var fileHash = await lazy.Value;
+                            Console.WriteLine($"Processing {fileHash.File.FullName}");
+                            mod.Files.Add(new Uri(modFolder.FullName).MakeRelativeUri(new Uri(fileHash.File.FullName)), fileHash.Hash);
+                            files.Add(fileHash.Hash, pathUri.MakeRelativeUri(new Uri(fileHash.File.FullName)));
+                        }
+                        mods.Add(new ModEntry { Mod = mod });
+                    }
+
+                    var repo = new Repo
+                    {
+                        Files = files,
+                        Modpacks = new List<Modpack>() { new Modpack { Mods = mods } }
+                    };
+
+                    var fileName = Path.Combine(pathUri.LocalPath, "repo.bin");
+                    new BinaryFormatter().Serialize(new FileInfo(fileName).Create(), repo);
+                    Console.WriteLine($"Written to {fileName}");
+
+                    return 0;
+                });
+            });
+        }
+
+        public static void DumpDownloadProgress(IObservable<DownloadProgress> obs, string name)
+        {
+            obs.Sample(TimeSpan.FromMilliseconds(250))
+                       .Buffer(2, 1)
+                       .Subscribe(progList =>
+                       {
+                           var prog = new DownloadProgressCombined(progList.Last(), progList.First());
+                           var dbl = prog.Current.Remaining.Bytes / prog.Speed.Size.Bytes;
+                           if (Double.IsNaN(dbl)) dbl = 0;
+                           var eta = prog.Speed.Interval.Multiply(dbl);
+                           Console.WriteLine($"\t{prog.Current.State} {name.PadRight(23)} {prog.Current.Remaining.Humanize("#.#").PadLeft(8)} left @ {prog.Speed.Humanize("#.#").PadLeft(10)} ETA: {eta.Humanize()}");
+                       }, ex => Console.WriteLine(ex.ToString()), () => Console.WriteLine("Done"));
         }
 
         public static void Main(string[] args)
         {
-            var app = new CommandLineApplication();
-            app.Name = "ModSink.CLI";
+            var app = new CommandLineApplication
+            {
+                Name = "modsink",
+                FullName = "ModSink.CLI"
+            };
             app.HelpOption("-?|-h|--help");
+            app.ShortVersionGetter = () => typeof(Program).Assembly.GetName().Version.ToString();
 
-            app.AddHash();
             app.AddColCheck();
+            app.AddSampleRepo();
+            app.AddDownload();
+            app.AddImport();
+            app.AddDump();
+            app.AddCheck();
 
-            app.Execute(args);
+            app.Execute(args.Length > 0 ? args : new string[] { "--help" });
+        }
+
+        private static void DumpRepo(Repo repo)
+        {
+            Console.WriteLine($"Repo at {repo.BaseUri}");
+            Console.WriteLine($"Files:");
+            foreach (var file in repo.Files)
+            {
+                Console.WriteLine($"\t{file.Key} at {new Uri(repo.BaseUri, file.Value)}");
+            }
+
+            Console.WriteLine($"ModPacks:");
+            foreach (var modpack in repo.Modpacks)
+            {
+                Console.WriteLine($"\tModpack '{modpack.Name}'");
+                Console.WriteLine($"\tMods:");
+                foreach (var mod in modpack.Mods)
+                {
+                    Console.WriteLine($"\t\tMod: '{mod.Mod.Name}' [{mod.Mod.Files.Count} files]");
+                }
+            }
         }
     }
 }

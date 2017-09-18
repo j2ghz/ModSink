@@ -1,4 +1,4 @@
-﻿using ModSink.Core.Local;
+﻿using ModSink.Core.Client;
 using ModSink.Core.Server;
 using System;
 using System.Collections.Generic;

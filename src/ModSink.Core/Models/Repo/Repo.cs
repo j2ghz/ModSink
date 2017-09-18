@@ -6,11 +6,13 @@ namespace ModSink.Core.Models.Repo
     [Serializable]
     public class Repo
     {
+        public Uri BaseUri { get; set; }
+
         /// <summary>
         /// <see cref="string"/> is relative path
         /// </summary>
-        public IDictionary<HashValue, string> Files { get; set; }
+        public IDictionary<HashValue, Uri> Files { get; set; }
 
-        public IList<Modpack> Modpacks { get; set; }
+        public ICollection<Modpack> Modpacks { get; set; }
     }
 }

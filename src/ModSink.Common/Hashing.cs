@@ -7,6 +7,8 @@ using System.IO;
 using System.Threading;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
+using System.Linq;
+using System.Reactive.Disposables;
 
 namespace ModSink.Common
 {
@@ -21,25 +23,51 @@ namespace ModSink.Common
 
         public async Task<HashValue> GetFileHash(FileInfo file, CancellationToken cancel)
         {
-            Console.WriteLine("Opening " + file.FullName);
-
-            using (var stream = file.OpenRead())
+            if (file.Length > 0)
             {
-                return await this.hashFunction.ComputeHashAsync(stream, cancel);
+                using (var stream = file.OpenRead())
+                {
+                    return await this.hashFunction.ComputeHashAsync(stream, cancel);
+                }
+            }
+            else
+            {
+                return this.hashFunction.HashOfEmpty;
             }
         }
 
-        public IObservable<(HashValue hash, FileInfo file)> GetFileHashes(DirectoryInfo directory)
+        public async Task<HashValue> GetFileHash(Stream stream, CancellationToken cancel)
         {
-            return GetFileHashes(directory.EnumerateFiles("*", SearchOption.AllDirectories));
+            return await this.hashFunction.ComputeHashAsync(stream, cancel);
         }
 
-        public IObservable<(HashValue hash, FileInfo file)> GetFileHashes(IEnumerable<FileInfo> files)
+        public IEnumerable<Lazy<Task<FileWithHash>>> GetFileHashes(DirectoryInfo directory, CancellationToken token)
         {
-            return files
-                .ToObservable()
-                .SelectMany(f => Observable.FromAsync(cancel => GetFileHash(f, cancel))
-                .Select(res => (res, f)));
+            foreach (var file in GetFiles(directory))
+            {
+                token.ThrowIfCancellationRequested();
+                yield return new Lazy<Task<FileWithHash>>(async () =>
+                {
+                    var hash = await GetFileHash(file, token);
+                    return new FileWithHash(file, hash);
+                });
+            }
+        }
+
+        public IEnumerable<FileInfo> GetFiles(DirectoryInfo directory)
+        {
+            var directoryStack = new Stack<DirectoryInfo>();
+            directoryStack.Push(directory);
+
+            while (directoryStack.Count > 0)
+            {
+                var dir = directoryStack.Pop();
+                dir.EnumerateDirectories().ForEach(directoryStack.Push);
+                foreach (var file in dir.EnumerateFiles())
+                {
+                    yield return file;
+                }
+            }
         }
     }
 }

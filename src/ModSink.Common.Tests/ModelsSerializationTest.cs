@@ -15,22 +15,15 @@ namespace Modsink.Common.Tests
         private IFormatter formatter = new BinaryFormatter();
 
         [Fact]
-        public void DeserializeRepo()
-        {
-            var stream = SerializeRepo();
-            stream.Position = 0;
-            var obj = formatter.Deserialize(stream);
-            Assert.IsAssignableFrom<Repo>(obj);
-        }
-
-        [Fact]
-        public Stream SerializeRepo()
+        public void SerializeDeserializeRepo()
         {
             var repo = TestDataBuilder.Repo();
             var stream = new MemoryStream();
             this.formatter.Serialize(stream, repo);
             stream.Length.Should().BeGreaterThan(0);
-            return stream;
+            stream.Position = 0;
+            var obj = this.formatter.Deserialize(stream);
+            Assert.IsAssignableFrom<Repo>(obj);
         }
     }
 }

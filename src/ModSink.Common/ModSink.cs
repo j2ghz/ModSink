@@ -1,7 +1,7 @@
 ﻿using System;
 using ModSink.Core;
-using ModSink.Core.Local;
 using ModSink.Core.Server;
+using ModSink.Core.Client;
 
 namespace ModSink.Common
 {

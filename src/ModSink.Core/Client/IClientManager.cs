@@ -1,17 +1,25 @@
-﻿using ModSink.Core.Models.Repo;
+﻿using ModSink.Core.Client;
+using ModSink.Core.Models.Repo;
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
+using System.Reactive;
 using System.Threading.Tasks;
 
-namespace ModSink.Core.Local
+namespace ModSink.Core.Client
 {
     public interface IClientManager
     {
-        Task DownloadMissingFiles(Modpack modpack);
+        IDownloadManager DownloadManager { get; }
+        ILocalRepoManager LocalRepoManager { get; }
+        ICollection<Modpack> Modpacks { get; }
+        ICollection<Repo> Repos { get; }
 
-        IObservable<HashValue> GetMissingFiles(Modpack modpack);
+        void DownloadMissingFiles(Modpack modpack);
 
-        IObservable<Modpack> GetModpacks();
+        Uri GetDownloadUri(HashValue hash);
+
+        IObservable<DownloadProgress> LoadRepo(Uri uri);
     }
 }
