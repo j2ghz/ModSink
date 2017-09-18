@@ -53,7 +53,7 @@
       <Version>4.6.1</Version>
     </PackageReference>
     <PackageReference Include="ModSink.Common">
-      <Version>0.2.1-ci0001</Version>
+      <Version>0.2.1-ci0035</Version>
     </PackageReference>
     <PackageReference Include="reactiveui-wpf">
       <Version>8.0.0-alpha0089</Version>
@@ -88,7 +88,11 @@
     <Compile Include="Helpers\AutofacDependencyResolver.cs" />
     <Compile Include="Helpers\RegistrationExtensions.cs" />
     <Compile Include="ViewModel\AppBootstrapper.cs" />
+    <Compile Include="ViewModel\DownloadsViewModel.cs" />
     <Compile Include="ViewModel\LibraryViewModel.cs" />
+    <Compile Include="View\DownloadsView.xaml.cs">
+      <DependentUpon>DownloadsView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="View\LibraryView.xaml.cs">
       <DependentUpon>LibraryView.xaml</DependentUpon>
     </Compile>
@@ -105,6 +109,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="View\DownloadsView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="View\LibraryView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

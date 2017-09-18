@@ -1,9 +1,13 @@
 ﻿using Autofac;
+using ModSink.Common.Client;
+using ModSink.Core;
 using ModSink.WPF.Helpers;
 using ModSink.WPF.ViewModel;
 using ReactiveUI;
 using Splat;
 using System.Reflection;
+using System.Runtime.Serialization;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Windows;
 
 namespace ModSink.WPF
@@ -21,7 +25,10 @@ namespace ModSink.WPF
 
             var builder = new ContainerBuilder();
 
+            builder.RegisterType<BinaryFormatter>().As<IFormatter>();
+            builder.Register(_ => new LocalRepoManager(new System.Uri(@"D:\modsink"))).AsImplementedInterfaces();
             builder.RegisterForReactiveUI(typeof(AppBootstrapper).Assembly);
+            builder.RegisterAssemblyTypes(typeof(IModSink).Assembly, typeof(ModSink.Common.ModSink).Assembly).Where(t => t.Name != "LocalRepoManager").AsImplementedInterfaces();
 
             var container = builder.Build();
             Locator.Current = new AutofacDependencyResolver(container);
@@ -29,7 +36,7 @@ namespace ModSink.WPF
             this.AppBootstrapper = container.Resolve<AppBootstrapper>();
             this.DataContext = this.AppBootstrapper;
 
-            AppBootstrapper.Router.Navigate.Execute(container.Resolve<ILibraryViewModel>());
+            AppBootstrapper.Router.Navigate.Execute(container.Resolve<IDownloadsViewModel>());
         }
 
         public AppBootstrapper AppBootstrapper { get; protected set; }
