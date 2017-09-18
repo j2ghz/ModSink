@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Text;
 
 namespace ModSink.Core.Client
@@ -8,7 +9,7 @@ namespace ModSink.Core.Client
     {
         event EventHandler<IDownload> DownloadStarted;
 
-        ICollection<IDownload> Downloads { get; }
+        ObservableCollection<IDownload> Downloads { get; }
 
         void CheckDownloadsToStart();
     }
