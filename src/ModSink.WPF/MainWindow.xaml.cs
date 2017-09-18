@@ -1,6 +1,8 @@
 ﻿using Autofac;
+using ModSink.WPF.Helpers;
 using ModSink.WPF.ViewModel;
-using ReactiveUI.Autofac;
+using ReactiveUI;
+using Splat;
 using System.Reflection;
 using System.Windows;
 
@@ -22,12 +24,12 @@ namespace ModSink.WPF
             builder.RegisterForReactiveUI(typeof(AppBootstrapper).Assembly);
 
             var container = builder.Build();
-            RxAppAutofacExtension.UseAutofacDependencyResolver(container);
+            Locator.Current = new AutofacDependencyResolver(container);
 
-            AppBootstrapper = container.Resolve<AppBootstrapper>();
-            var mainView = container.Resolve<LibraryViewModel>();
-            AppBootstrapper.Router.Navigate.Execute(mainView);
-            DataContext = AppBootstrapper;
+            this.AppBootstrapper = container.Resolve<AppBootstrapper>();
+            this.DataContext = this.AppBootstrapper;
+
+            AppBootstrapper.Router.Navigate.Execute(container.Resolve<ILibraryViewModel>());
         }
 
         public AppBootstrapper AppBootstrapper { get; protected set; }

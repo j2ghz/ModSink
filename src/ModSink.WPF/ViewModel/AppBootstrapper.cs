@@ -1,7 +1,6 @@
 ﻿using Autofac;
 using ModSink.WPF.View;
 using ReactiveUI;
-using ReactiveUI.Autofac;
 using Splat;
 using System;
 using System.Collections.Generic;

@@ -43,16 +43,16 @@ namespace ModSink.WPF
 
         private void CheckUpdates()
         {
-            var task = new Task(async () =>
+            var task = new Task( () =>
             {
                 this.log.Information("Looking for updates");
                 try
-                {
-                    using (var mgr = await UpdateManager.GitHubUpdateManager("https://github.com/j2ghz/ModSink", prerelease: true))
+                {                    
+                    using (var mgr = UpdateManager.GitHubUpdateManager("https://github.com/j2ghz/ModSink", prerelease: true).GetAwaiter().GetResult())
                     {
                         if (mgr.IsInstalledApp)
                         {
-                            var release = await mgr.UpdateApp(i => Log.ForContext<UpdateManager>().Debug("Update progress: {progress}", i));
+                            var release = mgr.UpdateApp(i => Log.ForContext<UpdateManager>().Debug("Update progress: {progress}", i)).GetAwaiter().GetResult();
                             this.log.Debug("New version: {version}", release);
                         }
                     }
