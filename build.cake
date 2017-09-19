@@ -46,16 +46,19 @@ Task("Build")
     .Does(() =>
     {
         NuGetRestore(solution);
-        MSBuild(modSinkWpf_csproj, configurator => configurator.SetConfiguration(configuration).UseToolVersion(MSBuildToolVersion.VS2017));
-        Information("Pack");
+        MSBuild(modSinkWpf_csproj, configurator => configurator.SetConfiguration(configuration).UseToolVersion(MSBuildToolVersion.VS2017));        
+    });
+
+Task("Pack")
+    .IsDependentOn("Build")
+    .Does(()=>{
         CreateDirectory(out_squirrel_nupkg);
         NuGetPack(modSinkWpf_nuspec, new NuGetPackSettings{ BasePath = modSinkWpf_dir + Directory("bin") + Directory(configuration), OutputDirectory = out_squirrel_nupkg, Version = SquirrelVersion });
-        Information("Releasify");
-        Squirrel(out_squirrel_nupkg + File("ModSink.WPF." + SquirrelVersion + ".nupkg"));
+        Squirrel(out_squirrel_nupkg + File("ModSink.WPF." + SquirrelVersion + ".nupkg"));    
     });
 
 Task("Release")
-    .IsDependentOn("Build")
+    .IsDependentOn("Pack")
     .WithCriteria(BuildSystem.AppVeyor.IsRunningOnAppVeyor && BuildSystem.AppVeyor.Environment.Repository.Branch == "master")
     .Does(()=>{
         Information("Releasing version {0} on Github", SquirrelVersion);
