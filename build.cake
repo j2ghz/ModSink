@@ -21,7 +21,6 @@ var out_squirrel_nupkg = output + Directory("squirrel");
 var out_squirrel = root + Directory("Releases");
 
 var SquirrelVersion = "";
-var NuGetVersion = "";
 var Version = "";
 
 Setup(context =>
@@ -30,8 +29,6 @@ Setup(context =>
     var v = GitVersion();
     SquirrelVersion = v.LegacySemVerPadded;
     Information("Version for Squirrel: " + SquirrelVersion);
-    NuGetVersion = v.NuGetVersionV2;
-    Information("Version for NuGet libraries: " + NuGetVersion);
     Version = v.FullSemVer;
     Information("Full version info: "+ v.InformationalVersion);
 
