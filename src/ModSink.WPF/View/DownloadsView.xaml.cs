@@ -12,31 +12,28 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
 using System.Windows.Shapes;
 
 namespace ModSink.WPF.View
 {
-    /// <summary>
-    /// Interaction logic for LibraryView.xaml
-    /// </summary>
-    public partial class LibraryView : UserControl, IViewFor<ILibraryViewModel>
+    public partial class DownloadsView : UserControl, IViewFor<IDownloadsViewModel>
     {
-        public LibraryView(ILibraryViewModel viewModel)
+        public DownloadsView(IDownloadsViewModel viewModel)
         {
-            ViewModel = viewModel;
+            this.ViewModel = viewModel;
+            this.DataContext = this.ViewModel;
             InitializeComponent();
         }
 
-        public ILibraryViewModel ViewModel
+        public IDownloadsViewModel ViewModel
         {
             get; set;
         }
 
         object IViewFor.ViewModel
         {
-            get { return ViewModel; }
-            set { ViewModel = (ILibraryViewModel)value; }
+            get { return this.ViewModel; }
+            set { this.ViewModel = (IDownloadsViewModel)value; }
         }
     }
 }

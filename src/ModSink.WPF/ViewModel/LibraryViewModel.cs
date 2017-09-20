@@ -1,4 +1,5 @@
-﻿using ReactiveUI;
+﻿using ModSink.Core;
+using ReactiveUI;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,18 +12,18 @@ namespace ModSink.WPF.ViewModel
     {
     }
 
-    internal class LibraryViewModel : ReactiveObject, ILibraryViewModel
+    public class LibraryViewModel : ReactiveObject, ILibraryViewModel
     {
         public LibraryViewModel(IScreen screen)
         {
-            HostScreen = screen;
+            this.HostScreen = screen;
         }
 
         public IScreen HostScreen { get; protected set; }
 
         public string UrlPathSegment
         {
-            get { return "welcome"; }
+            get { return "library"; }
         }
     }
 }
