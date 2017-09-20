@@ -42,8 +42,7 @@ Setup(context =>
 Task("Build")
     .Does(() =>
     {
-        NuGetRestore(solution);
-        MSBuild(modSinkWpf_csproj, configurator => configurator.SetConfiguration(configuration).UseToolVersion(MSBuildToolVersion.VS2017));        
+        MSBuild(modSinkWpf_csproj, configurator => configurator.SetConfiguration(configuration).UseToolVersion(MSBuildToolVersion.VS2017).WithTarget("Restore").WithTarget("Rebuild"));        
     });
 
 Task("Pack")
