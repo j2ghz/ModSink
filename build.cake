@@ -42,7 +42,7 @@ Setup(context =>
 Task("Build")
     .Does(() =>
     {
-        MSBuild(modSinkWpf_csproj, configurator => configurator.SetConfiguration(configuration).UseToolVersion(MSBuildToolVersion.VS2017).WithTarget("Restore").WithTarget("Build"));        
+        MSBuild(modSinkWpf_csproj, configurator => configurator.SetConfiguration(configuration).WithTarget("Restore").WithTarget("Build"));        
     });
 
 Task("Pack")
