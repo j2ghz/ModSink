@@ -14,6 +14,7 @@ using System.Runtime.Serialization.Formatters.Binary;
 using ModSink.Common.Client;
 using ModSink.Core;
 using System.Runtime.Serialization;
+using System.Windows.Controls;
 
 namespace ModSink.WPF
 {
@@ -59,7 +60,9 @@ namespace ModSink.WPF
             builder.Register(_ => new LocalRepoManager(new System.Uri(@"D:\modsink"))).AsImplementedInterfaces();
             builder.RegisterAssemblyTypes(typeof(IModSink).Assembly, typeof(ModSink.Common.ModSink).Assembly).Where(t => t.Name != "LocalRepoManager").AsImplementedInterfaces();
 
-            builder.RegisterAssemblyTypes(typeof(App).Assembly).Where(t => t.Name.EndsWith("ViewModel"));
+            builder.RegisterAssemblyTypes(typeof(App).Assembly).Where(t => t.Name.EndsWith("ViewModel")).AsImplementedInterfaces().AsSelf();
+            builder.RegisterAssemblyTypes(typeof(App).Assembly).Where(t => t.IsAssignableTo<TabItem>()).AsSelf().As<TabItem>();
+            builder.RegisterType<MainWindow>().AsSelf();
 
             //TODO: Load plugins, waiting on https://stackoverflow.com/questions/46351411
 
@@ -112,6 +115,11 @@ namespace ModSink.WPF
             {
                 Helpers.ConsoleManager.Show();
                 Log.Fatal(args.ExceptionObject as Exception, nameof(AppDomain.CurrentDomain.UnhandledException));
+            };
+            Application.Current.DispatcherUnhandledException += (sender, args) =>
+            {
+                Helpers.ConsoleManager.Show();
+                Log.Fatal(args.Exception, nameof(DispatcherUnhandledException));
             };
         }
 
