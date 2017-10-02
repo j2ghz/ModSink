@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Reactive.Linq;
+using System.Collections.ObjectModel;
 
 namespace ModSink.Common.Client
 {
@@ -15,11 +16,12 @@ namespace ModSink.Common.Client
         public DownloadManager(IDownloader downloader)
         {
             this.downloader = downloader;
+            this.Downloads.CollectionChanged += (_, __) => CheckDownloadsToStart();
         }
 
         public event EventHandler<IDownload> DownloadStarted;
 
-        public ICollection<IDownload> Downloads { get; } = new List<IDownload>();
+        public ObservableCollection<IDownload> Downloads { get; } = new ObservableCollection<IDownload>();
 
         public void CheckDownloadsToStart()
         {
