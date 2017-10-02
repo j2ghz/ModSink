@@ -54,7 +54,10 @@
       <Version>4.6.1</Version>
     </PackageReference>
     <PackageReference Include="ModSink.Common">
-      <Version>0.2.1-ci0035</Version>
+      <Version>0.2.1-ci0039</Version>
+    </PackageReference>
+    <PackageReference Include="NuPlug">
+      <Version>0.6.3</Version>
     </PackageReference>
     <PackageReference Include="reactiveui-wpf">
       <Version>8.0.0-alpha0089</Version>
@@ -86,11 +89,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="Helpers\AutofacDependencyResolver.cs" />
-    <Compile Include="Helpers\RegistrationExtensions.cs" />
-    <Compile Include="ViewModel\AppBootstrapper.cs" />
     <Compile Include="ViewModel\DownloadsViewModel.cs" />
-    <Compile Include="ViewModel\LibraryViewModel.cs" />
     <Compile Include="View\DownloadsView.xaml.cs">
       <DependentUpon>DownloadsView.xaml</DependentUpon>
     </Compile>
@@ -145,5 +144,6 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

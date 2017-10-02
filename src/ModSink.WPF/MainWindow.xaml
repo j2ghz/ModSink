@@ -6,13 +6,12 @@
         xmlns:vm="clr-namespace:ModSink.WPF.ViewModel"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="525"
-        d:DataContext="{d:DesignInstance vm:AppBootstrapper}">
+        Title="MainWindow" Height="350" Width="525">
     <DockPanel LastChildFill="True">
-        <rx:RoutedViewHost
-            Router="{Binding Router}"
-            DefaultContent="Error"
-            HorizontalContentAlignment="Stretch"
-            VerticalContentAlignment="Stretch" />
+        <TabControl>
+            <TabItem Header="Library" />
+            <TabItem Header="Downloads" />
+            <TabItem Header="Settings" />
+        </TabControl>
     </DockPanel>
 </Window>
