@@ -10,11 +10,32 @@ namespace ModSink.WPF.ViewModel
 {
     public class DownloadsViewModel : ReactiveObject
     {
-        public DownloadsViewModel(IDownloadManager downloadManager)
+        private string url;
+
+        public DownloadsViewModel(IClientManager clientManager)
         {
-            this.DownloadManager = downloadManager;
+            this.ClientManager = clientManager;
+            this.DownloadMissing = ReactiveCommand.Create(() =>
+            {
+                clientManager.DownloadMissingFiles(clientManager.Modpacks.First());
+                clientManager.DownloadManager.CheckDownloadsToStart();
+            });
+            this.LoadRepo = ReactiveCommand.Create(() =>
+            {
+                var obs = clientManager.LoadRepo(new Uri(this.Url));
+                obs.Subscribe(prog => Console.WriteLine(prog.State), () => Console.WriteLine("Done"));
+            });
         }
 
-        public IDownloadManager DownloadManager { get; }
+        public IClientManager ClientManager { get; }
+
+        public ReactiveCommand DownloadMissing { get; }
+        public ReactiveCommand LoadRepo { get; }
+
+        public string Url
+        {
+            get { return this.url; }
+            set { this.RaiseAndSetIfChanged(ref this.url, value); }
+        }
     }
 }
