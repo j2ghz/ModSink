@@ -15,10 +15,12 @@
             <TextBox Text="{Binding Url}" />
         </StackPanel>
         <ListView ItemsSource="{Binding ClientManager.DownloadManager.Downloads}">
-            <GridView>
-                <GridViewColumn Header="Name" DisplayMemberBinding="{Binding Name}" />
-                <GridViewColumn Header="State" DisplayMemberBinding="{Binding State}" />
-            </GridView>
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn Header="Name" DisplayMemberBinding="{Binding Name}" />
+                    <GridViewColumn Header="State" DisplayMemberBinding="{Binding State}" />
+                </GridView>
+            </ListView.View>
         </ListView>
     </DockPanel>
 </UserControl>

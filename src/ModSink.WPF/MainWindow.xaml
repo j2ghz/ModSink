@@ -12,7 +12,9 @@
         d:DataContext="{d:DesignInstance vm:MainWindowViewModel}">
     <DockPanel LastChildFill="True">
         <TabControl>
-            <TabItem Header="Library" >TBD</TabItem>
+            <TabItem Header="Library">
+                <v:LibraryView />
+            </TabItem>
             <TabItem Header="Downloads">
                 <v:DownloadsView DataContext="{Binding DownloadsVM}" />
             </TabItem>

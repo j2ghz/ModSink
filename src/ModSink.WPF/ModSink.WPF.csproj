@@ -56,9 +56,6 @@
     <PackageReference Include="ModSink.Common">
       <Version>0.2.1-ci0039</Version>
     </PackageReference>
-    <PackageReference Include="NuPlug">
-      <Version>0.6.3</Version>
-    </PackageReference>
     <PackageReference Include="reactiveui-wpf">
       <Version>8.0.0-alpha0089</Version>
     </PackageReference>
