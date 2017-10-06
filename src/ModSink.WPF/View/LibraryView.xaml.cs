@@ -1,5 +1,4 @@
-﻿using ReactiveUI;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -21,5 +20,9 @@ namespace ModSink.WPF.View
     /// </summary>
     public partial class LibraryView : UserControl
     {
+        public LibraryView()
+        {
+            InitializeComponent();
+        }
     }
 }
