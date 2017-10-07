@@ -53,14 +53,17 @@
     <PackageReference Include="Autofac">
       <Version>4.6.1</Version>
     </PackageReference>
+    <PackageReference Include="DynamicData.ReactiveUI">
+      <Version>6.0.1.2317-beta</Version>
+    </PackageReference>
     <PackageReference Include="ModSink.Common">
-      <Version>0.2.1-ci0039</Version>
+      <Version>0.2.1-ci0041</Version>
+    </PackageReference>
+    <PackageReference Include="ModSink.Core">
+      <Version>0.2.1-ci0041</Version>
     </PackageReference>
     <PackageReference Include="reactiveui-wpf">
-      <Version>8.0.0-alpha0089</Version>
-    </PackageReference>
-    <PackageReference Include="reactiveui">
-      <Version>8.0.0-alpha0089</Version>
+      <Version>8.0.0-alpha0094</Version>
     </PackageReference>
     <PackageReference Include="Serilog">
       <Version>2.5.0</Version>
@@ -87,6 +90,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="ViewModel\DownloadsViewModel.cs" />
+    <Compile Include="ViewModel\DownloadViewModel.cs" />
     <Compile Include="ViewModel\MainWindowViewModel.cs" />
     <Compile Include="View\DownloadsView.xaml.cs">
       <DependentUpon>DownloadsView.xaml</DependentUpon>

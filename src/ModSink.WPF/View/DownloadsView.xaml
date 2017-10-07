@@ -14,11 +14,14 @@
             <Button Content="Download" Command="{Binding DownloadMissing}" />
             <TextBox Text="{Binding Url}" />
         </StackPanel>
-        <ListView ItemsSource="{Binding ClientManager.DownloadManager.Downloads}">
+        <ListView ItemsSource="{Binding Downloads}">
             <ListView.View>
                 <GridView>
-                    <GridViewColumn Header="Name" DisplayMemberBinding="{Binding Name}" />
-                    <GridViewColumn Header="State" DisplayMemberBinding="{Binding State}" />
+                    <GridViewColumn Width="Auto" Header="Name" DisplayMemberBinding="{Binding Name}" />
+                    <GridViewColumn Width="Auto" Header="Size" DisplayMemberBinding="{Binding Size}" />
+                    <GridViewColumn Width="Auto" Header="Downloaded" DisplayMemberBinding="{Binding Downloaded}" />
+                    <GridViewColumn Width="Auto" Header="Speed" DisplayMemberBinding="{Binding Speed}" />
+                    <GridViewColumn Width="Auto" Header="Progress" DisplayMemberBinding="{Binding Progress}" />
                 </GridView>
             </ListView.View>
         </ListView>

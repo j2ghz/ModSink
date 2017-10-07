@@ -1,35 +1,43 @@
 ﻿using ModSink.Core.Client;
-using ReactiveUI;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
+using DynamicData;
+using DynamicData.Binding;
+using DynamicData.PLinq;
+using ReactiveUI;
+using DynamicData.ReactiveUI;
+using System.Linq;
 
 namespace ModSink.WPF.ViewModel
 {
     public class DownloadsViewModel : ReactiveObject
     {
+        private readonly ReactiveList<DownloadViewModel> downloads = new ReactiveList<DownloadViewModel>();
         private string url;
 
-        public DownloadsViewModel(IClientManager clientManager)
+        public DownloadsViewModel(IClientService clientService)
         {
-            this.ClientManager = clientManager;
+            this.ClientManager = clientService;
             this.DownloadMissing = ReactiveCommand.Create(() =>
             {
-                clientManager.DownloadMissingFiles(clientManager.Modpacks.First());
-                clientManager.DownloadManager.CheckDownloadsToStart();
+                clientService.DownloadMissingFiles(clientService.Modpacks.First());
+                clientService.DownloadService.CheckDownloadsToStart();
             });
             this.LoadRepo = ReactiveCommand.Create(() =>
             {
-                var obs = clientManager.LoadRepo(new Uri(this.Url));
-                obs.Subscribe(prog => Console.WriteLine(prog.State), () => Console.WriteLine("Done"));
+                clientService.LoadRepo(new Uri(this.Url)).Subscribe(_ => { }, () => Console.WriteLine("Repo downloaded"));
             });
+            this.ClientManager.DownloadService.Downloads
+                .Connect()
+                .Transform(d => new DownloadViewModel(d))
+                .Bind(downloads)
+                .Subscribe();
         }
 
-        public IClientManager ClientManager { get; }
-
+        public IClientService ClientManager { get; }
         public ReactiveCommand DownloadMissing { get; }
+        public IReadOnlyReactiveList<DownloadViewModel> Downloads => downloads;
         public ReactiveCommand LoadRepo { get; }
 
         public string Url

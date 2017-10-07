@@ -57,8 +57,8 @@ namespace ModSink.WPF
             var builder = new ContainerBuilder();
 
             builder.RegisterType<BinaryFormatter>().As<IFormatter>();
-            builder.Register(_ => new LocalRepoManager(new System.Uri(@"D:\modsink"))).AsImplementedInterfaces();
-            builder.RegisterAssemblyTypes(typeof(IModSink).Assembly, typeof(ModSink.Common.ModSink).Assembly).Where(t => t.Name != "LocalRepoManager").AsImplementedInterfaces();
+            builder.Register(_ => new LocalStorageService(new System.Uri(@"D:\modsink"))).AsImplementedInterfaces();
+            builder.RegisterAssemblyTypes(typeof(IModSink).Assembly, typeof(ModSink.Common.ModSink).Assembly).Where(t => t.Name != "LocalStorageService").AsImplementedInterfaces();
 
             builder.RegisterAssemblyTypes(typeof(App).Assembly).Where(t => t.Name.EndsWith("ViewModel")).AsImplementedInterfaces().AsSelf();
             builder.RegisterAssemblyTypes(typeof(App).Assembly).Where(t => t.IsAssignableTo<TabItem>()).AsSelf().As<TabItem>();
