@@ -78,7 +78,7 @@ namespace ModSink.CLI
                     var repoDown = client.LoadRepo(uri);
                     DumpDownloadProgress(repoDown, "Repo");
                     await repoDown;
-                    foreach (var modpack in client.Modpacks)
+                    foreach (var modpack in client.Modpacks.Items)
                     {
                         Console.WriteLine($"Scheduling {modpack.Name} [{modpack.Mods.Count} mods]");
                         client.DownloadMissingFiles(modpack);
@@ -122,7 +122,7 @@ namespace ModSink.CLI
                         var repoDown = client.LoadRepo(uri);
                         DumpDownloadProgress(repoDown, "Repo");
                         repoDown.Wait();
-                        foreach (var repo in client.Repos)
+                        foreach (var repo in client.Repos.Items)
                         {
                             DumpRepo(repo);
                         }

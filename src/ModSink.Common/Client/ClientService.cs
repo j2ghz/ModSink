@@ -8,11 +8,16 @@ using System.Linq;
 using System.IO;
 using System.Reactive.Linq;
 using System.Runtime.Serialization;
+using ReactiveUI;
+using DynamicData;
+using System.Data.HashFunction;
 
 namespace ModSink.Common.Client
 {
-    public class ClientService : IClientService
+    public class ClientService : ReactiveObject, IClientService
     {
+        private readonly SourceList<Repo> repos = new SourceList<Repo>();
+
         public ClientService(IDownloadService downloadService, ILocalStorageService localStorageService, IDownloader downloader, IFormatter serializationFormatter)
         {
             this.DownloadService = downloadService;
@@ -24,8 +29,8 @@ namespace ModSink.Common.Client
         public IDownloader Downloader { get; }
         public IDownloadService DownloadService { get; }
         public ILocalStorageService LocalStorageService { get; }
-        public ICollection<Modpack> Modpacks => this.Repos?.SelectMany(r => r.Modpacks).ToList();
-        public ICollection<Repo> Repos { get; } = new List<Repo>();
+        public IObservableList<Modpack> Modpacks => this.Repos.Connect().TransformMany(r => r.Modpacks).AsObservableList();
+        public IObservableList<Repo> Repos => this.repos.AsObservableList();
         public IFormatter SerializationFormatter { get; }
 
         public void DownloadMissingFiles(Modpack modpack)
@@ -39,7 +44,7 @@ namespace ModSink.Common.Client
 
         public Uri GetDownloadUri(HashValue hash)
         {
-            foreach (var repo in this.Repos)
+            foreach (var repo in this.Repos.Items)
             {
                 if (repo.Files.TryGetValue(hash, out Uri relativeUri))
                 {
@@ -61,7 +66,7 @@ namespace ModSink.Common.Client
                 stream = new FileStream(tempFile, FileMode.Open, FileAccess.Read);
                 var repo = (Repo)this.SerializationFormatter.Deserialize(stream);
                 repo.BaseUri = new Uri(uri, ".");
-                this.Repos.Add(repo);
+                this.repos.Add(repo);
                 o.OnCompleted();
             }).Publish();
             obs.Connect();
