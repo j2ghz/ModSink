@@ -1,6 +1,4 @@
-﻿using ModSink.WPF.ViewModel;
-using ReactiveUI;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,28 +10,19 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Windows.Navigation;
 using System.Windows.Shapes;
 
 namespace ModSink.WPF.View
 {
-    public partial class DownloadsView : UserControl, IViewFor<IDownloadsViewModel>
+    /// <summary>
+    /// Interaction logic for DownloadsView.xaml
+    /// </summary>
+    public partial class DownloadsView : UserControl
     {
-        public DownloadsView(IDownloadsViewModel viewModel)
+        public DownloadsView()
         {
-            this.ViewModel = viewModel;
-            this.DataContext = this.ViewModel;
             InitializeComponent();
-        }
-
-        public IDownloadsViewModel ViewModel
-        {
-            get; set;
-        }
-
-        object IViewFor.ViewModel
-        {
-            get { return this.ViewModel; }
-            set { this.ViewModel = (IDownloadsViewModel)value; }
         }
     }
 }

@@ -9,6 +9,12 @@ using Squirrel;
 using Serilog;
 using SharpRaven;
 using System.Reflection;
+using Autofac;
+using System.Runtime.Serialization.Formatters.Binary;
+using ModSink.Common.Client;
+using ModSink.Core;
+using System.Runtime.Serialization;
+using System.Windows.Controls;
 
 namespace ModSink.WPF
 {
@@ -36,38 +42,61 @@ namespace ModSink.WPF
                 SetupSentry();
             }
             CheckUpdates();
-            LoadPlugins();
-            log.Information("Starting UI");
+
             base.OnStartup(e);
+
+            var container = BuildContainer();
+
+            log.Information("Starting UI");
+            var mw = container.Resolve<MainWindow>();
+            mw.ShowDialog();
+        }
+
+        private IContainer BuildContainer()
+        {
+            var builder = new ContainerBuilder();
+
+            builder.RegisterType<BinaryFormatter>().As<IFormatter>();
+            builder.Register(_ => new LocalStorageService(new System.Uri(@"D:\modsink"))).AsImplementedInterfaces();
+            builder.RegisterAssemblyTypes(typeof(IModSink).Assembly, typeof(ModSink.Common.ModSink).Assembly).Where(t => t.Name != "LocalStorageService").AsImplementedInterfaces();
+
+            builder.RegisterAssemblyTypes(typeof(App).Assembly).Where(t => t.Name.EndsWith("ViewModel")).AsImplementedInterfaces().AsSelf();
+            builder.RegisterAssemblyTypes(typeof(App).Assembly).Where(t => t.IsAssignableTo<TabItem>()).AsSelf().As<TabItem>();
+            builder.RegisterType<MainWindow>().AsSelf();
+
+            //TODO: Load plugins, waiting on https://stackoverflow.com/questions/46351411
+
+            return builder.Build();
         }
 
         private void CheckUpdates()
         {
-            var task = new Task( () =>
-            {
-                this.log.Information("Looking for updates");
-                try
-                {                    
-                    using (var mgr = UpdateManager.GitHubUpdateManager("https://github.com/j2ghz/ModSink", prerelease: true).GetAwaiter().GetResult())
-                    {
-                        if (mgr.IsInstalledApp)
-                        {
-                            var release = mgr.UpdateApp(i => Log.ForContext<UpdateManager>().Debug("Update progress: {progress}", i)).GetAwaiter().GetResult();
-                            this.log.Debug("New version: {version}", release);
-                        }
-                    }
-                }
-                catch (Exception e)
-                {
-                    Log.ForContext<UpdateManager>().Error(e, "Exception during update checking");
-                    UpdateFailed?.Invoke(null, e);
-                }
-            });
+            var updateLog = Log.ForContext<UpdateManager>();
+            var task = new Task(async () =>
+           {
+               this.log.Information("Looking for updates");
+               try
+               {
+                   using (var mgr = UpdateManager.GitHubUpdateManager("https://github.com/j2ghz/ModSink", prerelease: true).GetAwaiter().GetResult())
+                   {
+                       if (mgr.IsInstalledApp)
+                       {
+                           var release = await mgr.UpdateApp(i => updateLog.Debug("Download progress: {progress}", i));
+                           this.log.Debug("Latest version: {version}", release.Version);
+                       }
+                   }
+               }
+               catch (Exception e)
+               {
+                   updateLog.Error(e, "Exception during update checking");
+                   UpdateFailed?.Invoke(null, e);
+               }
+               finally
+               {
+                   updateLog.Debug("Update check finished");
+               }
+           });
             task.Start();
-        }
-
-        private void LoadPlugins()
-        {
         }
 
         private void SetupLogging()
@@ -86,6 +115,11 @@ namespace ModSink.WPF
             {
                 Helpers.ConsoleManager.Show();
                 Log.Fatal(args.ExceptionObject as Exception, nameof(AppDomain.CurrentDomain.UnhandledException));
+            };
+            Application.Current.DispatcherUnhandledException += (sender, args) =>
+            {
+                Helpers.ConsoleManager.Show();
+                Log.Fatal(args.Exception, nameof(DispatcherUnhandledException));
             };
         }
 

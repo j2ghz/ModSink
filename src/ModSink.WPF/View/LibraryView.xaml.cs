@@ -1,6 +1,4 @@
-﻿using ModSink.WPF.ViewModel;
-using ReactiveUI;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -20,23 +18,11 @@ namespace ModSink.WPF.View
     /// <summary>
     /// Interaction logic for LibraryView.xaml
     /// </summary>
-    public partial class LibraryView : UserControl, IViewFor<ILibraryViewModel>
+    public partial class LibraryView : UserControl
     {
-        public LibraryView(ILibraryViewModel viewModel)
+        public LibraryView()
         {
-            ViewModel = viewModel;
             InitializeComponent();
-        }
-
-        public ILibraryViewModel ViewModel
-        {
-            get; set;
-        }
-
-        object IViewFor.ViewModel
-        {
-            get { return ViewModel; }
-            set { ViewModel = (ILibraryViewModel)value; }
         }
     }
 }

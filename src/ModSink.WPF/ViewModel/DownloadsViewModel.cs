@@ -1,66 +1,49 @@
-﻿using ReactiveUI;
+﻿using ModSink.Core.Client;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using System.ComponentModel;
-using ModSink.Core;
-using System.Reactive.Linq;
-using ModSink.Common.Client;
-using ModSink.Core.Client;
+using DynamicData;
+using DynamicData.Binding;
+using DynamicData.PLinq;
+using ReactiveUI;
+using DynamicData.ReactiveUI;
+using System.Linq;
 
 namespace ModSink.WPF.ViewModel
 {
-    public interface IDownloadsViewModel : IRoutableViewModel
+    public class DownloadsViewModel : ReactiveObject
     {
-        ReactiveCommand DownloadMissing { get; }
-        ICollection<IDownload> Downloads { get; }
-        ReactiveCommand LoadRepo { get; }
-        string Url { get; }
-    }
-
-    public class DownloadsViewModel : ReactiveObject, IDownloadsViewModel
-    {
-        private readonly IClientManager clientManager;
-        private readonly ReactiveCommand downloadMissing;
-        private readonly ReactiveCommand loadRepo;
+        private readonly ReactiveList<DownloadViewModel> downloads = new ReactiveList<DownloadViewModel>();
         private string url;
 
-        public DownloadsViewModel(IScreen screen, IClientManager clientManager)
+        public DownloadsViewModel(IClientService clientService)
         {
-            this.HostScreen = screen;
-            this.clientManager = clientManager;
-
-            var canLoadRepo = this.WhenAnyValue(x => x.Url, (url) => Uri.IsWellFormedUriString(url, UriKind.Absolute));
-            this.loadRepo = ReactiveCommand.Create(async () =>
+            this.ClientManager = clientService;
+            this.DownloadMissing = ReactiveCommand.Create(() =>
             {
-                await this.clientManager.LoadRepo(new Uri(this.Url));
-            }, canLoadRepo);
-
-            //var canDownloadMissing = this.WhenAnyValue(x => x.clientManager.Repos, (repos) => repos.Any());
-            this.downloadMissing = ReactiveCommand.Create(() =>
+                clientService.DownloadMissingFiles(clientService.Modpacks.First());
+                clientService.DownloadService.CheckDownloadsToStart();
+            });
+            this.LoadRepo = ReactiveCommand.Create(() =>
             {
-                this.clientManager.Modpacks.ForEach(this.clientManager.DownloadMissingFiles);
-                clientManager.DownloadManager.CheckDownloadsToStart();
-            });//, canDownloadMissing);
+                clientService.LoadRepo(new Uri(this.Url)).Subscribe(_ => { }, () => Console.WriteLine("Repo downloaded"));
+            });
+            this.ClientManager.DownloadService.Downloads
+                .Connect()
+                .Transform(d => new DownloadViewModel(d))
+                .Bind(downloads)
+                .Subscribe();
         }
 
-        public ReactiveCommand DownloadMissing => this.downloadMissing;
-        public ICollection<IDownload> Downloads => this.clientManager.DownloadManager.Downloads;
-        public IScreen HostScreen { get; protected set; }
-
-        public ReactiveCommand LoadRepo => this.loadRepo;
+        public IClientService ClientManager { get; }
+        public ReactiveCommand DownloadMissing { get; }
+        public IReadOnlyReactiveList<DownloadViewModel> Downloads => downloads;
+        public ReactiveCommand LoadRepo { get; }
 
         public string Url
         {
             get { return this.url; }
             set { this.RaiseAndSetIfChanged(ref this.url, value); }
-        }
-
-        public string UrlPathSegment
-        {
-            get { return "downloads"; }
         }
     }
 }
