@@ -9,10 +9,10 @@ using System.Threading.Tasks;
 
 namespace ModSink.Core.Client
 {
-    public interface IClientManager
+    public interface IClientService
     {
-        IDownloadManager DownloadManager { get; }
-        ILocalRepoManager LocalRepoManager { get; }
+        IDownloadService DownloadService { get; }
+        ILocalStorageService LocalStorageService { get; }
         ICollection<Modpack> Modpacks { get; }
         ICollection<Repo> Repos { get; }
 

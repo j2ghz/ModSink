@@ -13,7 +13,7 @@ namespace Modsink.Common.Tests.Client
 {
     public class LocalRepoManagerTest
     {
-        private ILocalRepoManager manager = new LocalRepoManager(new Uri(Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString())));
+        private ILocalStorageService manager = new LocalStorageService(new Uri(Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString())));
 
         [Fact]
         public void WriteReadAndDelete()

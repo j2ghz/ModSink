@@ -30,7 +30,7 @@ namespace ModSink.CLI
                     var pathStr = pathArg.Value ?? ".";
                     var path = Path.Combine(Directory.GetCurrentDirectory(), pathStr);
                     IHashFunction xxhash = new XXHash64();
-                    var hashing = new Hashing(xxhash);
+                    var hashing = new HashingService(xxhash);
                     hashing.GetFiles(new DirectoryInfo(path))
                     .Select(f =>
                     {
@@ -72,7 +72,7 @@ namespace ModSink.CLI
                     var localStr = pathArg.Value;
                     var localUri = new Uri(localStr);
                     var downloader = new HttpClientDownloader();
-                    var client = new ClientManager(new DownloadManager(downloader), new LocalRepoManager(localUri), downloader, new BinaryFormatter());
+                    var client = new ClientService(new DownloadService(downloader), new LocalStorageService(localUri), downloader, new BinaryFormatter());
 
                     Console.WriteLine("Downloading repo");
                     var repoDown = client.LoadRepo(uri);
@@ -83,12 +83,12 @@ namespace ModSink.CLI
                         Console.WriteLine($"Scheduling {modpack.Name} [{modpack.Mods.Count} mods]");
                         client.DownloadMissingFiles(modpack);
                     }
-                    client.DownloadManager.DownloadStarted += (sender, d) =>
-                    {
-                        Console.WriteLine($"Starting {d.Source}");
-                        DumpDownloadProgress(d.Progress, d.Name);
-                    };
-                    client.DownloadManager.CheckDownloadsToStart();
+                    //client.DownloadService.DownloadStarted += (sender, d) =>
+                    //{
+                    //    Console.WriteLine($"Starting {d.Source}");
+                    //    DumpDownloadProgress(d.Progress, d.Name);
+                    //};
+                    client.DownloadService.CheckDownloadsToStart();
                     Console.ReadKey();
                     return 0;
                 });
@@ -116,7 +116,7 @@ namespace ModSink.CLI
                     else
                     {
                         var downloader = new HttpClientDownloader();
-                        var client = new ClientManager(new DownloadManager(downloader), null, downloader, new BinaryFormatter());
+                        var client = new ClientService(new DownloadService(downloader), null, downloader, new BinaryFormatter());
 
                         Console.WriteLine("Downloading repo");
                         var repoDown = client.LoadRepo(uri);
@@ -146,8 +146,8 @@ namespace ModSink.CLI
                     var pathStr = pathArg.Value ?? "./hashed";
                     var path = Path.Combine(Directory.GetCurrentDirectory(), pathStr);
 
-                    var hashing = new Hashing(new XXHash64());
-                    var client = new ClientManager(null, new LocalRepoManager(new Uri(path)), null, null);
+                    var hashing = new HashingService(new XXHash64());
+                    var client = new ClientService(null, new LocalStorageService(new Uri(path)), null, null);
 
                     foreach (var file in hashing.GetFiles(new DirectoryInfo(path)).OrderBy(f => f.Length))
                     {
@@ -196,7 +196,7 @@ namespace ModSink.CLI
                     var path = Path.Combine(Directory.GetCurrentDirectory(), pathStr);
                     var pathDest = Path.Combine(Directory.GetCurrentDirectory(), pathDestStr);
 
-                    var hashing = new Hashing(new XXHash64());
+                    var hashing = new HashingService(new XXHash64());
 
                     foreach (var file in hashing.GetFiles(new DirectoryInfo(path)))
                     {
@@ -251,7 +251,7 @@ namespace ModSink.CLI
 
                 command.OnExecute(async () =>
                 {
-                    var hashing = new Hashing(new XXHash64());
+                    var hashing = new HashingService(new XXHash64());
 
                     var pathStr = pathArg.Value ?? ".";
                     var path = new DirectoryInfo(Path.Combine(Directory.GetCurrentDirectory(), pathStr));

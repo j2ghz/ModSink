@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace ModSink.Core
 {
-    public interface IHashing
+    public interface IHashingService
     {
         Task<HashValue> GetFileHash(FileInfo file, CancellationToken cancel);
 

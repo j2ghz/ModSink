@@ -1,15 +1,16 @@
-﻿using System;
+﻿using DynamicData;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Text;
 
 namespace ModSink.Core.Client
 {
-    public interface IDownloadManager
+    public interface IDownloadService
     {
-        event EventHandler<IDownload> DownloadStarted;
+        IObservableList<IDownload> Downloads { get; }
 
-        ObservableCollection<IDownload> Downloads { get; }
+        void Add(IDownload download);
 
         void CheckDownloadsToStart();
     }

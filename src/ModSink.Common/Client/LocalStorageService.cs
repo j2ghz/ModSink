@@ -7,12 +7,12 @@ using System.IO;
 
 namespace ModSink.Common.Client
 {
-    public class LocalRepoManager : ILocalRepoManager
+    public class LocalStorageService : ILocalStorageService
     {
         private readonly DirectoryInfo localDir;
         private readonly Uri localPath;
 
-        public LocalRepoManager(Uri localPath)
+        public LocalStorageService(Uri localPath)
         {
             this.localPath = localPath;
             this.localDir = new DirectoryInfo(localPath.LocalPath);

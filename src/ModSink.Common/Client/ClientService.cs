@@ -11,32 +11,30 @@ using System.Runtime.Serialization;
 
 namespace ModSink.Common.Client
 {
-    public class ClientManager : IClientManager
+    public class ClientService : IClientService
     {
-        public ClientManager(IDownloadManager downloadManager, ILocalRepoManager localRepoManager, IDownloader downloader, IFormatter serializationFormatter)
+        public ClientService(IDownloadService downloadService, ILocalStorageService localStorageService, IDownloader downloader, IFormatter serializationFormatter)
         {
-            this.DownloadManager = downloadManager;
-            this.LocalRepoManager = localRepoManager;
+            this.DownloadService = downloadService;
+            this.LocalStorageService = localStorageService;
             this.Downloader = downloader;
             this.SerializationFormatter = serializationFormatter;
         }
 
         public IDownloader Downloader { get; }
-        public IDownloadManager DownloadManager { get; }
-        public ILocalRepoManager LocalRepoManager { get; }
+        public IDownloadService DownloadService { get; }
+        public ILocalStorageService LocalStorageService { get; }
         public ICollection<Modpack> Modpacks => this.Repos?.SelectMany(r => r.Modpacks).ToList();
         public ICollection<Repo> Repos { get; } = new List<Repo>();
         public IFormatter SerializationFormatter { get; }
 
         public void DownloadMissingFiles(Modpack modpack)
         {
-            var files = modpack.Mods.SelectMany(mod => mod.Mod.Files.Select(f => f.Value));
-            var filesToDownload = files.Where(f => !this.LocalRepoManager.IsFileAvailable(f));
-            var downloads = filesToDownload.Select(f => new Download(GetDownloadUri(f), new Lazy<Stream>(() => this.LocalRepoManager.Write(f)), f.ToString()));
-            foreach (var download in downloads)
-            {
-                this.DownloadManager.Downloads.Add(download);
-            }
+            modpack.Mods
+                .SelectMany(mod => mod.Mod.Files.Select(f => f.Value))
+                .Where(f => !this.LocalStorageService.IsFileAvailable(f))
+                .Select(f => new Download(GetDownloadUri(f), new Lazy<Stream>(() => this.LocalStorageService.Write(f)), f.ToString()))
+                .ForEach(this.DownloadService.Add);
         }
 
         public Uri GetDownloadUri(HashValue hash)

@@ -12,11 +12,11 @@ using System.Reactive.Disposables;
 
 namespace ModSink.Common
 {
-    public class Hashing : IHashing
+    public class HashingService : IHashingService
     {
         private readonly IHashFunction hashFunction;
 
-        public Hashing(IHashFunction hashFunction)
+        public HashingService(IHashFunction hashFunction)
         {
             this.hashFunction = hashFunction;
         }

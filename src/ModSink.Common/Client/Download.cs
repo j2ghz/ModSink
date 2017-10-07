@@ -25,7 +25,7 @@ namespace ModSink.Common.Client
         public Uri Source { get; }
         public DownloadState State { get; private set; } = DownloadState.Queued;
 
-        public void Start(IDownloader downloader)
+        public void Start(IDownloader downloader) //TODO: redo using Stateless
         {
             if (this.State != DownloadState.Queued) throw new Exception($"State must be {DownloadState.Queued} to start a download");
             this.State = DownloadState.Downloading;

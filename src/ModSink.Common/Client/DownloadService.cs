@@ -5,42 +5,44 @@ using System.Linq;
 using System.Text;
 using System.Reactive.Linq;
 using System.Collections.ObjectModel;
+using DynamicData;
 
 namespace ModSink.Common.Client
 {
-    public class DownloadManager : IDownloadManager
+    public class DownloadService : IDownloadService
     {
         private readonly IDownloader downloader;
+        private readonly SourceList<IDownload> downloads = new SourceList<IDownload>();
         private byte simultaneousDownloads = 1;
 
-        public DownloadManager(IDownloader downloader)
+        public DownloadService(IDownloader downloader)
         {
             this.downloader = downloader;
-            this.Downloads.CollectionChanged += (_, __) => CheckDownloadsToStart();
         }
 
-        public event EventHandler<IDownload> DownloadStarted;
+        public IObservableList<IDownload> Downloads => this.downloads.AsObservableList();
 
-        public ObservableCollection<IDownload> Downloads { get; } = new ObservableCollection<IDownload>();
+        public void Add(IDownload download)
+        {
+            this.downloads.Add(download);
+            CheckDownloadsToStart();
+        }
 
         public void CheckDownloadsToStart()
         {
-            var toStart = this.simultaneousDownloads - this.Downloads.Count(d => d.State == DownloadState.Downloading);
+            var toStart = this.simultaneousDownloads - this.downloads.Items.Count(d => d.State == DownloadState.Downloading);
             for (int i = 0; i < toStart; i++)
             {
                 var d = NextDownload();
                 if (d == null) break;
                 d.Start(this.downloader);
                 d.Progress.Subscribe(_ => { }, _ => CheckDownloadsToStart(), () => CheckDownloadsToStart());
-                OnDownloadStarted(d);
             }
         }
 
         private IDownload NextDownload()
         {
-            return this.Downloads.Where(d => d.State == DownloadState.Queued).FirstOrDefault();
+            return this.Downloads.Items.Where(d => d.State == DownloadState.Queued).FirstOrDefault();
         }
-
-        private void OnDownloadStarted(IDownload e) => DownloadStarted?.Invoke(this, e);
     }
 }

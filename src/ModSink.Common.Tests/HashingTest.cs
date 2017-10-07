@@ -21,7 +21,7 @@ namespace Modsink.Common.Tests
         public async System.Threading.Tasks.Task GetHashOfEmptyAsync()
         {
             var hashF = new XXHash64();
-            var hashing = new Hashing(hashF);
+            var hashing = new HashingService(hashF);
             var stream = new MemoryStream(new byte[] { });
             var hash = await hashing.GetFileHash(stream, CancellationToken.None);
             hash.ShouldBeEquivalentTo(hashF.HashOfEmpty);

@@ -6,7 +6,7 @@ using System.Text;
 
 namespace ModSink.Core.Client
 {
-    public interface ILocalRepoManager
+    public interface ILocalStorageService
     {
         void Delete(HashValue hash);
 
