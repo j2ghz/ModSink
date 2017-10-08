@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:Controls="http://metro.mahapps.com/winfx/xaml/controls"
              xmlns:local="clr-namespace:ModSink.WPF.View"
              xmlns:repoModels="clr-namespace:ModSink.Core.Models.Repo;assembly=ModSink.Core"
              xmlns:vm="clr-namespace:ModSink.WPF.ViewModel"
@@ -11,8 +12,8 @@
              d:DataContext="{d:DesignInstance vm:LibraryViewModel}">
     <DockPanel LastChildFill="True">
         <DockPanel LastChildFill="True" DockPanel.Dock="Left">
-            <TextBox Text="Search" DockPanel.Dock="Top" />
-            <ListBox ItemsSource="{Binding Modpacks}" SelectedItem="{Binding SelectedModpack}">
+            <TextBox Controls:TextBoxHelper.Watermark="Search" DockPanel.Dock="Top" />
+            <ListBox MinWidth="120" ItemsSource="{Binding Modpacks}" SelectedItem="{Binding SelectedModpack}">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <TextBlock Text="{Binding Name}" />
@@ -20,14 +21,14 @@
                 </ListBox.ItemTemplate>
             </ListBox>
         </DockPanel>
-        <DockPanel LastChildFill="True" DataContext="{Binding SelectedModpack}">
-            <TextBlock Text="{Binding Name}" DockPanel.Dock="Top" />
+        <DockPanel LastChildFill="True" Margin="5" DataContext="{Binding SelectedModpack}">
+            <TextBlock Text="{Binding Name}" FontSize="32" DockPanel.Dock="Top" />
             <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
                 <Button Content="Install" />
-                <Button Content="Play" />
+                <Button Content="Play" IsEnabled="False" />
                 <TextBlock Text="15GB" />
             </StackPanel>
-            <TreeView ItemsSource="{Binding Mods}">
+            <TreeView Margin="5" ItemsSource="{Binding Mods}">
                 <TreeView.ItemTemplate>
                     <HierarchicalDataTemplate DataType="{x:Type repoModels:Modpack}" ItemsSource="{Binding Mod.Files}">
                         <TextBlock Text="{Binding Mod.Name}" />

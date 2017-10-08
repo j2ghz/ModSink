@@ -3,10 +3,11 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:Controls="http://metro.mahapps.com/winfx/xaml/controls"
              xmlns:local="clr-namespace:ModSink.WPF.View"
              xmlns:vm="clr-namespace:ModSink.WPF.ViewModel"
              mc:Ignorable="d"
-             d:DesignHeight="300" d:DesignWidth="300"
+             d:DesignHeight="600" d:DesignWidth="1000"
              d:DataContext="{d:DesignInstance vm:DownloadsViewModel}">
     <DockPanel LastChildFill="True">
         <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
@@ -17,11 +18,20 @@
         <ListView ItemsSource="{Binding Downloads}">
             <ListView.View>
                 <GridView>
-                    <GridViewColumn Width="Auto" Header="Name" DisplayMemberBinding="{Binding Name}" />
-                    <GridViewColumn Width="Auto" Header="Size" DisplayMemberBinding="{Binding Size}" />
-                    <GridViewColumn Width="Auto" Header="Downloaded" DisplayMemberBinding="{Binding Downloaded}" />
-                    <GridViewColumn Width="Auto" Header="Speed" DisplayMemberBinding="{Binding Speed}" />
-                    <GridViewColumn Width="Auto" Header="Progress" DisplayMemberBinding="{Binding Progress}" />
+                    <GridViewColumn Width="200" Header="Name" DisplayMemberBinding="{Binding Name}" />
+                    <GridViewColumn Width="100" Header="Size" DisplayMemberBinding="{Binding Size}" />
+                    <GridViewColumn Width="100" Header="Downloaded" DisplayMemberBinding="{Binding Downloaded}" />
+                    <GridViewColumn Width="100" Header="Speed" DisplayMemberBinding="{Binding Speed}" />
+                    <GridViewColumn Width="400" Header="Progress">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <Grid>
+                                    <ProgressBar Value="{Binding Progress, Mode=OneWay}" />
+                                    <TextBlock Text="{Binding Progress, Mode=OneWay, StringFormat={}{0:0}%}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                </Grid>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
                 </GridView>
             </ListView.View>
         </ListView>

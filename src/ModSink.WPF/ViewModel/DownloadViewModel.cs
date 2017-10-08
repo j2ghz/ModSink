@@ -15,7 +15,7 @@ namespace ModSink.WPF.ViewModel
     public class DownloadViewModel : ReactiveObject
     {
         private readonly ObservableAsPropertyHelper<string> downloaded;
-        private readonly ObservableAsPropertyHelper<string> progress;
+        private readonly ObservableAsPropertyHelper<double> progress;
         private readonly ObservableAsPropertyHelper<string> size;
         private readonly ObservableAsPropertyHelper<string> speed;
 
@@ -28,14 +28,14 @@ namespace ModSink.WPF.ViewModel
                 .Select(progList => new DownloadProgressCombined(progList.Last(), progList.First()));
 
             this.downloaded = progress.Select(p => p.Current.Downloaded.Humanize("#.##")).ToProperty(this, x => x.Downloaded);
-            this.progress = progress.Select(p => $"{(double)p.Current.Downloaded.Bits / p.Current.Size.Bits:P2}").ToProperty(this, x => x.Progress);
+            this.progress = progress.Select(p => 100d * p.Current.Downloaded.Bits / p.Current.Size.Bits).ToProperty(this, x => x.Progress);
             this.size = progress.Select(p => p.Current.Size.Humanize("#.##")).ToProperty(this, x => x.Size);
             this.speed = progress.Select(p => p.Speed.Humanize("#.##")).ToProperty(this, x => x.Speed);
         }
 
         public string Downloaded => downloaded.Value;
         public string Name { get; }
-        public string Progress => progress.Value;
+        public double Progress => progress.Value;
         public string Size => size.Value;
         public string Speed => speed.Value;
     }
