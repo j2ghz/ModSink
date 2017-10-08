@@ -60,10 +60,7 @@
       <Version>1.5.0</Version>
     </PackageReference>
     <PackageReference Include="ModSink.Common">
-      <Version>0.2.1-ci0041</Version>
-    </PackageReference>
-    <PackageReference Include="ModSink.Core">
-      <Version>0.2.1-ci0041</Version>
+      <Version>0.2.1-ci0042</Version>
     </PackageReference>
     <PackageReference Include="reactiveui-wpf">
       <Version>8.0.0-alpha0094</Version>
@@ -94,6 +91,7 @@
     </ApplicationDefinition>
     <Compile Include="ViewModel\DownloadsViewModel.cs" />
     <Compile Include="ViewModel\DownloadViewModel.cs" />
+    <Compile Include="ViewModel\LibraryViewModel.cs" />
     <Compile Include="ViewModel\MainWindowViewModel.cs" />
     <Compile Include="View\DownloadsView.xaml.cs">
       <DependentUpon>DownloadsView.xaml</DependentUpon>

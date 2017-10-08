@@ -21,7 +21,7 @@ namespace ModSink.WPF.ViewModel
             this.ClientManager = clientService;
             this.DownloadMissing = ReactiveCommand.Create(() =>
             {
-                clientService.DownloadMissingFiles(clientService.Modpacks.First());
+                clientService.DownloadMissingFiles(clientService.Modpacks.Items.First());
                 clientService.DownloadService.CheckDownloadsToStart();
             });
             this.LoadRepo = ReactiveCommand.Create(() =>

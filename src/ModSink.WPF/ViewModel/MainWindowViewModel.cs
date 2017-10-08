@@ -8,11 +8,13 @@ namespace ModSink.WPF.ViewModel
 {
     public class MainWindowViewModel
     {
-        public MainWindowViewModel(DownloadsViewModel downloadsVM)
+        public MainWindowViewModel(DownloadsViewModel downloadsVM, LibraryViewModel libraryVM)
         {
             DownloadsVM = downloadsVM;
+            LibraryVM = libraryVM;
         }
 
         public DownloadsViewModel DownloadsVM { get; }
+        public LibraryViewModel LibraryVM { get; }
     }
 }

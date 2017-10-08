@@ -14,7 +14,7 @@
     <DockPanel LastChildFill="True">
         <TabControl>
             <TabItem Header="Library">
-                <v:LibraryView />
+                <v:LibraryView DataContext="{Binding LibraryVM}" />
             </TabItem>
             <TabItem Header="Downloads">
                 <v:DownloadsView DataContext="{Binding DownloadsVM}" />
