@@ -15,6 +15,7 @@ using ModSink.Common.Client;
 using ModSink.Core;
 using System.Runtime.Serialization;
 using System.Windows.Controls;
+using AutofacSerilogIntegration;
 
 namespace ModSink.WPF
 {
@@ -56,13 +57,15 @@ namespace ModSink.WPF
         {
             var builder = new ContainerBuilder();
 
-            builder.RegisterType<BinaryFormatter>().As<IFormatter>();
-            builder.Register(_ => new LocalStorageService(new System.Uri(@"D:\modsink"))).AsImplementedInterfaces();
-            builder.RegisterAssemblyTypes(typeof(IModSink).Assembly, typeof(ModSink.Common.ModSink).Assembly).Where(t => t.Name != "LocalStorageService").AsImplementedInterfaces();
+            builder.RegisterLogger();
 
-            builder.RegisterAssemblyTypes(typeof(App).Assembly).Where(t => t.Name.EndsWith("ViewModel")).AsImplementedInterfaces().AsSelf();
-            builder.RegisterAssemblyTypes(typeof(App).Assembly).Where(t => t.IsAssignableTo<TabItem>()).AsSelf().As<TabItem>();
-            builder.RegisterType<MainWindow>().AsSelf();
+            builder.RegisterType<BinaryFormatter>().As<IFormatter>().SingleInstance();
+            builder.Register(_ => new LocalStorageService(new System.Uri(@"D:\modsink"))).AsImplementedInterfaces().SingleInstance();
+            builder.RegisterAssemblyTypes(typeof(IModSink).Assembly, typeof(ModSink.Common.ModSink).Assembly).Where(t => t.Name != "LocalStorageService").AsImplementedInterfaces().SingleInstance();
+
+            builder.RegisterAssemblyTypes(typeof(App).Assembly).Where(t => t.Name.EndsWith("ViewModel")).AsImplementedInterfaces().AsSelf().SingleInstance();
+            builder.RegisterAssemblyTypes(typeof(App).Assembly).Where(t => t.IsAssignableTo<TabItem>()).AsSelf().As<TabItem>().SingleInstance();
+            builder.RegisterType<MainWindow>().AsSelf().SingleInstance();
 
             //TODO: Load plugins, waiting on https://stackoverflow.com/questions/46351411
 

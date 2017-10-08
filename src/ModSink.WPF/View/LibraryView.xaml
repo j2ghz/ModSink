@@ -4,41 +4,44 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:ModSink.WPF.View"
+             xmlns:repoModels="clr-namespace:ModSink.Core.Models.Repo;assembly=ModSink.Core"
              xmlns:vm="clr-namespace:ModSink.WPF.ViewModel"
              mc:Ignorable="d"
-             d:DesignHeight="300" d:DesignWidth="500">
+             d:DesignHeight="300" d:DesignWidth="500"
+             d:DataContext="{d:DesignInstance vm:LibraryViewModel}">
     <DockPanel LastChildFill="True">
         <DockPanel LastChildFill="True" DockPanel.Dock="Left">
             <TextBox Text="Search" DockPanel.Dock="Top" />
-            <ListBox>
-                <ListBoxItem Content="Modpack" />
-                <ListBoxItem Content="Modpack2 Extra edition" />
+            <ListBox ItemsSource="{Binding Modpacks}" SelectedItem="{Binding SelectedModpack}">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding Name}" />
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
             </ListBox>
         </DockPanel>
-        <ScrollViewer HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Auto">
-            <StackPanel Orientation="Vertical">
-                <TextBlock Text="Modpack" />
-                <StackPanel Orientation="Horizontal">
-                    <Button Content="Install" />
-                    <Button Content="Play" />
-                    <TextBlock Text="15GB" />
-                </StackPanel>
-                <TreeView>
-                    <TreeView.ItemContainerStyle>
-                        <Style TargetType="{x:Type TreeViewItem}">
-                            <Setter Property="IsExpanded" Value="True" />
-                        </Style>
-                    </TreeView.ItemContainerStyle>
-                    <TreeViewItem Header="Mod1">
-                        <TreeViewItem Header="✓ 18-8B-32-E1-F0-B2-E9-5C 15GB /addon/data/1.dat" />
-                    </TreeViewItem>
-                    <TreeViewItem Header="Mod2">
-                        <TreeViewItem Header="✓ B6-BB-1A-04-F8-8B-45-56 4GB /addon/data/3.dat" />
-                        <TreeViewItem Header="✗ 02-FD-8D-3F-91-04-92-AA 1GB /addon/misc/5.wav" />
-                    </TreeViewItem>
-                    <TreeViewItem Header="Mod3" />
-                </TreeView>
+        <DockPanel LastChildFill="True" DataContext="{Binding SelectedModpack}">
+            <TextBlock Text="{Binding Name}" DockPanel.Dock="Top" />
+            <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
+                <Button Content="Install" />
+                <Button Content="Play" />
+                <TextBlock Text="15GB" />
             </StackPanel>
-        </ScrollViewer>
+            <TreeView ItemsSource="{Binding Mods}">
+                <TreeView.ItemTemplate>
+                    <HierarchicalDataTemplate DataType="{x:Type repoModels:Modpack}" ItemsSource="{Binding Mod.Files}">
+                        <TextBlock Text="{Binding Mod.Name}" />
+                        <HierarchicalDataTemplate.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="{Binding Value}" FontFamily="Consolas" />
+                                    <TextBlock Text="{Binding Key}" />
+                                </StackPanel>
+                            </DataTemplate>
+                        </HierarchicalDataTemplate.ItemTemplate>
+                    </HierarchicalDataTemplate>
+                </TreeView.ItemTemplate>
+            </TreeView>
+        </DockPanel>
     </DockPanel>
 </UserControl>
