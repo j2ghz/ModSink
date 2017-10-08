@@ -53,6 +53,9 @@
     <PackageReference Include="Autofac">
       <Version>4.6.1</Version>
     </PackageReference>
+    <PackageReference Include="AutofacSerilogIntegration">
+      <Version>2.0.1-dev-00031</Version>
+    </PackageReference>
     <PackageReference Include="DynamicData.ReactiveUI">
       <Version>6.0.1.2317-beta</Version>
     </PackageReference>

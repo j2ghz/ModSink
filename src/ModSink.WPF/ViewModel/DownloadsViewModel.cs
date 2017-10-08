@@ -8,17 +8,20 @@ using DynamicData.PLinq;
 using ReactiveUI;
 using DynamicData.ReactiveUI;
 using System.Linq;
+using Serilog;
 
 namespace ModSink.WPF.ViewModel
 {
     public class DownloadsViewModel : ReactiveObject
     {
         private readonly ReactiveList<DownloadViewModel> downloads = new ReactiveList<DownloadViewModel>();
+        private readonly ILogger log;
         private string url;
 
-        public DownloadsViewModel(IClientService clientService)
+        public DownloadsViewModel(IClientService clientService, ILogger log)
         {
             this.ClientManager = clientService;
+            this.log = log;
             this.DownloadMissing = ReactiveCommand.Create(() =>
             {
                 clientService.DownloadMissingFiles(clientService.Modpacks.Items.First());
@@ -26,7 +29,9 @@ namespace ModSink.WPF.ViewModel
             });
             this.LoadRepo = ReactiveCommand.Create(() =>
             {
-                clientService.LoadRepo(new Uri(this.Url)).Subscribe(_ => { }, () => Console.WriteLine("Repo downloaded"));
+                log.Information("Download repo from {url}", this.Url);
+                clientService.LoadRepo(new Uri(this.Url))
+                    .Subscribe(_ => { }, e => log.Error(e, "Repo download failed"), () => log.Information("Repo downloaded successfully"));
             });
             this.ClientManager.DownloadService.Downloads
                 .Connect()

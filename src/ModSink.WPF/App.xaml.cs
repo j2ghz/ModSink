@@ -15,6 +15,7 @@ using ModSink.Common.Client;
 using ModSink.Core;
 using System.Runtime.Serialization;
 using System.Windows.Controls;
+using AutofacSerilogIntegration;
 
 namespace ModSink.WPF
 {
@@ -55,6 +56,8 @@ namespace ModSink.WPF
         private IContainer BuildContainer()
         {
             var builder = new ContainerBuilder();
+
+            builder.RegisterLogger();
 
             builder.RegisterType<BinaryFormatter>().As<IFormatter>().SingleInstance();
             builder.Register(_ => new LocalStorageService(new System.Uri(@"D:\modsink"))).AsImplementedInterfaces().SingleInstance();
