@@ -9,6 +9,7 @@ using ReactiveUI;
 using DynamicData.ReactiveUI;
 using System.Linq;
 using Serilog;
+using System.Reactive;
 
 namespace ModSink.WPF.ViewModel
 {
@@ -22,17 +23,12 @@ namespace ModSink.WPF.ViewModel
         {
             this.ClientManager = clientService;
             this.log = log;
-            this.DownloadMissing = ReactiveCommand.Create(() =>
+            this.DownloadMissing = ReactiveCommand.CreateFromTask(async () =>
             {
-                clientService.DownloadMissingFiles(clientService.Modpacks.Items.First());
+                await clientService.DownloadMissingFiles(clientService.Modpacks.Items.First());
                 clientService.DownloadService.CheckDownloadsToStart();
             });
-            this.LoadRepo = ReactiveCommand.Create(() =>
-            {
-                log.Information("Download repo from {url}", this.Url);
-                clientService.LoadRepo(new Uri(this.Url))
-                    .Subscribe(_ => { }, e => log.Error(e, "Repo download failed"), () => log.Information("Repo downloaded successfully"));
-            });
+            this.LoadRepo = ReactiveCommand.CreateFromObservable(() => clientService.LoadRepo(new Uri(this.Url)));
             this.ClientManager.DownloadService.Downloads
                 .Connect()
                 .Transform(d => new DownloadViewModel(d))
@@ -43,7 +39,7 @@ namespace ModSink.WPF.ViewModel
         public IClientService ClientManager { get; }
         public ReactiveCommand DownloadMissing { get; }
         public IReadOnlyReactiveList<DownloadViewModel> Downloads => downloads;
-        public ReactiveCommand LoadRepo { get; }
+        public ReactiveCommand<Unit, DownloadProgress> LoadRepo { get; }
 
         public string Url
         {
