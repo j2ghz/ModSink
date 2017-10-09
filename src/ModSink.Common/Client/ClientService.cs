@@ -33,13 +33,20 @@ namespace ModSink.Common.Client
         public IObservableList<Repo> Repos => this.repos.AsObservableList();
         public IFormatter SerializationFormatter { get; }
 
-        public void DownloadMissingFiles(Modpack modpack)
+        public async Task DownloadMissingFiles(Modpack modpack)
         {
-            modpack.Mods
-                .SelectMany(mod => mod.Mod.Files.Select(f => f.Value))
-                .Where(f => !this.LocalStorageService.IsFileAvailable(f))
-                .Select(f => new Download(GetDownloadUri(f), new Lazy<Stream>(() => this.LocalStorageService.Write(f)), f.ToString()))
-                .ForEach(this.DownloadService.Add);
+            foreach (var mod in modpack.Mods)
+            {
+                foreach (var fh in mod.Mod.Files)
+                {
+                    var hash = fh.Value;
+                    if (await this.LocalStorageService.IsFileAvailable(hash)) continue;
+                    this.DownloadService.Add(new Download(
+                        GetDownloadUri(hash),
+                        new Lazy<Task<Stream>>(async () => await this.LocalStorageService.Write(hash)),
+                        hash.ToString()));
+                }
+            }
         }
 
         public Uri GetDownloadUri(HashValue hash)

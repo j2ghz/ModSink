@@ -3,19 +3,24 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace ModSink.Core.Client
 {
     public interface ILocalStorageService
     {
-        void Delete(HashValue hash);
+        Task Delete(HashValue hash);
+
+        Task<FileInfo> GetFileInfo(HashValue hash);
+
+        string GetFileName(HashValue hash);
 
         Uri GetFileUri(HashValue hash);
 
-        bool IsFileAvailable(HashValue hash);
+        Task<bool> IsFileAvailable(HashValue hash);
 
-        Stream Read(HashValue hash);
+        Task<Stream> Read(HashValue hash);
 
-        Stream Write(HashValue hash);
+        Task<Stream> Write(HashValue hash);
     }
 }

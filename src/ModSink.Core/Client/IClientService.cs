@@ -21,7 +21,7 @@ namespace ModSink.Core.Client
         IObservableList<Modpack> Modpacks { get; }
         IObservableList<Repo> Repos { get; }
 
-        void DownloadMissingFiles(Modpack modpack);
+        Task DownloadMissingFiles(Modpack modpack);
 
         Uri GetDownloadUri(HashValue hash);
 

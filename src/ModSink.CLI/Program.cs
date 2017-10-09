@@ -81,7 +81,7 @@ namespace ModSink.CLI
                     foreach (var modpack in client.Modpacks.Items)
                     {
                         Console.WriteLine($"Scheduling {modpack.Name} [{modpack.Mods.Count} mods]");
-                        client.DownloadMissingFiles(modpack);
+                        await client.DownloadMissingFiles(modpack);
                     }
                     //client.DownloadService.DownloadStarted += (sender, d) =>
                     //{

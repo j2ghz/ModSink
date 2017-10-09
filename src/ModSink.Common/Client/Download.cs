@@ -5,6 +5,7 @@ using System.Text;
 using System.IO;
 using System.Reactive.Subjects;
 using System.Reactive.Linq;
+using System.Threading.Tasks;
 
 namespace ModSink.Common.Client
 {
@@ -12,14 +13,14 @@ namespace ModSink.Common.Client
     {
         private Subject<DownloadProgress> progress = new Subject<DownloadProgress>();
 
-        public Download(Uri source, Lazy<Stream> destination, string name)
+        public Download(Uri source, Lazy<Task<Stream>> destination, string name)
         {
             this.Source = source;
             this.Destination = destination;
             this.Name = name;
         }
 
-        public Lazy<Stream> Destination { get; }
+        public Lazy<Task<Stream>> Destination { get; }
         public string Name { get; }
         public IObservable<DownloadProgress> Progress => progress;
         public Uri Source { get; }

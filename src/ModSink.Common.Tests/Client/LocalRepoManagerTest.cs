@@ -8,6 +8,7 @@ using System.IO;
 using System.Text;
 using FluentAssertions;
 using Xunit;
+using System.Threading.Tasks;
 
 namespace Modsink.Common.Tests.Client
 {
@@ -16,24 +17,24 @@ namespace Modsink.Common.Tests.Client
         private ILocalStorageService manager = new LocalStorageService(new Uri(Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString())));
 
         [Fact]
-        public void WriteReadAndDelete()
+        public async Task WriteReadAndDelete()
         {
             var hash = new XXHash64().HashOfEmpty;
-            this.manager.IsFileAvailable(hash).Should().Be(false);
-            Assert.Throws<FileNotFoundException>(() => this.manager.Read(hash));
-            using (var stream = this.manager.Write(hash))
+            (await this.manager.IsFileAvailable(hash)).Should().Be(false);
+            await Assert.ThrowsAsync<FileNotFoundException>(async () => await this.manager.Read(hash));
+            using (var stream = await this.manager.Write(hash))
             {
                 stream.WriteByte(0xff);
             }
-            this.manager.IsFileAvailable(hash).Should().Be(true);
-            using (var stream = this.manager.Read(hash))
+            (await this.manager.IsFileAvailable(hash)).Should().Be(true);
+            using (var stream = await this.manager.Read(hash))
             {
                 stream.ReadByte().Should().Be(0xff);
                 stream.ReadByte().Should().Be(-1);
             }
-            this.manager.Delete(hash);
-            this.manager.IsFileAvailable(hash).Should().Be(false);
-            Assert.Throws<FileNotFoundException>(() => this.manager.Read(hash));
+            await this.manager.Delete(hash);
+            (await this.manager.IsFileAvailable(hash)).Should().Be(false);
+            await Assert.ThrowsAsync<FileNotFoundException>(async () => await this.manager.Read(hash));
         }
     }
 }

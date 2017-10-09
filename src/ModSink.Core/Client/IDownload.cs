@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace ModSink.Core.Client
 {
@@ -15,7 +16,7 @@ namespace ModSink.Core.Client
 
     public interface IDownload
     {
-        Lazy<Stream> Destination { get; }
+        Lazy<Task<Stream>> Destination { get; }
         string Name { get; }
         IObservable<DownloadProgress> Progress { get; }
         Uri Source { get; }

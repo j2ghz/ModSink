@@ -11,6 +11,7 @@ using ModSink.Common.Client;
 using Humanizer.Bytes;
 using Humanizer;
 using static ModSink.Core.Client.DownloadProgress;
+using System.Threading.Tasks;
 
 namespace ModSink.Common
 {
@@ -35,7 +36,7 @@ namespace ModSink.Common
 
                 var totalRead = 0;
                 using (var input = await response.Content.ReadAsStreamAsync())
-                using (var output = download.Destination.Value)
+                using (var output = await download.Destination.Value)
                 {
                     byte[] buffer = new byte[16 * 1024];
                     var read = 0;
@@ -44,7 +45,7 @@ namespace ModSink.Common
                     report(length, ByteSize.FromBytes(0), TransferState.Downloading);
                     while ((read = await input.ReadAsync(buffer, 0, buffer.Length, cancel)) > 0)
                     {
-                        await output.WriteAsync(buffer, 0, read);
+                        output.Write(buffer, 0, read);
                         totalRead += read;
                         report(length, totalRead.Bytes(), TransferState.Downloading);
                     }
@@ -60,6 +61,6 @@ namespace ModSink.Common
             return progress;
         }
 
-        public IObservable<DownloadProgress> Download(Uri source, Stream destination, string name) => this.Download(new Download(source, new Lazy<Stream>(() => destination), name));
+        public IObservable<DownloadProgress> Download(Uri source, Stream destination, string name) => this.Download(new Download(source, new Lazy<Task<Stream>>(() => Task.Run<Stream>(() => destination)), name));
     }
 }
