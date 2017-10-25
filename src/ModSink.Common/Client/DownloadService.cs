@@ -20,7 +20,7 @@ namespace ModSink.Common.Client
             this.downloader = downloader;
         }
 
-        public IObservableList<IDownload> Downloads => this.downloads.AsObservableList();
+        public IObservableList<IDownload> Queue => this.downloads.AsObservableList();
 
         public void Add(IDownload download)
         {
@@ -42,7 +42,7 @@ namespace ModSink.Common.Client
 
         private IDownload NextDownload()
         {
-            return this.Downloads.Items.Where(d => d.State == DownloadState.Queued).FirstOrDefault();
+            return this.Queue.Items.Where(d => d.State == DownloadState.Queued).FirstOrDefault();
         }
     }
 }

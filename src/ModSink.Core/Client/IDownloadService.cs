@@ -8,7 +8,8 @@ namespace ModSink.Core.Client
 {
     public interface IDownloadService
     {
-        IObservableList<IDownload> Downloads { get; }
+        //TODO: Split into Queue and Active? Or use DynamicData on one source list? OR split interface but use DD on impl?
+        IObservableList<IDownload> Queue { get; }
 
         void Add(IDownload download);
 
