@@ -11,7 +11,7 @@ namespace ModSink.Common.Client
 {
     public class Download : IDownload
     {
-        private Subject<DownloadProgress> progress = new Subject<DownloadProgress>();
+        private readonly Subject<DownloadProgress> progress = new Subject<DownloadProgress>();
 
         public Download(Uri source, Lazy<Task<Stream>> destination, string name)
         {
