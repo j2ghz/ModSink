@@ -1,37 +1,42 @@
-﻿using ModSink.Core.Client;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System;
 using System.IO;
 using System.Reactive.Subjects;
-using System.Reactive.Linq;
 using System.Threading.Tasks;
+using ModSink.Core.Client;
+using ReactiveUI;
 
 namespace ModSink.Common.Client
 {
-    public class Download : IDownload
+    public class Download : ReactiveObject, IDownload
     {
         private readonly Subject<DownloadProgress> progress = new Subject<DownloadProgress>();
+        private DownloadState state = DownloadState.Queued;
 
         public Download(Uri source, Lazy<Task<Stream>> destination, string name)
         {
-            this.Source = source;
-            this.Destination = destination;
-            this.Name = name;
+            Source = source;
+            Destination = destination;
+            Name = name;
         }
 
         public Lazy<Task<Stream>> Destination { get; }
         public string Name { get; }
         public IObservable<DownloadProgress> Progress => progress;
         public Uri Source { get; }
-        public DownloadState State { get; private set; } = DownloadState.Queued;
+
+        public DownloadState State
+        {
+            get => state;
+            private set => this.RaiseAndSetIfChanged(ref state, value);
+        }
 
         public void Start(IDownloader downloader) //TODO: redo using Stateless
         {
-            if (this.State != DownloadState.Queued) throw new Exception($"State must be {DownloadState.Queued} to start a download");
-            this.State = DownloadState.Downloading;
+            if (State != DownloadState.Queued)
+                throw new Exception($"State must be {DownloadState.Queued} to start a download");
+            State = DownloadState.Downloading;
             downloader.Download(this).Subscribe(progress);
-            this.Progress.Subscribe(_ => { }, _ => this.State = DownloadState.Errored, () => this.State = DownloadState.Finished);
+            Progress.Subscribe(_ => { }, _ => State = DownloadState.Errored, () => State = DownloadState.Finished);
         }
     }
 }

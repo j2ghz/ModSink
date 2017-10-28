@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
+using ReactiveUI;
 
 namespace ModSink.Core.Client
 {
@@ -14,7 +15,7 @@ namespace ModSink.Core.Client
         Finished
     }
 
-    public interface IDownload
+    public interface IDownload : IReactiveObject
     {
         Lazy<Task<Stream>> Destination { get; }
         string Name { get; }
