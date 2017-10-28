@@ -83,12 +83,6 @@ namespace ModSink.CLI
                         Console.WriteLine($"Scheduling {modpack.Name} [{modpack.Mods.Count} mods]");
                         await client.DownloadMissingFiles(modpack);
                     }
-                    //client.DownloadService.DownloadStarted += (sender, d) =>
-                    //{
-                    //    Console.WriteLine($"Starting {d.Source}");
-                    //    DumpDownloadProgress(d.Progress, d.Name);
-                    //};
-                    client.DownloadService.CheckDownloadsToStart();
                     Console.ReadKey();
                     return 0;
                 });

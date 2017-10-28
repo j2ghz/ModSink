@@ -14,7 +14,7 @@ namespace Modsink.Common.Tests.Client
 {
     public class LocalRepoManagerTest
     {
-        private ILocalStorageService manager = new LocalStorageService(new Uri(Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString())));
+        private readonly ILocalStorageService manager = new LocalStorageService(new Uri(Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString())));
 
         [Fact]
         public async Task WriteReadAndDelete()

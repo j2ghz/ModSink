@@ -17,7 +17,7 @@ namespace ModSink.Common
 {
     public class HttpClientDownloader : IDownloader
     {
-        private HttpClient client = new HttpClient();
+        private readonly HttpClient client = new HttpClient();
 
         public IObservable<DownloadProgress> Download(IDownload download)
         {
@@ -31,14 +31,14 @@ namespace ModSink.Common
                 //Read response
                 report(ByteSize.FromBytes(0), ByteSize.FromBytes(0), TransferState.ReadingResponse);
                 response.EnsureSuccessStatusCode();
-                var length = ByteSize.FromBytes(response.Content.Headers.ContentLength.Value);
+                var length = ByteSize.FromBytes(response.Content.Headers.ContentLength ?? 0);
                 report(length, ByteSize.FromBytes(0), TransferState.ReadingResponse);
 
                 var totalRead = 0;
                 using (var input = await response.Content.ReadAsStreamAsync())
                 using (var output = await download.Destination.Value)
                 {
-                    byte[] buffer = new byte[16 * 1024];
+                    var buffer = new byte[16 * 1024];
                     var read = 0;
 
                     //Download

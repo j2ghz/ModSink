@@ -20,7 +20,7 @@ namespace ModSink.Common.Client
             this.downloader = downloader;
         }
 
-        public IObservableList<IDownload> Queue => this.downloads.AsObservableList();
+        public IObservableList<IDownload> Downloads => this.downloads.AsObservableList();
 
         public void Add(IDownload download)
         {
@@ -28,21 +28,21 @@ namespace ModSink.Common.Client
             CheckDownloadsToStart();
         }
 
-        public void CheckDownloadsToStart()
+        private void CheckDownloadsToStart()
         {
             var toStart = this.simultaneousDownloads - this.downloads.Items.Count(d => d.State == DownloadState.Downloading);
-            for (int i = 0; i < toStart; i++)
+            for (var i = 0; i < toStart; i++)
             {
                 var d = NextDownload();
                 if (d == null) break;
                 d.Start(this.downloader);
-                d.Progress.Subscribe(_ => { }, _ => CheckDownloadsToStart(), () => CheckDownloadsToStart());
+                d.Progress.Subscribe(_ => { }, _ => CheckDownloadsToStart(), CheckDownloadsToStart);
             }
         }
 
         private IDownload NextDownload()
         {
-            return this.Queue.Items.Where(d => d.State == DownloadState.Queued).FirstOrDefault();
+            return this.Downloads.Items.FirstOrDefault(d => d.State == DownloadState.Queued);
         }
     }
 }
