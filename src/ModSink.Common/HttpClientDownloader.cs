@@ -38,7 +38,7 @@ namespace ModSink.Common
                 using (var input = await response.Content.ReadAsStreamAsync())
                 using (var output = await download.Destination.Value)
                 {
-                    byte[] buffer = new byte[16 * 1024];
+                    var buffer = new byte[16 * 1024];
                     var read = 0;
 
                     //Download
