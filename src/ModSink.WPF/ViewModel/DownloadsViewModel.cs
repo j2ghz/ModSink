@@ -32,7 +32,7 @@ namespace ModSink.WPF.ViewModel
             this.LoadRepo = ReactiveCommand.CreateFromObservable(() => clientService.LoadRepo(new Uri(this.Url)));
             this.ClientManager.DownloadService.Downloads
                 .Connect()
-                .WhenPropertyChanged(d=> d.State,false)
+                .FilterOnProperty(d=> d.State,d=>d.State == DownloadState.Downloading)
                 .Transform(d => new DownloadViewModel(d))
                 .Bind(downloads)
                 .Subscribe();
