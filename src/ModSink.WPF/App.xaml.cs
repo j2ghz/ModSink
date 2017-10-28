@@ -75,7 +75,7 @@ namespace ModSink.WPF
         private void CheckUpdates()
         {
             var updateLog = Log.ForContext<UpdateManager>();
-            var task = new Task(async () =>
+            var task = new Task( () =>
            {
                this.log.Information("Looking for updates");
                try
@@ -84,7 +84,7 @@ namespace ModSink.WPF
                    {
                        if (mgr.IsInstalledApp)
                        {
-                           var release = await mgr.UpdateApp(i => updateLog.Debug("Download progress: {progress}", i));
+                           var release = mgr.UpdateApp(i => updateLog.Debug("Download progress: {progress}", i)).GetAwaiter().GetResult();
                            this.log.Debug("Latest version: {version}", release.Version);
                        }
                    }
