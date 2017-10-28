@@ -1,15 +1,17 @@
 ﻿using ModSink.Core.Client;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using DynamicData;
 using DynamicData.Binding;
 using DynamicData.PLinq;
-using ReactiveUI;
 using DynamicData.ReactiveUI;
-using System.Linq;
+using DynamicData.Alias;
 using Serilog;
 using System.Reactive;
+using DynamicData.Aggregation;
+using ReactiveUI;
 
 namespace ModSink.WPF.ViewModel
 {
@@ -26,11 +28,11 @@ namespace ModSink.WPF.ViewModel
             this.DownloadMissing = ReactiveCommand.CreateFromTask(async () =>
             {
                 await clientService.DownloadMissingFiles(clientService.Modpacks.Items.First());
-                clientService.DownloadService.CheckDownloadsToStart();
             });
             this.LoadRepo = ReactiveCommand.CreateFromObservable(() => clientService.LoadRepo(new Uri(this.Url)));
             this.ClientManager.DownloadService.Downloads
                 .Connect()
+                .WhenPropertyChanged(d=> d.State,false)
                 .Transform(d => new DownloadViewModel(d))
                 .Bind(downloads)
                 .Subscribe();
