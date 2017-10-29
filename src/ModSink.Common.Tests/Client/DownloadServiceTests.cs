@@ -4,7 +4,7 @@ using ModSink.Core.Client;
 using Moq;
 using Xunit;
 
-namespace Modsink.Common.Tests
+namespace Modsink.Common.Tests.Client
 {
     public class DownloadServiceTests
     {
@@ -14,8 +14,9 @@ namespace Modsink.Common.Tests
             var ds = new DownloadService(null);
             var download = new Mock<IDownload>();
             var state = DownloadState.Queued;
-            download.Setup(d => d.State).Returns(()=>state);
-            download.Setup(d => d.Progress).Callback(()=>state=DownloadState.Downloading).Returns(Observable.Empty<DownloadProgress>());
+            download.Setup(d => d.State).Returns(() => state);
+            download.Setup(d => d.Progress).Callback(() => state = DownloadState.Downloading)
+                .Returns(Observable.Empty<DownloadProgress>());
 
             ds.Add(download.Object);
 
