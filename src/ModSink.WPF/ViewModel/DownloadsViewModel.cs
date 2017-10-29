@@ -1,17 +1,14 @@
-﻿using ModSink.Core.Client;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Linq;
-using System.Threading.Tasks;
-using DynamicData;
-using DynamicData.Binding;
-using DynamicData.PLinq;
-using DynamicData.ReactiveUI;
-using DynamicData.Alias;
-using Serilog;
 using System.Reactive;
+using System.Reactive.Linq;
+using DynamicData;
 using DynamicData.Aggregation;
+using DynamicData.ReactiveUI;
+using Humanizer;
+using ModSink.Core.Client;
 using ReactiveUI;
+using Serilog;
 
 namespace ModSink.WPF.ViewModel
 {
@@ -19,34 +16,39 @@ namespace ModSink.WPF.ViewModel
     {
         private readonly ReactiveList<DownloadViewModel> downloads = new ReactiveList<DownloadViewModel>();
         private readonly ILogger log;
+        private readonly ObservableAsPropertyHelper<string> queueCount;
         private string url;
 
         public DownloadsViewModel(IClientService clientService, ILogger log)
         {
-            this.ClientManager = clientService;
             this.log = log;
-            this.DownloadMissing = ReactiveCommand.CreateFromTask(async () =>
+            DownloadMissing = ReactiveCommand.CreateFromTask(async () =>
             {
                 await clientService.DownloadMissingFiles(clientService.Modpacks.Items.First());
             });
-            this.LoadRepo = ReactiveCommand.CreateFromObservable(() => clientService.LoadRepo(new Uri(this.Url)));
-            this.ClientManager.DownloadService.Downloads
-                .Connect()
-                .FilterOnProperty(d=> d.State,d=>d.State == DownloadState.Downloading)
+            LoadRepo = ReactiveCommand.CreateFromObservable(() => clientService.LoadRepo(new Uri(Url)));
+            var ds = clientService.DownloadService.Downloads.Connect();
+            ds
+                .FilterOnProperty(d => d.State, d => d.State == DownloadState.Downloading)
                 .Transform(d => new DownloadViewModel(d))
                 .Bind(downloads)
                 .Subscribe();
+            queueCount = ds
+                .FilterOnProperty(d => d.State, d => d.State == DownloadState.Queued)
+                .Count()
+                .Select(i => "file".ToQuantity(i))
+                .ToProperty(this, t => t.QueueCount);
         }
 
-        public IClientService ClientManager { get; }
         public ReactiveCommand DownloadMissing { get; }
         public IReadOnlyReactiveList<DownloadViewModel> Downloads => downloads;
+        public string QueueCount => queueCount.Value;
         public ReactiveCommand<Unit, DownloadProgress> LoadRepo { get; }
 
         public string Url
         {
-            get { return this.url; }
-            set { this.RaiseAndSetIfChanged(ref this.url, value); }
+            get => url;
+            set => this.RaiseAndSetIfChanged(ref url, value);
         }
     }
 }

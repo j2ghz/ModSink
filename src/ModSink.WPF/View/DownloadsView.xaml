@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:Controls="http://metro.mahapps.com/winfx/xaml/controls"
+             xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
              xmlns:local="clr-namespace:ModSink.WPF.View"
              xmlns:vm="clr-namespace:ModSink.WPF.ViewModel"
              mc:Ignorable="d"
@@ -13,7 +13,8 @@
         <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
             <Button Content="Load" Command="{Binding LoadRepo}" />
             <Button Content="Download" Command="{Binding DownloadMissing}" />
-            <TextBox Text="{Binding Url}" />
+            <TextBox Text="{Binding Url}" MinWidth="100" />
+            <TextBlock Text="{Binding QueueCount}" />
         </StackPanel>
         <ListView ItemsSource="{Binding Downloads}">
             <ListView.View>
@@ -27,7 +28,8 @@
                             <DataTemplate>
                                 <Grid>
                                     <ProgressBar Value="{Binding Progress, Mode=OneWay}" />
-                                    <TextBlock Text="{Binding Progress, Mode=OneWay, StringFormat={}{0:0}%}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                    <TextBlock Text="{Binding Progress, Mode=OneWay, StringFormat={}{0:0}%}"
+                                               HorizontalAlignment="Center" VerticalAlignment="Center" />
                                 </Grid>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
