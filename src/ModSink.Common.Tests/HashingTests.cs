@@ -15,7 +15,7 @@ using FluentAssertions;
 
 namespace Modsink.Common.Tests
 {
-    public class HashingTest
+    public class HashingTests
     {
         [Fact]
         public async System.Threading.Tasks.Task GetHashOfEmptyAsync()

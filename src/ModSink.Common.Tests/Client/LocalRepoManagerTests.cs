@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace Modsink.Common.Tests.Client
 {
-    public class LocalRepoManagerTest
+    public class LocalRepoManagerTests
     {
         private readonly ILocalStorageService manager = new LocalStorageService(new Uri(Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString())));
 

@@ -7,7 +7,7 @@ using Xunit;
 
 namespace Modsink.Common.Tests
 {
-    public class XXHash64Test
+    public class XXHash64Tests
     {
         [Theory]
         [InlineData(new byte[] { 0x99, 0xE9, 0xD8, 0x51, 0x37, 0xDB, 0x46, 0xEF }, new byte[0])]

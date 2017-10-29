@@ -10,7 +10,7 @@ using FluentAssertions;
 
 namespace Modsink.Common.Tests
 {
-    public class ModelsSerializationTest
+    public class ModelsSerializationTests
     {
         private IFormatter formatter = new BinaryFormatter();
 
