@@ -5,19 +5,13 @@ using System.Threading.Tasks;
 using Humanizer;
 using ModSink.Core.Client;
 using ReactiveUI;
+using Serilog;
 using Stateless;
 
 namespace ModSink.Common.Client
 {
     public class Download : ReactiveObject, IDownload
     {
-        private enum Trigger
-        {
-            Start,
-            Finish,
-            Error
-        }
-
         private readonly Subject<DownloadProgress> progress = new Subject<DownloadProgress>();
         private readonly StateMachine<DownloadState, Trigger> state;
 
@@ -28,12 +22,14 @@ namespace ModSink.Common.Client
             Name = name;
 
             state = new StateMachine<DownloadState, Trigger>(DownloadState.Queued);
-            state.OnTransitioned(_=> this.RaisePropertyChanged(nameof(State)));
+            state.OnTransitioned(_ => this.RaisePropertyChanged(nameof(State)));
+            state.OnTransitioned(t =>
+                Log.Verbose("Download {name} switched to state {state}", Name, t.Destination.Humanize()));
             state.Configure(DownloadState.Queued)
                 .Permit(Trigger.Start, DownloadState.Downloading);
             state.Configure(DownloadState.Downloading)
-                .Permit(Trigger.Finish,DownloadState.Finished)
-                .Permit(Trigger.Error,DownloadState.Errored);
+                .Permit(Trigger.Finish, DownloadState.Finished)
+                .Permit(Trigger.Error, DownloadState.Errored);
         }
 
         public Lazy<Task<Stream>> Destination { get; }
@@ -48,6 +44,13 @@ namespace ModSink.Common.Client
             state.Fire(Trigger.Start);
             downloader.Download(this).Subscribe(progress);
             Progress.Subscribe(_ => { }, _ => state.Fire(Trigger.Error), () => state.Fire(Trigger.Finish));
+        }
+
+        private enum Trigger
+        {
+            Start,
+            Finish,
+            Error
         }
     }
 }
