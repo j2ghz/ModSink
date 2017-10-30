@@ -12,6 +12,7 @@ using System.Runtime.Serialization.Formatters.Binary;
 using ModSink.Core.Client;
 using ModSink.Common.Client;
 using Humanizer;
+using Serilog;
 
 namespace ModSink.CLI
 {
@@ -305,6 +306,10 @@ namespace ModSink.CLI
 
         public static void Main(string[] args)
         {
+            Log.Logger = new LoggerConfiguration()
+                .WriteTo.Console()
+                .CreateLogger();
+
             var app = new CommandLineApplication
             {
                 Name = "modsink",
@@ -320,7 +325,7 @@ namespace ModSink.CLI
             app.AddDump();
             app.AddCheck();
 
-            app.Execute(args.Length > 0 ? args : new string[] { "--help" });
+            app.Execute(args.Length > 0 ? args : new[] { "--help" });
         }
 
         private static void DumpRepo(Repo repo)

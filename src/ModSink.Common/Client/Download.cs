@@ -12,6 +12,7 @@ namespace ModSink.Common.Client
 {
     public class Download : ReactiveObject, IDownload
     {
+        private readonly ILogger log = Log.ForContext<Download>();
         private readonly Subject<DownloadProgress> progress = new Subject<DownloadProgress>();
         private readonly StateMachine<DownloadState, Trigger> state;
 
