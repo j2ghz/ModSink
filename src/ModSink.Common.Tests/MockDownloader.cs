@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Net.Http;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
@@ -9,8 +10,15 @@ using ModSink.Core.Client;
 
 namespace Modsink.Common.Tests
 {
-    internal class MockDownloader : IDownloader
+    public class MockDownloader : IDownloader
     {
+        private readonly bool shouldFail;
+
+        public MockDownloader(bool shouldFail)
+        {
+            this.shouldFail = shouldFail;
+        }
+
         public IObservable<DownloadProgress> Download(Uri source, Stream destination, string name)
         {
             return Download(new Download(source, new Lazy<Task<Stream>>(() => Task.Run(() => destination)), name));
@@ -43,7 +51,7 @@ namespace Modsink.Common.Tests
                     ByteSize.FromBytes(1),
                     ByteSize.FromBytes(0),
                     DownloadProgress.TransferState.Downloading));
-
+                if (shouldFail) throw new HttpRequestException();
                 //Finish
                 observer.OnNext(new DownloadProgress(
                     ByteSize.FromBytes(1),
