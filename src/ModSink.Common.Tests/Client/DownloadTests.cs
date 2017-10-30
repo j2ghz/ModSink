@@ -1,6 +1,7 @@
 ﻿using System.Net.Http;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
+using FluentAssertions;
 using ModSink.Common.Client;
 using ModSink.Core.Client;
 using Xunit;
@@ -14,17 +15,18 @@ namespace Modsink.Common.Tests.Client
         {
             var download = new Download(null, null, null);
             Assert.Equal(download.State, DownloadState.Queued);
-            download.Start(new MockDownloader(true));
+            download.Start(new MockDownloader(true, false));
             await Assert.ThrowsAsync<HttpRequestException>(async () => await download.Progress);
         }
 
-        [Fact(Skip = "completes too fast, await misses all elements")]
+        [Fact]
         public async Task StartAndFinishAsync()
         {
             var download = new Download(null, null, null);
             Assert.Equal(download.State, DownloadState.Queued);
-            download.Start(new MockDownloader(false));
-            await download.Progress;
+            download.Start(new MockDownloader(false, true));
+            var final = await download.Progress;
+            final.State.ShouldBeEquivalentTo(DownloadState.Finished);
         }
     }
 }
