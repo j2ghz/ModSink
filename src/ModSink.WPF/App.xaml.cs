@@ -41,8 +41,9 @@ namespace ModSink.WPF
             {
                 //Do not report errors during development
                 SetupSentry();
+                CheckUpdates();
             }
-            CheckUpdates();
+            
 
             base.OnStartup(e);
 

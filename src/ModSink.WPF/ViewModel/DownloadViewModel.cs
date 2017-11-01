@@ -22,15 +22,15 @@ namespace ModSink.WPF.ViewModel
         public DownloadViewModel(IDownload download)
         {
             Name = download.Name;
-            var progress = download.Progress
+            var dp = download.Progress                
                 .Sample(TimeSpan.FromMilliseconds(250))
                 .Buffer(2, 1)
                 .Select(progList => new DownloadProgressCombined(progList.Last(), progList.First()));
 
-            this.downloaded = progress.Select(p => p.Current.Downloaded.Humanize("#.##")).ToProperty(this, x => x.Downloaded);
-            this.progress = progress.Select(p => 100d * p.Current.Downloaded.Bits / p.Current.Size.Bits).ToProperty(this, x => x.Progress);
-            this.size = progress.Select(p => p.Current.Size.Humanize("#.##")).ToProperty(this, x => x.Size);
-            this.speed = progress.Select(p => p.Speed.Humanize("#.##")).ToProperty(this, x => x.Speed);
+            this.downloaded = dp.Select(p => p.Current.Downloaded.Humanize("#.##")).ToProperty(this, x => x.Downloaded);
+            this.progress = dp.Select(p => 100d * p.Current.Downloaded.Bits / p.Current.Size.Bits).ToProperty(this, x => x.Progress);
+            this.size = dp.Select(p => p.Current.Size.Humanize("#.##")).ToProperty(this, x => x.Size);
+            this.speed = dp.Select(p => p.Speed.Humanize("#.##")).ToProperty(this, x => x.Speed);
         }
 
         public string Downloaded => downloaded.Value;
