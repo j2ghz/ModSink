@@ -93,10 +93,7 @@ Task("Publish.NuGet")
                 Source = url_nuget_push,
                 ApiKey = key_nuget
         };        
-        foreach(var nupkg in GetFiles(out_nuget.ToString()+"/**/*.nupkg")){
-            Information("Publishing: {0}", nupkg);
-            NuGetPush(nupkg, nugetSettings);
-        }
+        NuGetPush(out_nuget.ToString()+@"\*.nupkg", nugetSettings);
     });
 
 Task("Publish.MyGet")
@@ -108,10 +105,7 @@ Task("Publish.MyGet")
                 Source = url_myget_push,
                 ApiKey = key_myget
         };
-        foreach(var nupkg in GetFiles(out_nuget.ToString()+"/**/*.nupkg")){
-            Information("Publishing: {0}", nupkg);
-            NuGetPush(nupkg, nugetSettings);
-        }
+        NuGetPush(out_nuget.ToString()+@"\*.nupkg", nugetSettings);
     });
 
 Task("Default")
