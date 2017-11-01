@@ -12,6 +12,7 @@ using Humanizer.Bytes;
 using Humanizer;
 using static ModSink.Core.Client.DownloadProgress;
 using System.Threading.Tasks;
+using System.Reactive.Subjects;
 
 namespace ModSink.Common
 {
@@ -19,48 +20,53 @@ namespace ModSink.Common
     {
         private readonly HttpClient client = new HttpClient();
 
-        public IObservable<DownloadProgress> Download(IDownload download)
+        public IConnectableObservable<DownloadProgress> Download(IDownload download)
         {
-            var progress = Observable.Create<DownloadProgress>(async (observer, cancel) =>
+            return Observable.Create<DownloadProgress>(async (observer, cancel) =>
             {
-                var report = new Action<ByteSize, ByteSize, TransferState>((size, downloaded, state) => observer.OnNext(new DownloadProgress(size, downloaded, state)));
-                //Get response
-                report(ByteSize.FromBytes(0), ByteSize.FromBytes(0), TransferState.AwaitingResponse);
-                var response = await this.client.GetAsync(download.Source, HttpCompletionOption.ResponseHeadersRead, cancel);
-
-                //Read response
-                report(ByteSize.FromBytes(0), ByteSize.FromBytes(0), TransferState.ReadingResponse);
-                response.EnsureSuccessStatusCode();
-                var length = ByteSize.FromBytes(response.Content.Headers.ContentLength ?? 0);
-                report(length, ByteSize.FromBytes(0), TransferState.ReadingResponse);
-
-                var totalRead = 0;
-                using (var input = await response.Content.ReadAsStreamAsync())
-                using (var output = await download.Destination.Value)
+                try
                 {
-                    var buffer = new byte[16 * 1024];
-                    var read = 0;
+                    var report = new Action<ByteSize, ByteSize, TransferState>((size, downloaded, state) => observer.OnNext(new DownloadProgress(size, downloaded, state)));
+                    //Get response
+                    report(ByteSize.FromBytes(0), ByteSize.FromBytes(0), TransferState.AwaitingResponse);
+                    var response = await this.client.GetAsync(download.Source, HttpCompletionOption.ResponseHeadersRead, cancel);
 
-                    //Download
-                    report(length, ByteSize.FromBytes(0), TransferState.Downloading);
-                    while ((read = await input.ReadAsync(buffer, 0, buffer.Length, cancel)) > 0)
+                    //Read response
+                    report(ByteSize.FromBytes(0), ByteSize.FromBytes(0), TransferState.ReadingResponse);
+                    response.EnsureSuccessStatusCode();
+                    var length = ByteSize.FromBytes(response.Content.Headers.ContentLength ?? 0);
+                    report(length, ByteSize.FromBytes(0), TransferState.ReadingResponse);
+
+                    var totalRead = 0;
+                    using (var input = await response.Content.ReadAsStreamAsync())
+                    using (var output = await download.Destination.Value)
                     {
-                        output.Write(buffer, 0, read);
-                        totalRead += read;
-                        report(length, totalRead.Bytes(), TransferState.Downloading);
-                    }
-                }
+                        var buffer = new byte[16 * 1024];
+                        var read = 0;
 
-                //Finish
-                report(length, totalRead.Bytes(), TransferState.Finished);
-                observer.OnCompleted();
+                        //Download
+                        report(length, ByteSize.FromBytes(0), TransferState.Downloading);
+                        while ((read = await input.ReadAsync(buffer, 0, buffer.Length, cancel)) > 0)
+                        {
+                            output.Write(buffer, 0, read);
+                            totalRead += read;
+                            report(length, totalRead.Bytes(), TransferState.Downloading);
+                        }
+                    }
+
+                    //Finish
+                    report(length, totalRead.Bytes(), TransferState.Finished);
+                    observer.OnCompleted();
+                }
+                catch (Exception e)
+                {
+                    observer.OnError(e);
+                }
+                
                 return Disposable.Empty;
             }).Publish();
-
-            progress.Connect();
-            return progress;
         }
 
-        public IObservable<DownloadProgress> Download(Uri source, Stream destination, string name) => this.Download(new Download(source, new Lazy<Task<Stream>>(() => Task.Run<Stream>(() => destination)), name));
+        public IConnectableObservable<DownloadProgress> Download(Uri source, Stream destination, string name) => this.Download(new Download(source, new Lazy<Task<Stream>>(() => Task.Run<Stream>(() => destination)), name));
     }
 }

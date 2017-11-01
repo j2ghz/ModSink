@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Humanizer.Bytes;
 using ModSink.Common.Client;
 using ModSink.Core.Client;
+using System.Reactive.Subjects;
 
 namespace Modsink.Common.Tests
 {
@@ -22,15 +23,15 @@ namespace Modsink.Common.Tests
             this.slow = slow;
         }
 
-        public IObservable<DownloadProgress> Download(Uri source, Stream destination, string name)
+        public IConnectableObservable<DownloadProgress> Download(Uri source, Stream destination, string name)
         {
             return Download(new Download(source, new Lazy<Task<Stream>>(() => Task.Run(() => destination)), name));
         }
 
 
-        public IObservable<DownloadProgress> Download(IDownload download)
+        public IConnectableObservable<DownloadProgress> Download(IDownload download)
         {
-            var progress = Observable.Create<DownloadProgress>(async (observer,cancel) =>
+            return Observable.Create<DownloadProgress>(async (observer,cancel) =>
             {
                 //Get response
                 observer.OnNext(new DownloadProgress(
@@ -77,9 +78,6 @@ namespace Modsink.Common.Tests
                 observer.OnCompleted();
                 return Disposable.Empty;
             }).Publish();
-
-            progress.Connect();
-            return progress;
         }
     }
 }

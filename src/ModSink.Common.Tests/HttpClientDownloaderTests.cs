@@ -20,10 +20,14 @@ namespace Modsink.Common.Tests
             using (var stream = new MemoryStream())
             {
                 var obs = client.Download(new Uri(@"http://ipv4.download.thinkbroadband.com/5MB.zip"), stream, "TestDownload");
-                var progress = await obs;
-                progress.Downloaded.ShouldBeEquivalentTo(progress.Size);
-                progress.Remaining.ShouldBeEquivalentTo(ByteSize.FromBits(0));
-                progress.State.ShouldBeEquivalentTo(DownloadProgress.TransferState.Finished);
+                using (var d = obs.Connect())
+                {
+                    var progress = await obs;
+                    progress.Downloaded.ShouldBeEquivalentTo(progress.Size);
+                    progress.Remaining.ShouldBeEquivalentTo(ByteSize.FromBits(0));
+                    progress.State.ShouldBeEquivalentTo(DownloadProgress.TransferState.Finished);
+                }
+
             }
         }
 

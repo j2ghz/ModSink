@@ -1,8 +1,10 @@
 ﻿using System;
 using System.IO;
+using System.Reactive.Disposables;
 using System.Reactive.Subjects;
 using System.Threading.Tasks;
 using Humanizer;
+using Humanizer.Bytes;
 using ModSink.Core.Client;
 using ReactiveUI;
 using Serilog;
@@ -13,8 +15,9 @@ namespace ModSink.Common.Client
     public class Download : ReactiveObject, IDownload
     {
         private readonly ILogger log = Log.ForContext<Download>();
-        private readonly Subject<DownloadProgress> progress = new Subject<DownloadProgress>();
+        private readonly BehaviorSubject<DownloadProgress> progress = new BehaviorSubject<DownloadProgress>(new DownloadProgress(ByteSize.FromBytes(0), ByteSize.FromBytes(0),DownloadProgress.TransferState.NotStarted));
         private readonly StateMachine<DownloadState, Trigger> state;
+        private CompositeDisposable progressSubscription = new CompositeDisposable();
 
         public Download(Uri source, Lazy<Task<Stream>> destination, string name)
         {
@@ -30,7 +33,8 @@ namespace ModSink.Common.Client
                 .Permit(Trigger.Start, DownloadState.Downloading);
             state.Configure(DownloadState.Downloading)
                 .Permit(Trigger.Finish, DownloadState.Finished)
-                .Permit(Trigger.Error, DownloadState.Errored);
+                .Permit(Trigger.Error, DownloadState.Errored)
+                .OnDeactivate(()=>progressSubscription.Dispose());
         }
 
         public Lazy<Task<Stream>> Destination { get; }
@@ -40,10 +44,12 @@ namespace ModSink.Common.Client
 
         public DownloadState State => state.State;
 
-        public void Start(IDownloader downloader) //TODO: redo using Stateless
+        public void Start(IDownloader downloader)
         {
             state.Fire(Trigger.Start);
-            downloader.Download(this).Subscribe(progress);
+            var obs = downloader.Download(this);
+            progressSubscription.Add(obs.Connect());
+            progressSubscription.Add(obs.Subscribe(progress));
             Progress.Subscribe(_ => { }, _ => state.Fire(Trigger.Error), () => state.Fire(Trigger.Finish));
         }
 

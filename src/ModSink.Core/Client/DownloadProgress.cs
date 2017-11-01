@@ -20,6 +20,7 @@ namespace ModSink.Core.Client
 
         public enum TransferState
         {
+            NotStarted,
             AwaitingResponse,
             ReadingResponse,
             Downloading,

@@ -1,14 +1,16 @@
-﻿using System.Net.Http;
+﻿using System.Diagnostics;
+using System.Net.Http;
+using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
-using FluentAssertions;
 using ModSink.Common.Client;
 using ModSink.Core.Client;
+using ReactiveUI;
 using Xunit;
 
 namespace Modsink.Common.Tests.Client
 {
-    public class DownloadTests
+    public class DownloadTests : ReactiveObject
     {
         [Fact]
         public async Task StartAndFailAsync()
@@ -24,9 +26,11 @@ namespace Modsink.Common.Tests.Client
         {
             var download = new Download(null, null, null);
             Assert.Equal(download.State, DownloadState.Queued);
+            download.Progress.Subscribe(Observer.Create<DownloadProgress>(dp => Trace.Write(dp.Remaining)));
             download.Start(new MockDownloader(false, true));
             var final = await download.Progress;
-            final.State.ShouldBeEquivalentTo(DownloadState.Finished);
+            Assert.Equal(DownloadState.Finished, DownloadState.Finished);
+            Assert.Equal(DownloadProgress.TransferState.Finished, final.State);
         }
     }
 }
