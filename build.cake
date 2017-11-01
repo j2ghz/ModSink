@@ -93,7 +93,7 @@ Task("Publish.NuGet")
                 Source = url_nuget_push,
                 ApiKey = key_nuget
         };        
-        DotNetCoreNuGetPush(out_nuget, nugetSettings);
+        DotNetCoreNuGetPush(out_nuget+"/", nugetSettings);
     });
 
 Task("Publish.MyGet")
@@ -105,7 +105,7 @@ Task("Publish.MyGet")
                 Source = url_myget_push,
                 ApiKey = key_myget
         };
-        DotNetCoreNuGetPush(out_nuget, nugetSettings);
+        DotNetCoreNuGetPush(out_nuget+"/", nugetSettings);
     });
 
 Task("Default")
