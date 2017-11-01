@@ -2,6 +2,12 @@
 
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;net461</TargetFrameworks>
+    <Authors>J2ghz</Authors>
+    <Product>ModSink Common Library</Product>
+    <Description>This library contains most of the logic for ModSink.</Description>
+    <PackageLicenseUrl>https://github.com/j2ghz/ModSink.Common/blob/master/LICENSE</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/j2ghz/ModSink.Common</PackageProjectUrl>
+    <Copyright>Copyright (C) 2017 Jozef Hollý</Copyright>
   </PropertyGroup>
 
 
