@@ -61,6 +61,7 @@ Task("Pack.Common")
     DotNetCorePack(modSinkCommon_csproj, new DotNetCorePackSettings
      {
          Configuration = "Release",
+         IncludeSymbols = true,
          OutputDirectory = out_nuget,
          ArgumentCustomization = args=>args.Append("/p:PackageVersion="+NuGetVersion)
      });
@@ -72,6 +73,7 @@ Task("Pack.Core")
     DotNetCorePack(modSinkCore_csproj, new DotNetCorePackSettings
      {
          Configuration = "Release",
+         IncludeSymbols = true,
          OutputDirectory = out_nuget,
          ArgumentCustomization = args=>args.Append("/p:PackageVersion="+NuGetVersion)
      });
