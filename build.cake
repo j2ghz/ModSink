@@ -89,11 +89,11 @@ Task("Publish.NuGet")
     .WithCriteria(!String.IsNullOrWhiteSpace(key_nuget))    
     .WithCriteria(BuildSystem.AppVeyor.IsRunningOnAppVeyor && BuildSystem.AppVeyor.Environment.Repository.Branch == "master")
     .Does(()=>{
-        var nugetSettings = new NuGetPushSettings {
+        var nugetSettings = new DotNetCoreNuGetPushSettings {
                 Source = url_nuget_push,
                 ApiKey = key_nuget
         };        
-        NuGetPush(out_nuget.ToString()+@"\*.nupkg", nugetSettings);
+        DotNetCoreNuGetPush(out_nuget.ToString()+@"\*.nupkg", nugetSettings);
     });
 
 Task("Publish.MyGet")
@@ -101,11 +101,11 @@ Task("Publish.MyGet")
     .IsDependentOn("Pack.Common")
     .WithCriteria(!String.IsNullOrWhiteSpace(key_myget))
     .Does(()=>{
-        var nugetSettings = new NuGetPushSettings {
+        var nugetSettings = new DotNetCoreNuGetPushSettings {
                 Source = url_myget_push,
                 ApiKey = key_myget
         };
-        NuGetPush(out_nuget.ToString()+@"\*.nupkg", nugetSettings);
+        DotNetCoreNuGetPush(out_nuget.ToString()+@"\*.nupkg", nugetSettings);
     });
 
 Task("Default")
