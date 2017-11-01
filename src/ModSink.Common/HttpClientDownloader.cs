@@ -1,18 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using ModSink.Core.Client;
 using System.IO;
-using System.Net;
 using System.Net.Http;
-using System.Reactive.Linq;
 using System.Reactive.Disposables;
-using ModSink.Common.Client;
-using Humanizer.Bytes;
-using Humanizer;
-using static ModSink.Core.Client.DownloadProgress;
-using System.Threading.Tasks;
+using System.Reactive.Linq;
 using System.Reactive.Subjects;
+using System.Threading.Tasks;
+using Humanizer;
+using Humanizer.Bytes;
+using ModSink.Common.Client;
+using ModSink.Core.Client;
+using static ModSink.Core.Client.DownloadProgress;
 
 namespace ModSink.Common
 {
@@ -26,10 +23,12 @@ namespace ModSink.Common
             {
                 try
                 {
-                    var report = new Action<ByteSize, ByteSize, TransferState>((size, downloaded, state) => observer.OnNext(new DownloadProgress(size, downloaded, state)));
+                    var report = new Action<ByteSize, ByteSize, TransferState>((size, downloaded, state) =>
+                        observer.OnNext(new DownloadProgress(size, downloaded, state)));
                     //Get response
                     report(ByteSize.FromBytes(0), ByteSize.FromBytes(0), TransferState.AwaitingResponse);
-                    var response = await this.client.GetAsync(download.Source, HttpCompletionOption.ResponseHeadersRead, cancel);
+                    var response = await client.GetAsync(download.Source, HttpCompletionOption.ResponseHeadersRead,
+                        cancel);
 
                     //Read response
                     report(ByteSize.FromBytes(0), ByteSize.FromBytes(0), TransferState.ReadingResponse);
@@ -62,11 +61,14 @@ namespace ModSink.Common
                 {
                     observer.OnError(e);
                 }
-                
+
                 return Disposable.Empty;
             }).Publish();
         }
 
-        public IConnectableObservable<DownloadProgress> Download(Uri source, Stream destination, string name) => this.Download(new Download(source, new Lazy<Task<Stream>>(() => Task.Run<Stream>(() => destination)), name));
+        public IConnectableObservable<DownloadProgress> Download(Uri source, Stream destination, string name)
+        {
+            return Download(new Download(source, new Lazy<Task<Stream>>(() => Task.Run(() => destination)), name));
+        }
     }
 }
