@@ -95,7 +95,7 @@ Task("Publish.NuGet")
         };        
         foreach(var nupkg in GetFiles(out_nuget.ToString()+"/**/*symbols.nupkg")){ 
             Information("Publishing: {0}", nupkg); 
-            DotNetCoreNuGetPush(nupkg, nugetSettings); 
+            DotNetCoreNuGetPush(nupkg.ToString(), nugetSettings); 
         }
     });
 
@@ -110,7 +110,7 @@ Task("Publish.MyGet")
         };
         foreach(var nupkg in GetFiles(out_nuget.ToString()+"/**/*symbols.nupkg")){ 
             Information("Publishing: {0}", nupkg); 
-            DotNetCoreNuGetPush(nupkg, nugetSettings); 
+            DotNetCoreNuGetPush(nupkg.ToString(), nugetSettings); 
         }
     });
 
