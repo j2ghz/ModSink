@@ -7,7 +7,6 @@
 
   <ItemGroup>
     <PackageReference Include="DynamicData" Version="6.0.1.2317-beta" />
-    <PackageReference Include="gitlink" Version="3.1.0" />
     <PackageReference Include="Humanizer" Version="2.2.0" />
     <PackageReference Include="reactiveui" Version="8.0.0-alpha0094" />
     <PackageReference Include="System.Interactive" Version="3.1.1" />
