@@ -93,7 +93,6 @@ namespace ModSink.WPF
                 catch (Exception e)
                 {
                     updateLog.Error(e, "Exception during update checking");
-                    UpdateFailed?.Invoke(null, e);
                 }
                 finally
                 {
@@ -130,25 +129,6 @@ namespace ModSink.WPF
                 ConsoleManager.Show();
                 Log.Fatal(args.Exception, nameof(DispatcherUnhandledException));
             };
-        }
-
-        [Obsolete]
-        private void SetupSentry()
-        {
-            log.Information("Setting up exception reporting");
-            var ravenClient =
-                new RavenClient(
-                    "https://6e3a1e08759944bb932434095137f63b:ab9ff9be2ec74518bcb0c1d860d98cbe@sentry.j2ghz.com/2");
-            ravenClient.Release = FullVersion?.Split('+').First();
-            ravenClient.ErrorOnCapture = exception =>
-            {
-                Log.ForContext<RavenClient>().Error(exception, "Sentry error reporting encountered an exception");
-            };
-            AppDomain.CurrentDomain.UnhandledException += (sender, args) =>
-            {
-                ravenClient.Capture(new SentryEvent(args.ExceptionObject as Exception));
-            };
-            UpdateFailed += (sender, e) => { ravenClient.Capture(new SentryEvent(e)); };
         }
     }
 }
