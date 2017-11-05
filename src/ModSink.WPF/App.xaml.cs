@@ -16,6 +16,7 @@ using ModSink.Core;
 using System.Runtime.Serialization;
 using System.Windows.Controls;
 using AutofacSerilogIntegration;
+using Serilog.Sinks.Sentry;
 
 namespace ModSink.WPF
 {
@@ -40,7 +41,7 @@ namespace ModSink.WPF
             if (!System.Diagnostics.Debugger.IsAttached)
             {
                 //Do not report errors during development
-                SetupSentry();
+                //SetupSentry();
                 CheckUpdates();
             }
             
@@ -111,8 +112,9 @@ namespace ModSink.WPF
                 .WriteTo.RollingFile(
                         "../Logs/{Date}.log",
                         outputTemplate: "{Timestamp:o} [{Level:u3}] ({SourceContext}) {Message}{NewLine}{Exception}")
+                .WriteTo.Sentry("https://6e3a1e08759944bb932434095137f63b:ab9ff9be2ec74518bcb0c1d860d98cbe@sentry.j2ghz.com/2")
                 .Enrich.FromLogContext()
-                .MinimumLevel.Debug()
+                .MinimumLevel.Verbose()
                 .CreateLogger();
             Log.Information("Log initialized");
             AppDomain.CurrentDomain.UnhandledException += (sender, args) =>
@@ -126,11 +128,11 @@ namespace ModSink.WPF
                 Log.Fatal(args.Exception, nameof(DispatcherUnhandledException));
             };
         }
-
+        [Obsolete]
         private void SetupSentry()
         {
             log.Information("Setting up exception reporting");
-            var ravenClient = new RavenClient("https://410966a6c264489f8123948949c745c7:61776bfffd384fbf8c3b30c0d3ad90fa@sentry.io/189364");
+            var ravenClient = new RavenClient("https://6e3a1e08759944bb932434095137f63b:ab9ff9be2ec74518bcb0c1d860d98cbe@sentry.j2ghz.com/2");
             ravenClient.Release = FullVersion?.Split('+').First();
             ravenClient.ErrorOnCapture = exception =>
             {
