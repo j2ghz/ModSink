@@ -38,9 +38,10 @@ namespace ModSink.WPF
             SetupLogging();
             log = Log.ForContext<App>();
             log.Information("Starting ModSink ({version})", FullVersion);
+#if !DEBUG
             if (!Debugger.IsAttached)
                 CheckUpdates();
-
+#endif
 
             base.OnStartup(e);
 
@@ -77,21 +78,16 @@ namespace ModSink.WPF
         private void CheckUpdates()
         {
             var updateLog = Log.ForContext<UpdateManager>();
-            var task = new Task(() =>
+            Task.Factory.StartNew(async () =>
             {
                 log.Information("Looking for updates");
                 try
                 {
-                    using (var mgr = UpdateManager
-                        .GitHubUpdateManager("https://github.com/j2ghz/ModSink", prerelease: true).GetAwaiter()
-                        .GetResult())
+                    using (var mgr =
+                        await UpdateManager.GitHubUpdateManager("https://github.com/j2ghz/ModSink", prerelease: true))
                     {
-                        if (mgr.IsInstalledApp)
-                        {
-                            var release = mgr.UpdateApp(i => updateLog.Debug("Download progress: {progress}", i))
-                                .GetAwaiter().GetResult();
-                            log.Debug("Latest version: {version}", release.Version);
-                        }
+                        var release = await mgr.UpdateApp(i => updateLog.Debug("Download progress: {progress}", i));
+                        log.Debug("Latest version: {version}", release.Version);
                     }
                 }
                 catch (Exception e)
@@ -104,7 +100,6 @@ namespace ModSink.WPF
                     updateLog.Debug("Update check finished");
                 }
             });
-            task.Start();
         }
 
         private void SetupLogging()
@@ -119,6 +114,9 @@ namespace ModSink.WPF
                 .WriteTo.Sentry(
                     "https://6e3a1e08759944bb932434095137f63b:ab9ff9be2ec74518bcb0c1d860d98cbe@sentry.j2ghz.com/2")
                 .Enrich.FromLogContext()
+                .Enrich.WithProcessId()
+                .Enrich.WithProcessName()
+                .Enrich.WithThreadId()
                 .MinimumLevel.Verbose()
                 .CreateLogger();
             Log.Information("Log initialized");
