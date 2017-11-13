@@ -15,8 +15,6 @@ using ModSink.WPF.Helpers;
 using Serilog;
 using Serilog.Debugging;
 using Serilog.Sinks.Sentry;
-using SharpRaven;
-using SharpRaven.Data;
 using Squirrel;
 
 namespace ModSink.WPF
@@ -25,10 +23,8 @@ namespace ModSink.WPF
     {
         private ILogger log;
 
-        private string FullVersion => typeof(App).GetTypeInfo().Assembly
+        private static string FullVersion => typeof(App).GetTypeInfo().Assembly
             .GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion;
-
-        private event EventHandler<Exception> UpdateFailed;
 
         protected override void OnStartup(StartupEventArgs e)
         {
@@ -36,7 +32,6 @@ namespace ModSink.WPF
                 ConsoleManager.Show();
             SelfLog.Enable(Console.Error);
             SetupLogging();
-            log = Log.ForContext<App>();
             log.Information("Starting ModSink ({version})", FullVersion);
 #if !DEBUG
             if (!Debugger.IsAttached)
@@ -86,8 +81,8 @@ namespace ModSink.WPF
                     using (var mgr =
                         await UpdateManager.GitHubUpdateManager("https://github.com/j2ghz/ModSink", prerelease: true))
                     {
-                        var release = await mgr.UpdateApp(i => updateLog.Debug("Download progress: {progress}", i));
-                        log.Debug("Latest version: {version}", release.Version);
+                        var release = await mgr.UpdateApp(i => updateLog.Debug("Downloading file, progress: {progress}", i));
+                        log.Information("Latest version: {version}", release.Version);
                     }
                 }
                 catch (Exception e)
@@ -111,23 +106,30 @@ namespace ModSink.WPF
                     "../Logs/{Date}.log",
                     outputTemplate: "{Timestamp:o} [{Level:u3}] ({SourceContext}) {Message}{NewLine}{Exception}")
                 .WriteTo.Sentry(
-                    "https://6e3a1e08759944bb932434095137f63b:ab9ff9be2ec74518bcb0c1d860d98cbe@sentry.j2ghz.com/2")
+                    "https://6e3a1e08759944bb932434095137f63b:ab9ff9be2ec74518bcb0c1d860d98cbe@sentry.j2ghz.com/2", FullVersion)
                 .Enrich.FromLogContext()
                 .Enrich.WithProcessId()
                 .Enrich.WithProcessName()
                 .Enrich.WithThreadId()
                 .MinimumLevel.Verbose()
                 .CreateLogger();
-            Log.Information("Log initialized");
+            log = Log.ForContext<App>();
+            log.Information("Log initialized");
             AppDomain.CurrentDomain.UnhandledException += (sender, args) =>
             {
                 ConsoleManager.Show();
-                Log.Fatal(args.ExceptionObject as Exception, nameof(AppDomain.CurrentDomain.UnhandledException));
+                log.Fatal(args.ExceptionObject as Exception, "{exception type}, Sender: {sender}",
+                    nameof(AppDomain.CurrentDomain.UnhandledException), sender);
             };
             Current.DispatcherUnhandledException += (sender, args) =>
             {
                 ConsoleManager.Show();
-                Log.Fatal(args.Exception, nameof(DispatcherUnhandledException));
+                log.Fatal(args.Exception, "{exception type}, Sender: {sender}", nameof(DispatcherUnhandledException),
+                    sender);
+            };
+            AppDomain.CurrentDomain.FirstChanceException += (sender, args) =>
+            {
+                log.Debug(args.Exception, "Sender: {sender}", sender);
             };
         }
     }
