@@ -1,6 +1,5 @@
 using System;
 using System.Diagnostics;
-using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
@@ -15,8 +14,6 @@ using ModSink.WPF.Helpers;
 using Serilog;
 using Serilog.Debugging;
 using Serilog.Sinks.Sentry;
-using SharpRaven;
-using SharpRaven.Data;
 using Squirrel;
 
 namespace ModSink.WPF
@@ -122,12 +119,18 @@ namespace ModSink.WPF
             AppDomain.CurrentDomain.UnhandledException += (sender, args) =>
             {
                 ConsoleManager.Show();
-                Log.Fatal(args.ExceptionObject as Exception, nameof(AppDomain.CurrentDomain.UnhandledException));
+                Log.Fatal(args.ExceptionObject as Exception, "{exception type}, Sender: {sender}",
+                    nameof(AppDomain.CurrentDomain.UnhandledException), sender);
             };
             Current.DispatcherUnhandledException += (sender, args) =>
             {
                 ConsoleManager.Show();
-                Log.Fatal(args.Exception, nameof(DispatcherUnhandledException));
+                Log.Fatal(args.Exception, "{exception type}, Sender: {sender}", nameof(DispatcherUnhandledException),
+                    sender);
+            };
+            AppDomain.CurrentDomain.FirstChanceException += (sender, args) =>
+            {
+                Log.Debug(args.Exception, "Sender: {sender}", sender);
             };
         }
     }
