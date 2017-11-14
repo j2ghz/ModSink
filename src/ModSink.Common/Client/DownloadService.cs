@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Net;
 using DynamicData;
 using ModSink.Core.Client;
 
@@ -9,13 +10,23 @@ namespace ModSink.Common.Client
     {
         private readonly IDownloader downloader;
         private readonly SourceList<IDownload> downloads = new SourceList<IDownload>();
+        private byte simultaneousDownloads;
 
         public DownloadService(IDownloader downloader)
         {
             this.downloader = downloader;
+            SimultaneousDownloads = 5;
         }
 
-        public byte SimultaneousDownloads { get; set; } = 5;
+        public byte SimultaneousDownloads
+        {
+            get => simultaneousDownloads;
+            set
+            {
+                simultaneousDownloads = value;
+                ServicePointManager.DefaultConnectionLimit = value;
+            }
+        }
 
         public IObservableList<IDownload> Downloads => downloads.AsObservableList();
 
