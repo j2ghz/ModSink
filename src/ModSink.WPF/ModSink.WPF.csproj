@@ -66,7 +66,7 @@
       <Version>1.5.0</Version>
     </PackageReference>
     <PackageReference Include="ModSink.Common">
-      <Version>0.2.1-ci0073</Version>
+      <Version>0.2.1-ci0075</Version>
     </PackageReference>
     <PackageReference Include="reactiveui-wpf">
       <Version>8.0.0-alpha0094</Version>

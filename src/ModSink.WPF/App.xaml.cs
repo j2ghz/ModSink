@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics;
 using System.Linq;
+using System.Net;
 using System.Reflection;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
@@ -49,6 +50,9 @@ namespace ModSink.WPF
 
         private IContainer BuildContainer()
         {
+            //TODO: FIX:
+            ServicePointManager.DefaultConnectionLimit = 10;
+
             var builder = new ContainerBuilder();
 
             builder.RegisterLogger();
