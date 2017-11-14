@@ -4,6 +4,7 @@ using System.Reactive.Linq;
 using Humanizer;
 using ModSink.Core.Client;
 using ReactiveUI;
+using Serilog;
 
 namespace ModSink.WPF.ViewModel
 {
@@ -34,12 +35,26 @@ namespace ModSink.WPF.ViewModel
 
             progress = dpRealtime.Select(p => 100d * p.Downloaded.Bits / p.Size.Bits).ToProperty(this, x => x.Progress);
             size = dpRealtime.Select(p => p.Size.Humanize("G03")).ToProperty(this, x => x.Size);
+
+            LogErrors(downloaded);
+            LogErrors(progress);
+            LogErrors(size);
+            LogErrors(speed);
         }
+
+        private ILogger log => Log.ForContext<DownloadViewModel>().ForContext("downloadName", Name);
 
         public string Downloaded => downloaded.Value;
         public string Name { get; }
         public double Progress => progress.Value;
         public string Size => size.Value;
         public string Speed => speed.Value;
+
+        private void LogErrors(IHandleObservableErrors oaph)
+        {
+            oaph.ThrownExceptions.Subscribe(e =>
+                log.Warning(e, "{downloadName} An exception from Observable of underlying download was caught"));
+            //TODO: Change to Error
+        }
     }
 }
