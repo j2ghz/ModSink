@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel.Design;
 using System.IO;
 using System.Threading.Tasks;
 using ModSink.Core.Client;
@@ -42,10 +43,7 @@ namespace ModSink.Common.Client
         public async Task<bool> IsFileAvailable(FileSignature fileSignature)
         {
             var fi = await GetFileInfo(fileSignature);
-            if (!await Task.Run(() => fi.Exists)) return false;
-            if (Convert.ToUInt64(fi.Length) == fileSignature.Length)
-                return true;
-            throw new FileSignatureException(fileSignature, new FileSignature(fileSignature.Hash, fi.Length));
+            return await Task.Run(() => fi.Exists);
         }
 
         public async Task<Stream> Read(FileSignature fileSignature)
@@ -58,6 +56,24 @@ namespace ModSink.Common.Client
         {
             var file = await GetFileInfo(fileSignature);
             return await Task.Run(() => file.Open(FileMode.Create, FileAccess.Write));
+        }
+
+        public async Task<bool> WriteIfMissingOrInvalid(FileSignature fileSignature, out Stream stream)
+        {
+            var fi = await GetFileInfo(fileSignature);
+            var exists = await IsFileAvailable(fileSignature);
+            if (exists == false)
+            {
+                stream = await Write(fileSignature);
+                return false;
+            }
+            if (fileSignature.Length == Convert.ToUInt64(fi.Length))
+            {
+                stream = null;
+                return true;
+            }
+            stream = await Write(fileSignature);
+            return false;
         }
     }
 }
