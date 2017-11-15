@@ -18,8 +18,9 @@ namespace ModSink.Common.Client
             new BehaviorSubject<DownloadProgress>(new DownloadProgress(ByteSize.FromBytes(0), ByteSize.FromBytes(0),
                 DownloadProgress.TransferState.NotStarted));
 
-        private readonly StateMachine<DownloadState, Trigger> state;
         private readonly CompositeDisposable progressSubscription = new CompositeDisposable();
+
+        private readonly StateMachine<DownloadState, Trigger> state;
 
         public Download(Uri source, Lazy<Task<Stream>> destination, string name)
         {
@@ -39,7 +40,7 @@ namespace ModSink.Common.Client
                 .OnDeactivate(() => progressSubscription.Dispose());
         }
 
-        private ILogger log => Log.ForContext<Download>().ForContext("id", Name);
+        private ILogger log => Log.ForContext<Download>().ForContext("ID", Name);
 
         public Lazy<Task<Stream>> Destination { get; }
         public string Name { get; }
@@ -48,10 +49,10 @@ namespace ModSink.Common.Client
 
         public DownloadState State => state.State;
 
-        public void Start(IDownloader downloader)
+        public async Task Start(IDownloader downloader)
         {
             state.Fire(Trigger.Start);
-            var obs = downloader.Download(this);
+            var obs = downloader.Download(Source, await Destination.Value);
             progressSubscription.Add(obs.Connect());
             progressSubscription.Add(obs.Subscribe(progress));
             Progress.Subscribe(_ => { }, _ => state.Fire(Trigger.Error), () => state.Fire(Trigger.Finish));

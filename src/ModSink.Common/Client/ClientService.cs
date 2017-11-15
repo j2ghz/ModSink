@@ -59,7 +59,7 @@ namespace ModSink.Common.Client
             {
                 var tempFile = Path.GetTempFileName();
                 var stream = new FileStream(tempFile, FileMode.Create);
-                var progress = Downloader.Download(uri, stream, "Repo");
+                var progress = Downloader.Download(uri, stream);
                 progress.Subscribe(o.OnNext, o.OnError, () => { });
                 await progress;
                 stream = new FileStream(tempFile, FileMode.Open, FileAccess.Read);

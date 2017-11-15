@@ -19,7 +19,7 @@ namespace Modsink.Common.Tests
             var client = new HttpClientDownloader();
             using (var stream = new MemoryStream())
             {
-                var obs = client.Download(new Uri(@"http://ipv4.download.thinkbroadband.com/5MB.zip"), stream, "TestDownload");
+                var obs = client.Download(new Uri(@"http://ipv4.download.thinkbroadband.com/5MB.zip"), stream);
                 using (var d = obs.Connect())
                 {
                     var progress = await obs;
