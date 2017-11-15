@@ -23,7 +23,7 @@ namespace ModSink.Core.Client
 
         Task DownloadMissingFiles(Modpack modpack);
 
-        Uri GetDownloadUri(HashValue hash);
+        Uri GetDownloadUri(FileSignature fileSignature);
 
         IObservable<DownloadProgress> LoadRepo(Uri uri);
     }

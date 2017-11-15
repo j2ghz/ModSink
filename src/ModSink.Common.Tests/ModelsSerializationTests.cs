@@ -1,28 +1,25 @@
-﻿using ModSink.Core.Models.Repo;
-using System;
-using System.Collections.Generic;
-using System.IO;
+﻿using System.IO;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
-using System.Text;
-using Xunit;
 using FluentAssertions;
+using ModSink.Core.Models.Repo;
+using Xunit;
 
 namespace Modsink.Common.Tests
 {
     public class ModelsSerializationTests
     {
-        private IFormatter formatter = new BinaryFormatter();
+        private readonly IFormatter formatter = new BinaryFormatter();
 
         [Fact]
         public void SerializeDeserializeRepo()
         {
             var repo = TestDataBuilder.Repo();
             var stream = new MemoryStream();
-            this.formatter.Serialize(stream, repo);
+            formatter.Serialize(stream, repo);
             stream.Length.Should().BeGreaterThan(0);
             stream.Position = 0;
-            var obj = this.formatter.Deserialize(stream);
+            var obj = formatter.Deserialize(stream);
             Assert.IsAssignableFrom<Repo>(obj);
         }
     }
