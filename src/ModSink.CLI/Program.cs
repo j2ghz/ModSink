@@ -278,7 +278,7 @@ namespace ModSink.CLI
                     var repo = new Repo
                     {
                         Files = files,
-                        Modpacks = new List<Modpack>() { new Modpack { Mods = mods } }
+                        Modpacks = new List<Modpack>() { new Modpack { Mods = mods, Name = "TestModpack"} }
                     };
 
                     var fileName = Path.Combine(pathUri.LocalPath, "repo.bin");
