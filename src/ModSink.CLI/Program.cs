@@ -246,7 +246,7 @@ namespace ModSink.CLI
                     var path = new DirectoryInfo(Path.Combine(Directory.GetCurrentDirectory(), pathStr));
                     var pathUri = new Uri(path.FullName);
 
-                    var files = new Dictionary<HashValue, Uri>();
+                    var files = new Dictionary<FileSignature, Uri>();
                     var mods = new List<ModEntry>();
 
                     foreach (var modFolder in path.EnumerateDirectories())
@@ -255,7 +255,7 @@ namespace ModSink.CLI
                         var obs = hashing.GetFileHashes(modFolder, CancellationToken.None);
                         var mod = new Mod
                         {
-                            Files = new Dictionary<Uri, HashValue>(),
+                            Files = new Dictionary<Uri, FileSignature>(),
                             Name = modFolder.Name,
                             Version = "1.0"
                         };
@@ -263,9 +263,10 @@ namespace ModSink.CLI
                         {
                             var fileHash = await lazy.Value;
                             Console.WriteLine($"Processing {fileHash.File.FullName}");
+                            var fileSig = new FileSignature(fileHash.Hash,fileHash.File.Length);
                             mod.Files.Add(new Uri(modFolder.FullName).MakeRelativeUri(new Uri(fileHash.File.FullName)),
-                                fileHash.Hash);
-                            files.Add(fileHash.Hash, pathUri.MakeRelativeUri(new Uri(fileHash.File.FullName)));
+                                fileSig);
+                            files.Add(fileSig, pathUri.MakeRelativeUri(new Uri(fileHash.File.FullName)));
                         }
                         mods.Add(new ModEntry {Mod = mod});
                     }

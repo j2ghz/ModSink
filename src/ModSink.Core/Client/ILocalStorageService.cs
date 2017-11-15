@@ -1,26 +1,24 @@
-﻿using ModSink.Core.Models.Repo;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.IO;
-using System.Text;
 using System.Threading.Tasks;
+using ModSink.Core.Models.Repo;
 
 namespace ModSink.Core.Client
 {
     public interface ILocalStorageService
     {
-        Task Delete(HashValue hash);
+        Task Delete(FileSignature fileSignature);
 
-        Task<FileInfo> GetFileInfo(HashValue hash);
+        Task<FileInfo> GetFileInfo(FileSignature fileSignature);
 
-        string GetFileName(HashValue hash);
+        string GetFileName(FileSignature fileSignature);
 
-        Uri GetFileUri(HashValue hash);
+        Uri GetFileUri(FileSignature fileSignature);
 
-        Task<bool> IsFileAvailable(HashValue hash);
+        Task<bool> IsFileAvailable(FileSignature fileSignature);
 
-        Task<Stream> Read(HashValue hash);
+        Task<Stream> Read(FileSignature fileSignature);
 
-        Task<Stream> Write(HashValue hash);
+        Task<Stream> Write(FileSignature fileSignature);
     }
 }
