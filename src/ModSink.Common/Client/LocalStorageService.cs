@@ -59,13 +59,5 @@ namespace ModSink.Common.Client
             var file = await GetFileInfo(fileSignature);
             return await Task.Run(() => file.Open(FileMode.Create, FileAccess.Write));
         }
-
-        private class FileSignatureException : Exception
-        {
-            public FileSignatureException(FileSignature expected, FileSignature actual) : base(
-                $"File with a signature {expected} was expected, but {actual} was found")
-            {
-            }
-        }
     }
 }

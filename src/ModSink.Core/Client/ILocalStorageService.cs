@@ -21,4 +21,11 @@ namespace ModSink.Core.Client
 
         Task<Stream> Write(FileSignature fileSignature);
     }
+    public class FileSignatureException : Exception
+    {
+        public FileSignatureException(FileSignature expected, FileSignature actual) : base(
+            $"File with a signature {expected} was expected, but {actual} was found")
+        {
+        }
+    }
 }

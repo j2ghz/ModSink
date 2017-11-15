@@ -8,6 +8,7 @@ using DynamicData;
 using ModSink.Core.Client;
 using ModSink.Core.Models.Repo;
 using ReactiveUI;
+using Serilog;
 
 namespace ModSink.Common.Client
 {
@@ -26,6 +27,7 @@ namespace ModSink.Common.Client
 
         public IDownloader Downloader { get; }
         public IFormatter SerializationFormatter { get; }
+        private ILogger log => Log.ForContext<ClientService>();
         public IDownloadService DownloadService { get; }
         public ILocalStorageService LocalStorageService { get; }
         public IObservableList<Modpack> Modpacks => Repos.Connect().TransformMany(r => r.Modpacks).AsObservableList();
@@ -36,12 +38,21 @@ namespace ModSink.Common.Client
             foreach (var mod in modpack.Mods)
             foreach (var fh in mod.Mod.Files)
             {
-                var hash = fh.Value;
-                if (await LocalStorageService.IsFileAvailable(hash)) continue;
+                var fileSignature = fh.Value;
+
+                try
+                {
+                    if (await LocalStorageService.IsFileAvailable(fileSignature)) continue;
+                }
+                catch (FileSignatureException e)
+                {
+                    log.Warning(e, "File found, but with a wrong signature, deleting");
+                    await LocalStorageService.Delete(fileSignature);
+                }
                 DownloadService.Add(new Download(
-                    GetDownloadUri(hash),
-                    new Lazy<Task<Stream>>(async () => await LocalStorageService.Write(hash)),
-                    hash.ToString()));
+                    GetDownloadUri(fileSignature),
+                    new Lazy<Task<Stream>>(async () => await LocalStorageService.Write(fileSignature)),
+                    fileSignature.ToString()));
             }
         }
 
