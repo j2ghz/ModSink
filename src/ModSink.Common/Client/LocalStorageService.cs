@@ -1,11 +1,8 @@
-﻿using ModSink.Core.Client;
-using System;
-using System.Collections.Generic;
-using System.Text;
-using ModSink.Core.Models.Repo;
+﻿using System;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
+using ModSink.Core.Client;
+using ModSink.Core.Models.Repo;
 
 namespace ModSink.Common.Client
 {
@@ -17,7 +14,9 @@ namespace ModSink.Common.Client
         public LocalStorageService(Uri localPath)
         {
             this.localPath = localPath;
-            this.localDir = new DirectoryInfo(localPath.LocalPath);
+            localDir = new DirectoryInfo(localPath.LocalPath);
+            if (!localDir.Exists)
+                localDir.Create();
         }
 
         public async Task Delete(HashValue hash)
@@ -28,7 +27,7 @@ namespace ModSink.Common.Client
 
         public async Task<FileInfo> GetFileInfo(HashValue hash)
         {
-            return await Task.Run(() => new FileInfo(GetFileName(hash)));
+            return await Task.Run(() => new FileInfo(GetFileUri(hash).LocalPath));
         }
 
         public string GetFileName(HashValue hash)
@@ -38,7 +37,7 @@ namespace ModSink.Common.Client
 
         public Uri GetFileUri(HashValue hash)
         {
-            return new Uri(this.localPath, hash.ToString());
+            return new Uri(localPath, hash.ToString());
         }
 
         public async Task<bool> IsFileAvailable(HashValue hash)
