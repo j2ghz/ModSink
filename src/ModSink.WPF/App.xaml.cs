@@ -1,6 +1,5 @@
 using System;
 using System.Diagnostics;
-using System.Linq;
 using System.Net;
 using System.Reflection;
 using System.Runtime.Serialization;
@@ -45,7 +44,7 @@ namespace ModSink.WPF
 
             log.Information("Starting UI");
             var mw = container.Resolve<MainWindow>();
-            mw.ShowDialog();
+            mw.Show();
         }
 
         private IContainer BuildContainer()
@@ -85,7 +84,8 @@ namespace ModSink.WPF
                     using (var mgr =
                         await UpdateManager.GitHubUpdateManager("https://github.com/j2ghz/ModSink", prerelease: true))
                     {
-                        var release = await mgr.UpdateApp(i => updateLog.Debug("Downloading file, progress: {progress}", i));
+                        var release = await mgr.UpdateApp(i =>
+                            updateLog.Debug("Downloading file, progress: {progress}", i));
                         log.Information("Latest version: {version}", release.Version);
                     }
                 }
@@ -105,15 +105,15 @@ namespace ModSink.WPF
             Log.Logger = new LoggerConfiguration()
                 .WriteTo.LiterateConsole(
                     outputTemplate:
-                    "{Timestamp:HH:mm:ss} {Level:u3} [{SourceContext}] {Message:lj}{NewLine}{Exception}")
+                    "{Timestamp:HH:mm:ss} {Level:u3} {ThreadId} [{SourceContext}] {Properties} {Message:lj}{NewLine}{Exception}")
                 .WriteTo.RollingFile(
                     "../Logs/{Date}.log",
-                    outputTemplate: "{Timestamp:o} [{Level:u3}] ({SourceContext}) {Message}{NewLine}{Exception}")
+                    outputTemplate:
+                    "{Timestamp:o} [{Level:u3}] ({SourceContext}) {Properties} {Message}{NewLine}{Exception}")
                 .WriteTo.Sentry(
-                    "https://6e3a1e08759944bb932434095137f63b:ab9ff9be2ec74518bcb0c1d860d98cbe@sentry.j2ghz.com/2", FullVersion.Substring(0,64))
+                    "https://6e3a1e08759944bb932434095137f63b:ab9ff9be2ec74518bcb0c1d860d98cbe@sentry.j2ghz.com/2",
+                    FullVersion?.Substring(0, 64))
                 .Enrich.FromLogContext()
-                .Enrich.WithProcessId()
-                .Enrich.WithProcessName()
                 .Enrich.WithThreadId()
                 .MinimumLevel.Verbose()
                 .CreateLogger();
@@ -122,18 +122,19 @@ namespace ModSink.WPF
             AppDomain.CurrentDomain.UnhandledException += (sender, args) =>
             {
                 ConsoleManager.Show();
-                log.Fatal(args.ExceptionObject as Exception, "{exception type}, Sender: {sender}",
-                    nameof(AppDomain.CurrentDomain.UnhandledException), sender);
+                log.ForContext(sender.GetType()).Fatal(args.ExceptionObject as Exception, "{exception}",
+                    nameof(AppDomain.CurrentDomain.UnhandledException));
             };
             Current.DispatcherUnhandledException += (sender, args) =>
             {
                 ConsoleManager.Show();
-                log.Fatal(args.Exception, "{exception type}, Sender: {sender}", nameof(DispatcherUnhandledException),
+                log.ForContext(sender.GetType()).Fatal(args.Exception, "{exception}",
+                    nameof(DispatcherUnhandledException),
                     sender);
             };
             AppDomain.CurrentDomain.FirstChanceException += (sender, args) =>
             {
-                log.Debug(args.Exception, "Sender: {sender}", sender);
+                log.ForContext(sender.GetType()).Debug(args.Exception, "FirstChanceException");
             };
         }
     }

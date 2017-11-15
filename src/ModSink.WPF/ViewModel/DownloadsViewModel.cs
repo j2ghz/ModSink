@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
+using System.Windows.Threading;
 using DynamicData;
 using DynamicData.Aggregation;
 using DynamicData.ReactiveUI;
@@ -17,7 +18,7 @@ namespace ModSink.WPF.ViewModel
         private readonly ReactiveList<DownloadViewModel> downloads = new ReactiveList<DownloadViewModel>();
         private readonly ILogger log;
         private readonly ObservableAsPropertyHelper<string> queueCount;
-        private string url = @"https://a3.417rct.org/Swifty_repos/modsinktestrepo/repo.bin";
+        private string url = @"https://mods.j2ghz.com/repo.bin";
 
         public DownloadsViewModel(IClientService clientService, ILogger log)
         {
@@ -26,7 +27,9 @@ namespace ModSink.WPF.ViewModel
             {
                 await clientService.DownloadMissingFiles(clientService.Modpacks.Items.First());
             });
+            DownloadMissing.ThrownExceptions.Subscribe(e => throw e);
             LoadRepo = ReactiveCommand.CreateFromObservable(() => clientService.LoadRepo(new Uri(Url)));
+            
             var ds = clientService.DownloadService.Downloads.Connect();
             ds
                 .FilterOnProperty(d => d.State, d => d.State == DownloadState.Downloading)
