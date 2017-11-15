@@ -1,62 +1,71 @@
-﻿using ModSink.Core.Client;
-using System;
-using System.Collections.Generic;
-using System.Text;
-using ModSink.Core.Models.Repo;
+﻿using System;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
+using ModSink.Core.Client;
+using ModSink.Core.Models.Repo;
 
 namespace ModSink.Common.Client
 {
     public class LocalStorageService : ILocalStorageService
     {
-        private readonly DirectoryInfo localDir;
         private readonly Uri localPath;
 
         public LocalStorageService(Uri localPath)
         {
             this.localPath = localPath;
-            this.localDir = new DirectoryInfo(localPath.LocalPath);
+            var localDir = new DirectoryInfo(localPath.LocalPath);
+            if (!localDir.Exists)
+                localDir.Create();
         }
 
-        public async Task Delete(HashValue hash)
+        public async Task Delete(FileSignature fileSignature)
         {
-            var fi = await GetFileInfo(hash);
+            var fi = await GetFileInfo(fileSignature);
             await Task.Run(() => fi.Delete());
         }
 
-        public async Task<FileInfo> GetFileInfo(HashValue hash)
+        public async Task<FileInfo> GetFileInfo(FileSignature fileSignature)
         {
-            return await Task.Run(() => new FileInfo(GetFileName(hash)));
+            return await Task.Run(() => new FileInfo(GetFileUri(fileSignature).LocalPath));
         }
 
-        public string GetFileName(HashValue hash)
+        public string GetFileName(FileSignature fileSignature)
         {
-            return hash.ToString();
+            return fileSignature.Hash.ToString();
         }
 
-        public Uri GetFileUri(HashValue hash)
+        public Uri GetFileUri(FileSignature fileSignature)
         {
-            return new Uri(this.localPath, hash.ToString());
+            return new Uri(localPath, GetFileName(fileSignature));
         }
 
-        public async Task<bool> IsFileAvailable(HashValue hash)
+        public async Task<bool> IsFileAvailable(FileSignature fileSignature)
         {
-            var fi = await GetFileInfo(hash);
-            return await Task.Run(() => fi.Exists);
+            var fi = await GetFileInfo(fileSignature);
+            if (!await Task.Run(() => fi.Exists)) return false;
+            if (Convert.ToUInt64(fi.Length) == fileSignature.Length)
+                return true;
+            throw new FileSignatureException(fileSignature, new FileSignature(fileSignature.Hash, fi.Length));
         }
 
-        public async Task<Stream> Read(HashValue hash)
+        public async Task<Stream> Read(FileSignature fileSignature)
         {
-            var file = await GetFileInfo(hash);
+            var file = await GetFileInfo(fileSignature);
             return await Task.Run(() => file.Open(FileMode.Open, FileAccess.Read));
         }
 
-        public async Task<Stream> Write(HashValue hash)
+        public async Task<Stream> Write(FileSignature fileSignature)
         {
-            var file = await GetFileInfo(hash);
+            var file = await GetFileInfo(fileSignature);
             return await Task.Run(() => file.Open(FileMode.Create, FileAccess.Write));
+        }
+
+        private class FileSignatureException : Exception
+        {
+            public FileSignatureException(FileSignature expected, FileSignature actual) : base(
+                $"File with a signature {expected} was expected, but {actual} was found")
+            {
+            }
         }
     }
 }

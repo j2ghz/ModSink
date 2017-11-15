@@ -17,7 +17,7 @@ namespace ModSink.Common
     {
         private readonly HttpClient client = new HttpClient();
 
-        public IConnectableObservable<DownloadProgress> Download(IDownload download)
+        public IConnectableObservable<DownloadProgress> Download(Uri source, Stream destination)
         {
             return Observable.Create<DownloadProgress>(async (observer, cancel) =>
             {
@@ -27,7 +27,7 @@ namespace ModSink.Common
                         observer.OnNext(new DownloadProgress(size, downloaded, state)));
                     //Get response
                     report(ByteSize.FromBytes(0), ByteSize.FromBytes(0), TransferState.AwaitingResponse);
-                    var response = await client.GetAsync(download.Source, HttpCompletionOption.ResponseHeadersRead,
+                    var response = await client.GetAsync(source, HttpCompletionOption.ResponseHeadersRead,
                         cancel);
 
                     //Read response
@@ -38,7 +38,7 @@ namespace ModSink.Common
 
                     var totalRead = 0;
                     using (var input = await response.Content.ReadAsStreamAsync())
-                    using (var output = await download.Destination.Value)
+                    using (var output = destination)
                     {
                         var buffer = new byte[16 * 1024];
                         var read = 0;
@@ -64,11 +64,6 @@ namespace ModSink.Common
 
                 return Disposable.Empty;
             }).Publish();
-        }
-
-        public IConnectableObservable<DownloadProgress> Download(Uri source, Stream destination, string name)
-        {
-            return Download(new Download(source, new Lazy<Task<Stream>>(() => Task.Run(() => destination)), name));
         }
     }
 }

@@ -11,7 +11,7 @@ namespace ModSink.Core.Models.Repo
         /// <summary>
         /// <see cref="string"/> is relative path
         /// </summary>
-        public IDictionary<HashValue, Uri> Files { get; set; }
+        public IDictionary<FileSignature, Uri> Files { get; set; }
 
         public ICollection<Modpack> Modpacks { get; set; }
     }

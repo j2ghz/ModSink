@@ -23,13 +23,7 @@ namespace Modsink.Common.Tests
             this.slow = slow;
         }
 
-        public IConnectableObservable<DownloadProgress> Download(Uri source, Stream destination, string name)
-        {
-            return Download(new Download(source, new Lazy<Task<Stream>>(() => Task.Run(() => destination)), name));
-        }
-
-
-        public IConnectableObservable<DownloadProgress> Download(IDownload download)
+        public IConnectableObservable<DownloadProgress> Download(Uri source, Stream destination)
         {
             return Observable.Create<DownloadProgress>(async (observer,cancel) =>
             {
