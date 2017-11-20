@@ -8,7 +8,6 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using Autofac;
-using AutofacSerilogIntegration;
 using ModSink.Common.Client;
 using ModSink.Core;
 using ModSink.WPF.Helpers;
@@ -54,10 +53,8 @@ namespace ModSink.WPF
 
             var builder = new ContainerBuilder();
 
-            builder.RegisterLogger();
-
             builder.RegisterType<BinaryFormatter>().As<IFormatter>().SingleInstance();
-            builder.Register(_ => new LocalStorageService(new Uri(@"D:\modsink"))).AsImplementedInterfaces()
+            builder.Register(_ => new LocalStorageService(new Uri(@"D:\modsink\"))).AsImplementedInterfaces()
                 .SingleInstance();
             builder.RegisterAssemblyTypes(typeof(IModSink).Assembly, typeof(Common.ModSink).Assembly)
                 .Where(t => t.Name != "LocalStorageService").AsImplementedInterfaces().SingleInstance();
@@ -129,12 +126,11 @@ namespace ModSink.WPF
             {
                 ConsoleManager.Show();
                 log.ForContext(sender.GetType()).Fatal(args.Exception, "{exception}",
-                    nameof(DispatcherUnhandledException),
-                    sender);
+                    nameof(DispatcherUnhandledException));
             };
             AppDomain.CurrentDomain.FirstChanceException += (sender, args) =>
             {
-                log.ForContext(sender.GetType()).Debug(args.Exception, "FirstChanceException");
+                log.ForContext(sender.GetType()).Verbose(args.Exception, "FirstChanceException");
             };
         }
     }

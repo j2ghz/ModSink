@@ -7,7 +7,7 @@
              xmlns:local="clr-namespace:ModSink.WPF.View"
              xmlns:vm="clr-namespace:ModSink.WPF.ViewModel"
              mc:Ignorable="d"
-             d:DesignHeight="600" d:DesignWidth="1000"
+             d:DesignHeight="800" d:DesignWidth="1500"
              d:DataContext="{d:DesignInstance vm:DownloadsViewModel}">
     <DockPanel LastChildFill="True">
         <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
@@ -19,11 +19,12 @@
         <ListView ItemsSource="{Binding Downloads}">
             <ListView.View>
                 <GridView>
-                    <GridViewColumn Width="200" Header="Name" DisplayMemberBinding="{Binding Name}" />
-                    <GridViewColumn Width="100" Header="Size" DisplayMemberBinding="{Binding Size}" />
+                    <GridViewColumn Width="300" Header="Name" DisplayMemberBinding="{Binding Name}" />
+                    <GridViewColumn Width="150" Header="State" DisplayMemberBinding="{Binding State}" />
                     <GridViewColumn Width="100" Header="Downloaded" DisplayMemberBinding="{Binding Downloaded}" />
+                    <GridViewColumn Width="100" Header="Size" DisplayMemberBinding="{Binding Size}" />
                     <GridViewColumn Width="100" Header="Speed" DisplayMemberBinding="{Binding Speed}" />
-                    <GridViewColumn Width="400" Header="Progress">
+                    <GridViewColumn Width="500" Header="Progress">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <Grid>
