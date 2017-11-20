@@ -31,7 +31,7 @@ namespace ModSink.Common.Client
             state = new StateMachine<DownloadState, Trigger>(DownloadState.Queued);
             state.OnTransitioned(_ => this.RaisePropertyChanged(nameof(State)));
             state.OnTransitioned(t =>
-                log.Verbose("Switched to state {state}", Name, t.Destination.Humanize()));
+                log.Verbose("Switched to state {state}", t.Destination.Humanize()));
             state.Configure(DownloadState.Queued)
                 .Permit(Trigger.Start, DownloadState.Downloading);
             state.Configure(DownloadState.Downloading)

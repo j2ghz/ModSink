@@ -76,6 +76,7 @@ namespace ModSink.CLI
 
                     Console.WriteLine("Downloading repo");
                     var repoDown = client.LoadRepo(uri);
+                    repoDown.Connect();
                     DumpDownloadProgress(repoDown, "Repo");
                     await repoDown;
                     foreach (var modpack in client.Modpacks.Items)
@@ -115,6 +116,7 @@ namespace ModSink.CLI
 
                         Console.WriteLine("Downloading repo");
                         var repoDown = client.LoadRepo(uri);
+                        repoDown.Connect();
                         DumpDownloadProgress(repoDown, "Repo");
                         repoDown.Wait();
                         foreach (var repo in client.Repos.Items)

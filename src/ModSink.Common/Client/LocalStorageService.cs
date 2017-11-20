@@ -42,10 +42,7 @@ namespace ModSink.Common.Client
         public async Task<bool> IsFileAvailable(FileSignature fileSignature)
         {
             var fi = await GetFileInfo(fileSignature);
-            if (!await Task.Run(() => fi.Exists)) return false;
-            if (Convert.ToUInt64(fi.Length) == fileSignature.Length)
-                return true;
-            throw new FileSignatureException(fileSignature, new FileSignature(fileSignature.Hash, fi.Length));
+            return await Task.Run(() => fi.Exists);
         }
 
         public async Task<Stream> Read(FileSignature fileSignature)
@@ -58,6 +55,16 @@ namespace ModSink.Common.Client
         {
             var file = await GetFileInfo(fileSignature);
             return await Task.Run(() => file.Open(FileMode.Create, FileAccess.Write));
+        }
+
+        public async Task<(bool available, Lazy<Task<Stream>> stream)> WriteIfMissingOrInvalid(
+            FileSignature fileSignature)
+        {
+            var fi = await GetFileInfo(fileSignature);
+            var exists = await IsFileAvailable(fileSignature);
+            if (exists == false || fileSignature.Length != Convert.ToUInt64(fi.Length))
+                return (false, new Lazy<Task<Stream>>(() => Write(fileSignature)));
+            return (true, null);
         }
     }
 }

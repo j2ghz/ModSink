@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using System.Reactive.Subjects;
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
 using DynamicData;
@@ -35,24 +37,15 @@ namespace ModSink.Common.Client
 
         public async Task DownloadMissingFiles(Modpack modpack)
         {
+            log.Information("Gathering files to download for {modpack}",modpack.Name);
             foreach (var mod in modpack.Mods)
             foreach (var fh in mod.Mod.Files)
             {
                 var fileSignature = fh.Value;
-
-                try
-                {
-                    if (await LocalStorageService.IsFileAvailable(fileSignature)) continue;
-                }
-                catch (FileSignatureException e)
-                {
-                    log.Warning(e, "File found, but with a wrong signature, deleting");
-                    await LocalStorageService.Delete(fileSignature);
-                }
-                DownloadService.Add(new Download(
-                    GetDownloadUri(fileSignature),
-                    new Lazy<Task<Stream>>(async () => await LocalStorageService.Write(fileSignature)),
-                    fileSignature.ToString()));
+                var res = await LocalStorageService.WriteIfMissingOrInvalid(fileSignature);
+                if (!res.available)
+                    DownloadService.Add(new Download(GetDownloadUri(fileSignature), res.stream,
+                        fileSignature.ToString()));
             }
         }
 
@@ -64,23 +57,25 @@ namespace ModSink.Common.Client
             throw new KeyNotFoundException($"Key {fileSignature} was not found in a Files dictionary of any Repo");
         }
 
-        public IObservable<DownloadProgress> LoadRepo(Uri uri)
+        public IConnectableObservable<DownloadProgress> LoadRepo(Uri uri)
         {
-            var obs = Observable.Create<DownloadProgress>(async o =>
+            log.Information("Loading repo from {url}",uri);
+            return Observable.Create<DownloadProgress>(async o =>
             {
+                var dispose = new CompositeDisposable();
                 var tempFile = Path.GetTempFileName();
+                log.Debug("Downloading repo to temp file {path}",tempFile);
                 var stream = new FileStream(tempFile, FileMode.Create);
                 var progress = Downloader.Download(uri, stream);
-                progress.Subscribe(o.OnNext, o.OnError, () => { });
+                progress.Subscribe(o.OnNext, o.OnError).DisposeWith(dispose);
                 await progress;
                 stream = new FileStream(tempFile, FileMode.Open, FileAccess.Read);
+                log.Debug("Deserializing downloaded repo");
                 var repo = (Repo) SerializationFormatter.Deserialize(stream);
                 repo.BaseUri = new Uri(uri, ".");
                 repos.Add(repo);
                 o.OnCompleted();
             }).Publish();
-            obs.Connect();
-            return obs;
         }
     }
 }
