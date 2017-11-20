@@ -1,5 +1,4 @@
 ﻿using System;
-using System.ComponentModel.Design;
 using System.IO;
 using System.Threading.Tasks;
 using ModSink.Core.Client;
@@ -58,22 +57,14 @@ namespace ModSink.Common.Client
             return await Task.Run(() => file.Open(FileMode.Create, FileAccess.Write));
         }
 
-        public async Task<bool> WriteIfMissingOrInvalid(FileSignature fileSignature, out Stream stream)
+        public async Task<(bool available, Lazy<Task<Stream>> stream)> WriteIfMissingOrInvalid(
+            FileSignature fileSignature)
         {
             var fi = await GetFileInfo(fileSignature);
             var exists = await IsFileAvailable(fileSignature);
-            if (exists == false)
-            {
-                stream = await Write(fileSignature);
-                return false;
-            }
-            if (fileSignature.Length == Convert.ToUInt64(fi.Length))
-            {
-                stream = null;
-                return true;
-            }
-            stream = await Write(fileSignature);
-            return false;
+            if (exists == false || fileSignature.Length != Convert.ToUInt64(fi.Length))
+                return (false, new Lazy<Task<Stream>>(() => Write(fileSignature)));
+            return (true, null);
         }
     }
 }
