@@ -30,7 +30,7 @@
             </StackPanel>
             <TreeView Margin="5" ItemsSource="{Binding Mods}">
                 <TreeView.ItemTemplate>
-                    <HierarchicalDataTemplate DataType="{x:Type repoModels:Modpack}" ItemsSource="{Binding Mod.Files}">
+                    <HierarchicalDataTemplate ItemsSource="{Binding Mod.Files}">
                         <TextBlock Text="{Binding Mod.Name}" />
                         <HierarchicalDataTemplate.ItemTemplate>
                             <DataTemplate>
