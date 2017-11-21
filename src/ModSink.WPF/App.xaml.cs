@@ -59,6 +59,8 @@ namespace ModSink.WPF
             builder.RegisterAssemblyTypes(typeof(IModSink).Assembly, typeof(Common.ModSink).Assembly)
                 .Where(t => t.Name != "LocalStorageService").AsImplementedInterfaces().SingleInstance();
 
+            builder.RegisterAssemblyTypes(typeof(App).Assembly).Where(t => t.Name.EndsWith("Model"))
+                .AsImplementedInterfaces().AsSelf().SingleInstance();
             builder.RegisterAssemblyTypes(typeof(App).Assembly).Where(t => t.Name.EndsWith("ViewModel"))
                 .AsImplementedInterfaces().AsSelf().SingleInstance();
             builder.RegisterAssemblyTypes(typeof(App).Assembly).Where(t => t.IsAssignableTo<TabItem>()).AsSelf()

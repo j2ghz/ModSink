@@ -1,38 +1,36 @@
-﻿using ModSink.Core.Client;
-using ModSink.Core.Models.Repo;
-using ReactiveUI;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System;
+using System.Reactive.Linq;
 using DynamicData;
 using DynamicData.Binding;
 using DynamicData.ReactiveUI;
+using ModSink.Core.Client;
+using ModSink.Core.Models.Repo;
+using ReactiveUI;
 
 namespace ModSink.WPF.ViewModel
 {
     public class LibraryViewModel : ReactiveObject
     {
-        private readonly ReactiveList<Modpack> modpacks = new ReactiveList<Modpack>();
-        private Modpack selectedModpack;
+        public ObservableCollectionExtended<ModpackViewModel> Modpacks { get; } = new ObservableCollectionExtended<ModpackViewModel>();
+        private ModpackViewModel selectedModpack;
 
         public LibraryViewModel(IClientService clientService)
         {
-            this.ClientService = clientService;
-            this.ClientService.Modpacks
+            ClientService = clientService;
+            ClientService.Modpacks
                 .Connect()
-                .Bind(this.modpacks)
+                .Transform(m=> new ModpackViewModel(m))
+                .ObserveOnDispatcher()
+                .Bind(Modpacks)
                 .Subscribe();
         }
 
         public IClientService ClientService { get; }
-        public IReadOnlyReactiveList<Modpack> Modpacks => this.modpacks;
 
-        public Modpack SelectedModpack
+        public ModpackViewModel SelectedModpack
         {
-            get { return this.selectedModpack; }
-            set { this.RaiseAndSetIfChanged(ref this.selectedModpack, value); }
+            get => selectedModpack;
+            set => this.RaiseAndSetIfChanged(ref selectedModpack, value);
         }
     }
 }

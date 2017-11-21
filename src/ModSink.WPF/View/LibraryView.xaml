@@ -16,19 +16,19 @@
             <ListBox MinWidth="120" ItemsSource="{Binding Modpacks}" SelectedItem="{Binding SelectedModpack}">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
-                        <TextBlock Text="{Binding Name}" />
+                        <TextBlock Text="{Binding Modpack.Name}" />
                     </DataTemplate>
                 </ListBox.ItemTemplate>
             </ListBox>
         </DockPanel>
         <DockPanel LastChildFill="True" Margin="5" DataContext="{Binding SelectedModpack}">
-            <TextBlock Text="{Binding Name}" FontSize="32" DockPanel.Dock="Top" />
+            <TextBlock Text="{Binding Modpack.Name}" FontSize="32" DockPanel.Dock="Top" />
             <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
                 <Button Content="Install" />
                 <Button Content="Play" IsEnabled="False" />
-                <TextBlock Text="15GB" />
+                <TextBlock Text="{Binding Size}" />
             </StackPanel>
-            <TreeView Margin="5" ItemsSource="{Binding Mods}">
+            <TreeView Margin="5" ItemsSource="{Binding Modpack.Mods}">
                 <TreeView.ItemTemplate>
                     <HierarchicalDataTemplate ItemsSource="{Binding Mod.Files}">
                         <TextBlock Text="{Binding Mod.Name}" />

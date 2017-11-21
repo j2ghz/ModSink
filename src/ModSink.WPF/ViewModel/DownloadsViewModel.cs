@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Linq;
-using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using DynamicData;
@@ -17,15 +15,10 @@ namespace ModSink.WPF.ViewModel
         private readonly CompositeDisposable disposable = new CompositeDisposable();
         private readonly ReactiveList<DownloadViewModel> downloads = new ReactiveList<DownloadViewModel>();
         private readonly ObservableAsPropertyHelper<string> queueCount;
+        private string url;
 
         public DownloadsViewModel(IClientService clientService)
         {
-            DownloadMissing = ReactiveCommand.CreateFromTask(async () =>
-            {
-                await clientService.DownloadMissingFiles(clientService.Modpacks.Items.First());
-            });
-            DownloadMissing.ThrownExceptions.Subscribe(e => throw e);
-
             var ds = clientService.DownloadService.Downloads.Connect();
             ds
                 .AutoRefresh(d => d.State)
@@ -41,7 +34,7 @@ namespace ModSink.WPF.ViewModel
                 .ToProperty(this, t => t.QueueCount);
         }
 
-        public ReactiveCommand DownloadMissing { get; }
+
         public IReadOnlyReactiveList<DownloadViewModel> Downloads => downloads;
         public string QueueCount => queueCount.Value;
 
