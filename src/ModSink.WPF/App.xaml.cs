@@ -130,10 +130,17 @@ namespace ModSink.WPF
                 log.ForContext(sender.GetType()).Fatal(args.Exception, "{exception}",
                     nameof(DispatcherUnhandledException));
             };
-            AppDomain.CurrentDomain.FirstChanceException += (sender, args) =>
+            //AppDomain.CurrentDomain.FirstChanceException += (sender, args) =>
+            //{
+            //    log.ForContext(sender.GetType()).Verbose(args.Exception, "FirstChanceException");
+            //};
+            PresentationTraceSources.Refresh();
+            PresentationTraceSources.DataBindingSource.Listeners.Add(new RelayTraceListener(m =>
             {
-                log.ForContext(sender.GetType()).Verbose(args.Exception, "FirstChanceException");
-            };
+                log.ForContext(typeof(PresentationTraceSources)).Error(m);
+            }));
+            PresentationTraceSources.DataBindingSource.Switch.Level = SourceLevels.Warning | SourceLevels.Error;
+
         }
     }
 }
