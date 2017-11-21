@@ -18,11 +18,11 @@ namespace ModSink.Core.Models.Repo
             Length = Convert.ToUInt64(length);
         }
 
-        public HashValue Hash { get; }
+        public HashValue Hash { get; set; }
         /// <summary>
         /// The length of the file taken from <see cref="FileInfo"/>, in bytes.
         /// </summary>
-        public ulong Length { get; }
+        public ulong Length { get; set; }
 
 
         public bool Equals(FileSignature other)
