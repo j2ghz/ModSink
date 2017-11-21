@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Reactive.Disposables;
 using System.Reactive.Linq;
-using System.Reactive.Subjects;
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
 using DynamicData;
@@ -16,8 +14,6 @@ namespace ModSink.Common.Client
 {
     public class ClientService : ReactiveObject, IClientService
     {
-        private readonly SourceList<Repo> repos = new SourceList<Repo>();
-
         public ClientService(IDownloadService downloadService, ILocalStorageService localStorageService,
             IDownloader downloader, IFormatter serializationFormatter)
         {
@@ -25,19 +21,25 @@ namespace ModSink.Common.Client
             LocalStorageService = localStorageService;
             Downloader = downloader;
             SerializationFormatter = serializationFormatter;
+
+            Repos = RepoUrls.Connect().Transform(s => new Uri(s)).TransformAsync(LoadRepo).AsObservableList();
+            Modpacks = Repos.Connect().TransformMany(r => r.Modpacks).AsObservableList();
         }
 
         public IDownloader Downloader { get; }
         public IFormatter SerializationFormatter { get; }
         private ILogger log => Log.ForContext<ClientService>();
+        public ISourceList<string> RepoUrls { get; } = new SourceList<string>();
         public IDownloadService DownloadService { get; }
         public ILocalStorageService LocalStorageService { get; }
-        public IObservableList<Modpack> Modpacks => Repos.Connect().TransformMany(r => r.Modpacks).AsObservableList();
-        public IObservableList<Repo> Repos => repos.AsObservableList();
+        public IObservableList<Modpack> Modpacks { get; }
+
+        public IObservableList<Repo> Repos { get; }
+
 
         public async Task DownloadMissingFiles(Modpack modpack)
         {
-            log.Information("Gathering files to download for {modpack}",modpack.Name);
+            log.Information("Gathering files to download for {modpack}", modpack.Name);
             foreach (var mod in modpack.Mods)
             foreach (var fh in mod.Mod.Files)
             {
@@ -57,25 +59,18 @@ namespace ModSink.Common.Client
             throw new KeyNotFoundException($"Key {fileSignature} was not found in a Files dictionary of any Repo");
         }
 
-        public IConnectableObservable<DownloadProgress> LoadRepo(Uri uri)
+        public async Task<Repo> LoadRepo(Uri uri)
         {
-            log.Information("Loading repo from {url}",uri);
-            return Observable.Create<DownloadProgress>(async o =>
-            {
-                var dispose = new CompositeDisposable();
-                var tempFile = Path.GetTempFileName();
-                log.Debug("Downloading repo to temp file {path}",tempFile);
-                var stream = new FileStream(tempFile, FileMode.Create);
-                var progress = Downloader.Download(uri, stream);
-                progress.Subscribe(o.OnNext, o.OnError).DisposeWith(dispose);
-                await progress;
-                stream = new FileStream(tempFile, FileMode.Open, FileAccess.Read);
-                log.Debug("Deserializing downloaded repo");
-                var repo = (Repo) SerializationFormatter.Deserialize(stream);
-                repo.BaseUri = new Uri(uri, ".");
-                repos.Add(repo);
-                o.OnCompleted();
-            }).Publish();
+            log.Information("Loading repo from {url}", uri);
+            var tempFile = Path.GetTempFileName();
+            log.Debug("Downloading repo to temp file {path}", tempFile);
+            var stream = new FileStream(tempFile, FileMode.Create);
+            await Downloader.Download(uri, stream);
+            stream = new FileStream(tempFile, FileMode.Open, FileAccess.Read);
+            log.Debug("Deserializing downloaded repo");
+            var repo = (Repo) SerializationFormatter.Deserialize(stream);
+            repo.BaseUri = new Uri(uri, ".");
+            return repo;
         }
     }
 }

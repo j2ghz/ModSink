@@ -1,16 +1,8 @@
-﻿using DynamicData;
-using DynamicData.Binding;
-using ModSink.Core.Client;
+﻿using System;
+using System.Threading.Tasks;
+using DynamicData;
 using ModSink.Core.Models.Repo;
 using ReactiveUI;
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Reactive;
-using System.Reactive.Subjects;
-using System.Threading.Tasks;
 
 namespace ModSink.Core.Client
 {
@@ -18,14 +10,10 @@ namespace ModSink.Core.Client
     {
         IDownloadService DownloadService { get; }
         ILocalStorageService LocalStorageService { get; }
-
         IObservableList<Modpack> Modpacks { get; }
         IObservableList<Repo> Repos { get; }
-
+        ISourceList<string> RepoUrls { get; }
         Task DownloadMissingFiles(Modpack modpack);
-
         Uri GetDownloadUri(FileSignature fileSignature);
-
-        IConnectableObservable<DownloadProgress> LoadRepo(Uri uri);
     }
 }

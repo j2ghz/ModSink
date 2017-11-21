@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reactive.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Threading;
+using DynamicData;
 using Humanizer;
 using Microsoft.Extensions.CommandLineUtils;
 using ModSink.Common;
@@ -75,10 +76,9 @@ namespace ModSink.CLI
                         downloader, new BinaryFormatter());
 
                     Console.WriteLine("Downloading repo");
-                    var repoDown = client.LoadRepo(uri);
-                    repoDown.Connect();
-                    DumpDownloadProgress(repoDown, "Repo");
-                    await repoDown;
+                    client.RepoUrls.Add(uriStr);
+                    Console.ReadKey();
+                    
                     foreach (var modpack in client.Modpacks.Items)
                     {
                         Console.WriteLine($"Scheduling {modpack.Name} [{modpack.Mods.Count} mods]");
@@ -115,10 +115,7 @@ namespace ModSink.CLI
                             new BinaryFormatter());
 
                         Console.WriteLine("Downloading repo");
-                        var repoDown = client.LoadRepo(uri);
-                        repoDown.Connect();
-                        DumpDownloadProgress(repoDown, "Repo");
-                        repoDown.Wait();
+                        client.RepoUrls.Add(uriStr);
                         foreach (var repo in client.Repos.Items)
                             DumpRepo(repo);
                     }
