@@ -1,8 +1,8 @@
-﻿using DynamicData;
-using DynamicData.Alias;
-using DynamicData.ReactiveUI;
+﻿using System;
+using System.Reactive.Linq;
+using DynamicData;
+using DynamicData.Binding;
 using ModSink.Core.Client;
-using ModSink.Core.Models.Repo;
 using ReactiveUI;
 
 namespace ModSink.WPF.Model
@@ -14,10 +14,14 @@ namespace ModSink.WPF.Model
         public SettingsModel(IClientService client)
         {
             this.client = client;
+            client.RepoUrls.Connect().ObserveOnDispatcher()
+                .Bind(RepoUrls)
+                .Subscribe();
 
             // Temporary to ease testing
             client.RepoUrls.Add(@"https://a3.417rct.org/Swifty_repos/modsinktestrepo/repo.bin");
         }
-       
+
+        public ObservableCollectionExtended<string> RepoUrls { get; } = new ObservableCollectionExtended<string>();
     }
 }
