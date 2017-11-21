@@ -5,6 +5,7 @@ using DynamicData;
 using DynamicData.Binding;
 using ModSink.Core.Client;
 using ReactiveUI;
+using Serilog;
 
 namespace ModSink.WPF.ViewModel
 {
@@ -24,9 +25,15 @@ namespace ModSink.WPF.ViewModel
 
             var canInstall = this.WhenAnyValue(x => x.SelectedModpack).Select(m => m?.Modpack != null);
             Install = ReactiveCommand.CreateFromTask(
-                async m => await clientService.DownloadMissingFiles(SelectedModpack.Modpack),
+                async () =>
+                {
+                    log.Information("Installing modpack {modpack_name}", SelectedModpack.Modpack.Name);
+                    await clientService.DownloadMissingFiles(SelectedModpack.Modpack);
+                },
                 canInstall);
         }
+
+        private ILogger log => Log.ForContext<LibraryViewModel>();
 
         public ReactiveCommand<Unit, Unit> Install { get; set; }
 
