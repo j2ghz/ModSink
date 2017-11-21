@@ -37,7 +37,7 @@ namespace ModSink.Common.Client
 
         public async Task DownloadMissingFiles(Modpack modpack)
         {
-            log.Information("Gathering files to download for {modpack}",modpack.Name);
+            log.Information("Gathering files to download for {modpack}", modpack.Name);
             foreach (var mod in modpack.Mods)
             foreach (var fh in mod.Mod.Files)
             {
@@ -59,12 +59,12 @@ namespace ModSink.Common.Client
 
         public IConnectableObservable<DownloadProgress> LoadRepo(Uri uri)
         {
-            log.Information("Loading repo from {url}",uri);
+            log.Information("Loading repo from {url}", uri);
             return Observable.Create<DownloadProgress>(async o =>
             {
                 var dispose = new CompositeDisposable();
                 var tempFile = Path.GetTempFileName();
-                log.Debug("Downloading repo to temp file {path}",tempFile);
+                log.Debug("Downloading repo to temp file {path}", tempFile);
                 var stream = new FileStream(tempFile, FileMode.Create);
                 var progress = Downloader.Download(uri, stream);
                 progress.Subscribe(o.OnNext, o.OnError).DisposeWith(dispose);
