@@ -21,6 +21,11 @@ namespace ModSink.Core.Client
         Uri Source { get; }
         DownloadState State { get; }
 
+        /// <summary>
+        ///     In bytes, as <see cref="FileInfo" />. Cancelled if different, ignored if zero.
+        /// </summary>
+        ulong ExpectedLength { get; }
+
         Task Start(IDownloader downloader);
     }
 }

@@ -22,11 +22,12 @@ namespace ModSink.Common.Client
 
         private readonly StateMachine<DownloadState, Trigger> state;
 
-        public Download(Uri source, Lazy<Task<Stream>> destination, string name)
+        public Download(Uri source, Lazy<Task<Stream>> destination, string name, ulong expectedLength = 0)
         {
             Source = source;
             Destination = destination;
             Name = name;
+            ExpectedLength = expectedLength;
 
             state = new StateMachine<DownloadState, Trigger>(DownloadState.Queued);
             state.OnTransitioned(_ => this.RaisePropertyChanged(nameof(State)));
@@ -49,10 +50,12 @@ namespace ModSink.Common.Client
 
         public DownloadState State => state.State;
 
+        public ulong ExpectedLength { get; }
+
         public async Task Start(IDownloader downloader)
         {
             state.Fire(Trigger.Start);
-            var obs = downloader.Download(Source, await Destination.Value);
+            var obs = downloader.Download(Source, await Destination.Value, ExpectedLength);
             progressSubscription.Add(obs.Connect());
             progressSubscription.Add(obs.Subscribe(progress));
             Progress.Subscribe(_ => { }, _ => state.Fire(Trigger.Error), () => state.Fire(Trigger.Finish));

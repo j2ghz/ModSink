@@ -17,7 +17,7 @@ namespace ModSink.Common
     {
         private readonly HttpClient client = new HttpClient();
 
-        public IConnectableObservable<DownloadProgress> Download(Uri source, Stream destination)
+        public IConnectableObservable<DownloadProgress> Download(Uri source, Stream destination, ulong expectedLength = 0)
         {
             return Observable.Create<DownloadProgress>(async (observer, cancel) =>
             {
@@ -33,7 +33,18 @@ namespace ModSink.Common
                     //Read response
                     report(ByteSize.FromBytes(0), ByteSize.FromBytes(0), TransferState.ReadingResponse);
                     response.EnsureSuccessStatusCode();
+                    if (expectedLength != 0)
+                    {
+                        if (response.Content.Headers.ContentLength > 0)
+                        {
+                            if (Convert.ToUInt64(response.Content.Headers.ContentLength) != expectedLength)
+                            {
+                                throw new HttpRequestException($"Size of the download ({response.Content.Headers.ContentLength}) differed from expected ({expectedLength})");
+                            }
+                        }
+                    }
                     var length = ByteSize.FromBytes(response.Content.Headers.ContentLength ?? 0);
+                    
                     report(length, ByteSize.FromBytes(0), TransferState.ReadingResponse);
 
                     var totalRead = 0;

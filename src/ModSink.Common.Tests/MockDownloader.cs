@@ -23,7 +23,7 @@ namespace Modsink.Common.Tests
             this.slow = slow;
         }
 
-        public IConnectableObservable<DownloadProgress> Download(Uri source, Stream destination)
+        public IConnectableObservable<DownloadProgress> Download(Uri source, Stream destination, ulong expectedLength = 0)
         {
             return Observable.Create<DownloadProgress>(async (observer,cancel) =>
             {
