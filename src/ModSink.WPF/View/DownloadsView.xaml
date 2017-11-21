@@ -11,9 +11,6 @@
              d:DataContext="{d:DesignInstance vm:DownloadsViewModel}">
     <DockPanel LastChildFill="True">
         <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
-            <Button Content="Load" Command="{Binding LoadRepo}" />
-            <Button Content="Download" Command="{Binding DownloadMissing}" />
-            <TextBox Text="{Binding Url}" MinWidth="100" />
             <TextBlock Text="{Binding QueueCount}" />
         </StackPanel>
         <ListView ItemsSource="{Binding Downloads}">

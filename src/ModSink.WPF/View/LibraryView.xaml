@@ -22,11 +22,11 @@
             </ListBox>
         </DockPanel>
         <DockPanel LastChildFill="True" Margin="5" DataContext="{Binding SelectedModpack}">
-            <TextBlock Text="{Binding Modpack.Name}" FontSize="32" DockPanel.Dock="Top" />
-            <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
+            <TextBlock Text="{Binding Modpack.Name}" FontSize="32" DockPanel.Dock="Top" Padding="5" />
+            <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" Margin="2">
                 <Button Content="Install" />
                 <Button Content="Play" IsEnabled="False" />
-                <TextBlock Text="{Binding Size}" />
+                <TextBlock Text="{Binding Size, StringFormat=~{0}}" />
             </StackPanel>
             <TreeView Margin="5" ItemsSource="{Binding Modpack.Mods}">
                 <TreeView.ItemTemplate>
@@ -35,7 +35,7 @@
                         <HierarchicalDataTemplate.ItemTemplate>
                             <DataTemplate>
                                 <StackPanel Orientation="Horizontal">
-                                    <TextBlock Text="{Binding Value}" FontFamily="Consolas" />
+                                    <TextBlock Text="{Binding Value}" FontFamily="Consolas" MinWidth="200" />
                                     <TextBlock Text="{Binding Key}" />
                                 </StackPanel>
                             </DataTemplate>
