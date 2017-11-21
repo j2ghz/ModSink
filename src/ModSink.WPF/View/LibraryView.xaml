@@ -16,26 +16,25 @@
             <ListBox MinWidth="120" ItemsSource="{Binding Modpacks}" SelectedItem="{Binding SelectedModpack}">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
-                        <TextBlock Text="{Binding Name}" />
+                        <TextBlock Text="{Binding Modpack.Name}" />
                     </DataTemplate>
                 </ListBox.ItemTemplate>
             </ListBox>
         </DockPanel>
-        <DockPanel LastChildFill="True" Margin="5" DataContext="{Binding SelectedModpack}">
-            <TextBlock Text="{Binding Name}" FontSize="32" DockPanel.Dock="Top" />
-            <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
-                <Button Content="Install" />
-                <Button Content="Play" IsEnabled="False" />
-                <TextBlock Text="15GB" />
+        <DockPanel LastChildFill="True" Margin="5">
+            <TextBlock Text="{Binding SelectedModpack.Modpack.Name}" FontSize="32" DockPanel.Dock="Top" Padding="5" />
+            <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" Margin="2">
+                <TextBlock Text="{Binding SelectedModpack.Size, StringFormat=~{0}}" />
+                <Button Content="Install" Command="{Binding Install}" Margin="15,5" />
             </StackPanel>
-            <TreeView Margin="5" ItemsSource="{Binding Mods}">
+            <TreeView Margin="5" ItemsSource="{Binding SelectedModpack.Modpack.Mods}">
                 <TreeView.ItemTemplate>
-                    <HierarchicalDataTemplate DataType="{x:Type repoModels:Modpack}" ItemsSource="{Binding Mod.Files}">
+                    <HierarchicalDataTemplate ItemsSource="{Binding Mod.Files}">
                         <TextBlock Text="{Binding Mod.Name}" />
                         <HierarchicalDataTemplate.ItemTemplate>
                             <DataTemplate>
                                 <StackPanel Orientation="Horizontal">
-                                    <TextBlock Text="{Binding Value}" FontFamily="Consolas" />
+                                    <TextBlock Text="{Binding Value}" FontFamily="Consolas" MinWidth="200" />
                                     <TextBlock Text="{Binding Key}" />
                                 </StackPanel>
                             </DataTemplate>
