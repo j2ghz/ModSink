@@ -19,7 +19,9 @@
             <TabItem Header="Downloads">
                 <v:DownloadsView DataContext="{Binding DownloadsVM}" />
             </TabItem>
-            <TabItem Header="Settings" />
+            <TabItem Header="Settings" >
+                <v:SettingsView DataContext="{Binding SettingsVM}"/>
+            </TabItem>
         </TabControl>
     </DockPanel>
 </Controls:MetroWindow>

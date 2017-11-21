@@ -17,7 +17,6 @@ namespace ModSink.WPF.ViewModel
         private readonly CompositeDisposable disposable = new CompositeDisposable();
         private readonly ReactiveList<DownloadViewModel> downloads = new ReactiveList<DownloadViewModel>();
         private readonly ObservableAsPropertyHelper<string> queueCount;
-        private string url = @"https://a3.417rct.org/Swifty_repos/modsinktestrepo/repo.bin";
 
         public DownloadsViewModel(IClientService clientService)
         {
@@ -26,12 +25,6 @@ namespace ModSink.WPF.ViewModel
                 await clientService.DownloadMissingFiles(clientService.Modpacks.Items.First());
             });
             DownloadMissing.ThrownExceptions.Subscribe(e => throw e);
-            LoadRepo = ReactiveCommand.CreateFromObservable(() =>
-            {
-                var obs = clientService.LoadRepo(new Uri(Url));
-                obs.Connect().DisposeWith(disposable);
-                return obs;
-            });
 
             var ds = clientService.DownloadService.Downloads.Connect();
             ds
@@ -51,7 +44,6 @@ namespace ModSink.WPF.ViewModel
         public ReactiveCommand DownloadMissing { get; }
         public IReadOnlyReactiveList<DownloadViewModel> Downloads => downloads;
         public string QueueCount => queueCount.Value;
-        public ReactiveCommand<Unit, DownloadProgress> LoadRepo { get; }
 
         public string Url
         {
