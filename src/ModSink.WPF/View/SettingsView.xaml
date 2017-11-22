@@ -4,12 +4,33 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:ModSink.WPF.View"
-             xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
+             xmlns:c="http://metro.mahapps.com/winfx/xaml/controls"
              xmlns:vm="clr-namespace:ModSink.WPF.ViewModel"
              mc:Ignorable="d"
              d:DesignHeight="300" d:DesignWidth="300"
              d:DataContext="{d:DesignInstance vm:SettingsViewModel}">
-    <Grid>
-        <ListBox ItemsSource="{Binding Settings.RepoUrls}" />
-    </Grid>
+    <c:MetroTabControl TabStripPlacement="Left">
+        <TabItem Header="General">
+            <WrapPanel Orientation="Horizontal">
+                <GroupBox Header="Theme">
+                    <StackPanel Orientation="Vertical">
+                        <ComboBox ItemsSource="{Binding Themes}"
+                                  SelectedItem="{Binding ThemeSelected}"
+                                  DisplayMemberPath="Name"
+                                  c:TextBoxHelper.Watermark="Base Theme"
+                                  c:TextBoxHelper.UseFloatingWatermark="True"/>
+                        <ComboBox ItemsSource="{Binding Accents}"
+                                  SelectedItem="{Binding AccentSelected}"
+                                  DisplayMemberPath="Name"
+                                  c:TextBoxHelper.Watermark="Accent"
+                                  c:TextBoxHelper.UseFloatingWatermark="True"/>
+                    </StackPanel>
+                </GroupBox>
+            </WrapPanel>
+        </TabItem>
+        <TabItem Header="Repos">
+            <ListBox ItemsSource="{Binding Settings.RepoUrls}" />
+        </TabItem>
+
+    </c:MetroTabControl>
 </UserControl>

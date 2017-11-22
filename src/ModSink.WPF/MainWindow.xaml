@@ -12,7 +12,7 @@
         Title="MainWindow" Height="600" Width="1000"
         d:DataContext="{d:DesignInstance vm:MainWindowViewModel}">
     <DockPanel LastChildFill="True">
-        <TabControl Controls:TabControlHelper.Underlined="TabItems">
+        <Controls:MetroTabControl Controls:TabControlHelper.Underlined="TabItems">
             <TabItem Header="Library">
                 <v:LibraryView DataContext="{Binding LibraryVM}" />
             </TabItem>
@@ -22,6 +22,6 @@
             <TabItem Header="Settings" >
                 <v:SettingsView DataContext="{Binding SettingsVM}"/>
             </TabItem>
-        </TabControl>
+        </Controls:MetroTabControl>
     </DockPanel>
 </Controls:MetroWindow>
