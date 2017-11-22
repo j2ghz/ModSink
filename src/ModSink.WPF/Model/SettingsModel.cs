@@ -9,11 +9,9 @@ namespace ModSink.WPF.Model
 {
     public class SettingsModel : ReactiveObject
     {
-        private readonly IClientService client;
-
         public SettingsModel(IClientService client)
         {
-            this.client = client;
+            this.Client = client;
             client.RepoUrls.Connect().ObserveOnDispatcher()
                 .Bind(RepoUrls)
                 .Subscribe();
@@ -21,6 +19,8 @@ namespace ModSink.WPF.Model
             // Temporary to ease testing
             client.RepoUrls.Add(@"https://a3.417rct.org/Swifty_repos/modsinktestrepo/repo.bin");
         }
+
+        public IClientService Client { get; }
 
         public ObservableCollectionExtended<string> RepoUrls { get; } = new ObservableCollectionExtended<string>();
     }

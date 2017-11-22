@@ -12,6 +12,8 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using MahApps.Metro.Controls.Dialogs;
+using ModSink.WPF.ViewModel;
 
 namespace ModSink.WPF.View
 {
@@ -23,6 +25,7 @@ namespace ModSink.WPF.View
         public SettingsView()
         {
             InitializeComponent();
+            (DataContext as SettingsViewModel).DialogCoordinator = DialogCoordinator.Instance;
         }
     }
 }

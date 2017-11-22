@@ -7,6 +7,8 @@
              xmlns:c="http://metro.mahapps.com/winfx/xaml/controls"
              xmlns:vm="clr-namespace:ModSink.WPF.ViewModel"
              mc:Ignorable="d"
+             xmlns:dialog="clr-namespace:MahApps.Metro.Controls.Dialogs;assembly=MahApps.Metro"
+             dialog:DialogParticipation.Register="{Binding}"
              d:DesignHeight="300" d:DesignWidth="300"
              d:DataContext="{d:DesignInstance vm:SettingsViewModel}">
     <c:MetroTabControl TabStripPlacement="Left" c:TabControlHelper.Underlined="TabPanel">
@@ -29,7 +31,13 @@
             </WrapPanel>
         </TabItem>
         <TabItem Header="Repos">
-            <ListBox ItemsSource="{Binding Settings.RepoUrls}" />
+            <DockPanel LastChildFill="True">
+                <WrapPanel Orientation="Horizontal" DockPanel.Dock="Top">
+                    <Button Command="{Binding AddRepoUrl}" Content="Add"/>
+                    <Button Command="{Binding RemoveRepoUrl}" Content="Remove"/>
+                </WrapPanel>
+                <ListBox ItemsSource="{Binding Settings.RepoUrls}" />
+            </DockPanel>
         </TabItem>
 
     </c:MetroTabControl>

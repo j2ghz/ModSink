@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Windows;
 using MahApps.Metro;
+using MahApps.Metro.Controls.Dialogs;
 using ModSink.WPF.Model;
 using ReactiveUI;
 
@@ -12,7 +13,15 @@ namespace ModSink.WPF.ViewModel
         public SettingsViewModel(SettingsModel settings)
         {
             Settings = settings;
+            AddRepoUrl = ReactiveCommand.CreateFromTask(async () =>
+            {
+                var repoUrl = await DialogCoordinator.ShowInputAsync(this, "Add new Repo",
+                    "Enter the url for the new Repo you want to add. It usually looks like https://example.com/someFolder/repo.bin");
+                settings.Client.RepoUrls.Edit(l => l.Add(repoUrl));
+            });
         }
+
+        public IDialogCoordinator DialogCoordinator { get; set; }
 
         public ICollection<Accent> Accents { get; } = ThemeManager.Accents.ToList();
 
@@ -42,6 +51,9 @@ namespace ModSink.WPF.ViewModel
                 this.RaisePropertyChanged();
             }
         }
+
+        public ReactiveCommand AddRepoUrl { get; }
+        public ReactiveCommand RemoveRepoUrl { get; }
 
 
         public SettingsModel Settings { get; }
