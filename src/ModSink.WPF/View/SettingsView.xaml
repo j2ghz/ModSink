@@ -20,12 +20,12 @@
                                   SelectedItem="{Binding ThemeSelected}"
                                   DisplayMemberPath="Name"
                                   c:TextBoxHelper.Watermark="Base Theme"
-                                  c:TextBoxHelper.UseFloatingWatermark="True"/>
+                                  c:TextBoxHelper.UseFloatingWatermark="True" />
                         <ComboBox ItemsSource="{Binding Accents}"
                                   SelectedItem="{Binding AccentSelected}"
                                   DisplayMemberPath="Name"
                                   c:TextBoxHelper.Watermark="Accent"
-                                  c:TextBoxHelper.UseFloatingWatermark="True"/>
+                                  c:TextBoxHelper.UseFloatingWatermark="True" />
                     </StackPanel>
                 </GroupBox>
             </WrapPanel>
@@ -33,10 +33,10 @@
         <TabItem Header="Repos">
             <DockPanel LastChildFill="True">
                 <WrapPanel Orientation="Horizontal" DockPanel.Dock="Top">
-                    <Button Command="{Binding AddRepoUrl}" Content="Add"/>
-                    <Button Command="{Binding RemoveRepoUrl}" Content="Remove"/>
+                    <Button Command="{Binding AddRepoUrl}" Content="Add" />
+                    <Button Command="{Binding RemoveRepoUrl}" Content="Remove" />
                 </WrapPanel>
-                <ListBox ItemsSource="{Binding Settings.RepoUrls}" />
+                <ListBox ItemsSource="{Binding Settings.RepoUrls}" SelectedItem="{Binding RepoSelected}" />
             </DockPanel>
         </TabItem>
 

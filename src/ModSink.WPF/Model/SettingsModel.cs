@@ -11,7 +11,7 @@ namespace ModSink.WPF.Model
     {
         public SettingsModel(IClientService client)
         {
-            this.Client = client;
+            Client = client;
             client.RepoUrls.Connect().ObserveOnDispatcher()
                 .Bind(RepoUrls)
                 .Subscribe();
