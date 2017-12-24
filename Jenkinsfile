@@ -18,10 +18,13 @@ pipeline {
           steps {
             dir(path: 'src/ModSink.Common.Tests') {
               sh 'dotnet restore'
-              sh 'dotnet xunit -xml result.xml'
+              sh 'dotnet xunit -xml result.xml'              
+            }            
+          }
+          post {
+            success {
               junit 'src/ModSink.Common.Tests/result.xml'
             }
-            
           }
         }
         stage('Publish') {
