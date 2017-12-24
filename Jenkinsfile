@@ -17,6 +17,7 @@ pipeline {
         stage('Test') {
           steps {
             sh '''cd ./src/ModSink.Common.Tests/
+dotnet restore
 dotnet xunit -xml result.xml'''
             junit 'src/ModSink.Common.Tests/result.xml'
           }
