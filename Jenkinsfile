@@ -6,12 +6,12 @@ pipeline {
     
   }
   stages {
-    stage('Build') {
+    stage('Restore') {
       steps {
         sh 'dotnet restore'
       }
     }
-    stage('Test') {
+    stage('Process') {
       parallel {
         stage('Test') {
           steps {
