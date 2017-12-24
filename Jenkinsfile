@@ -16,7 +16,9 @@ pipeline {
       parallel {
         stage('Test') {
           steps {
-            sh 'dotnet test src/ModSink.Common.Tests/ModSink.Common.Tests.csproj'
+            sh '''cd ./src/ModSink.Common.Tests/
+dotnet xunit -xml result.xml'''
+            junit 'src/ModSink.Common.Tests/result.xml'
           }
         }
         stage('Publish') {
