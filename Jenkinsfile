@@ -24,7 +24,7 @@ dotnet xunit -xml result.xml'''
         }
         stage('Publish') {
           steps {
-            sh 'dotnet pack src/ModSink.Common/ModSink.Common.csproj'
+            sh 'dotnet pack -c Release --include-symbols /p:TargetFrameworks=netstandard2.0 src/ModSink.Common/ModSink.Common.csproj'
             archiveArtifacts 'src/ModSink.Common/bin/'
           }
         }
