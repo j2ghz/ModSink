@@ -2,6 +2,7 @@ pipeline {
   agent {
     docker {
       image 'microsoft/dotnet:sdk'
+      args '--user root'
     }
     
   }
