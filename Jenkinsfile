@@ -1,7 +1,7 @@
 pipeline {
   agent {
     docker {
-      image 'microsoft/dotnet:sdk'
+      image 'microsoft/dotnet:2.0.4-sdk-2.1.3'
       args '--user root'
     }
     
