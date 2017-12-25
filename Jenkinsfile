@@ -16,10 +16,7 @@ pipeline {
       parallel {
         stage('Test') {
           steps {
-            dir(path: 'src/ModSink.Common.Tests') {
-              sh 'dotnet restore'
-              sh 'dotnet xunit -xml result.xml'              
-            }            
+            sh 'cd src/ModSink.Common.Tests && dotnet restore && dotnet xunit -xml result.xml'
           }
           post {
             success {
