@@ -16,7 +16,8 @@ pipeline {
       parallel {
         stage('Test') {
           steps {
-            sh 'cd src/ModSink.Common.Tests; dotnet restore; dotnet xunit -xml result.xml; if [ $? -eq 1 ]; then exit 0; fi'
+            sh 'cd src/ModSink.Common.Tests; dotnet restore'
+            sh 'cd src/ModSink.Common.Tests; set +e; dotnet xunit -xml result.xml; if [ $? -eq 1 ]; then exit 0; fi; set -e;'
           }
           post {
             success {
