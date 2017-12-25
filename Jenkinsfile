@@ -18,8 +18,7 @@ pipeline {
           steps {
             sh 'cd src/ModSink.Common.Tests; dotnet restore'
             sh 'cd src/ModSink.Common.Tests; set +e; dotnet xunit -xml result.xml; if [ $? -eq 1 ]; then exit 0; fi; set -e;'
-            junit 'src/ModSink.Common.Tests/result.xml'
-            archiveArtifacts 'src/ModSink.Common.Tests/result.xml'
+            step([$class: 'XUnitPublisher', testTimeMargin: '3000', thresholdMode: 1, thresholds: [[$class: 'FailedThreshold', failureNewThreshold: '', failureThreshold: '', unstableNewThreshold: '', unstableThreshold: ''], [$class: 'SkippedThreshold', failureNewThreshold: '', failureThreshold: '', unstableNewThreshold: '', unstableThreshold: '']], tools: [[$class: 'XUnitDotNetTestType', deleteOutputFiles: true, failIfNotNew: true, pattern: 'src/ModSink.Common.Tests/result.xml', skipNoTestFiles: false, stopProcessingIfError: true]]])
           }
         }
         stage('Publish') {
