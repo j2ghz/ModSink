@@ -18,17 +18,14 @@ pipeline {
           steps {
             sh 'cd src/ModSink.Common.Tests; dotnet restore'
             sh 'cd src/ModSink.Common.Tests; set +e; dotnet xunit -xml result.xml; if [ $? -eq 1 ]; then exit 0; fi; set -e;'
-          }
-          post {
-            success {
-              junit 'src/ModSink.Common.Tests/result.xml'
-            }
+            junit 'src/ModSink.Common.Tests/result.xml'
+            archiveArtifacts 'src/ModSink.Common.Tests/result.xml'
           }
         }
         stage('Publish') {
           steps {
             sh 'dotnet pack -c Release --include-symbols /p:TargetFrameworks=netstandard2.0 src/ModSink.Common/ModSink.Common.csproj'
-            archiveArtifacts 'src/ModSink.Common/bin/*.nupkg'
+            archiveArtifacts 'src/**/*.nupkg'
           }
         }
       }
