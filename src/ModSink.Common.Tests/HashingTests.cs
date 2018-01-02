@@ -24,7 +24,7 @@ namespace Modsink.Common.Tests
             var hashing = new HashingService(hashF);
             var stream = new MemoryStream(new byte[] { });
             var hash = await hashing.GetFileHash(stream, CancellationToken.None);
-            hash.ShouldBeEquivalentTo(hashF.HashOfEmpty);
+            hash.Should().Be(hashF.HashOfEmpty);
         }
     }
 }
