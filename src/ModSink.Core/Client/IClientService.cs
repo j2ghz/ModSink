@@ -12,7 +12,7 @@ namespace ModSink.Core.Client
         ILocalStorageService LocalStorageService { get; }
         IObservableList<Modpack> Modpacks { get; }
         IObservableList<Repo> Repos { get; }
-        ISourceList<string> RepoUrls { get; }
+        ISourceList<string> GroupUrls { get; }
         Task DownloadMissingFiles(Modpack modpack);
         Uri GetDownloadUri(FileSignature fileSignature);
     }
