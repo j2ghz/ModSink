@@ -56,6 +56,9 @@
     <PackageReference Include="Autofac">
       <Version>4.6.2</Version>
     </PackageReference>
+    <PackageReference Include="Ben.Demystifier">
+      <Version>0.0.8</Version>
+    </PackageReference>
     <PackageReference Include="DynamicData.ReactiveUI">
       <Version>6.0.4.2351</Version>
     </PackageReference>
