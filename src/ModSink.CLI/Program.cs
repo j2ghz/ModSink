@@ -77,13 +77,16 @@ namespace ModSink.CLI
 
                     Console.WriteLine("Downloading repo");
                     client.RepoUrls.Add(uriStr);
-                    Console.ReadKey();
-                    
-                    foreach (var modpack in client.Modpacks.Items)
+                    client.Modpacks.Connect().Subscribe(cs =>
                     {
-                        Console.WriteLine($"Scheduling {modpack.Name} [{modpack.Mods.Count} mods]");
-                        await client.DownloadMissingFiles(modpack);
-                    }
+                        foreach (var modpack in client.Modpacks.Items)
+                        {
+                            Console.WriteLine($"Scheduling {modpack.Name} [{modpack.Mods.Count} mods]");
+                            client.DownloadMissingFiles(modpack).GetAwaiter().GetResult();
+                        }
+                    });
+
+
                     Console.ReadKey();
                     return 0;
                 });
@@ -262,7 +265,7 @@ namespace ModSink.CLI
                         {
                             var fileHash = await lazy.Value;
                             Console.WriteLine($"Processing {fileHash.File.FullName}");
-                            var fileSig = new FileSignature(fileHash.Hash,fileHash.File.Length);
+                            var fileSig = new FileSignature(fileHash.Hash, fileHash.File.Length);
                             mod.Files.Add(new Uri(modFolder.FullName).MakeRelativeUri(new Uri(fileHash.File.FullName)),
                                 fileSig);
                             files.Add(fileSig, pathUri.MakeRelativeUri(new Uri(fileHash.File.FullName)));
@@ -303,7 +306,10 @@ namespace ModSink.CLI
         public static void Main(string[] args)
         {
             Log.Logger = new LoggerConfiguration()
-                .WriteTo.Console()
+                .WriteTo.Console(outputTemplate:
+                    "{Timestamp:HH:mm:ss} {Level:u3} [{SourceContext}] {Properties} {Message:lj}{NewLine}{Exception}")
+                .MinimumLevel.Verbose()
+                .Enrich.FromLogContext()
                 .CreateLogger();
 
             var app = new CommandLineApplication

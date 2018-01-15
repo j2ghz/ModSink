@@ -28,7 +28,7 @@ namespace ModSink.Common.Client
 
         public IDownloader Downloader { get; }
         public IFormatter SerializationFormatter { get; }
-        private ILogger log => Log.ForContext<ClientService>();
+        private ILogger Log => Serilog.Log.ForContext<ClientService>();
         public ISourceList<string> RepoUrls { get; } = new SourceList<string>();
         public IDownloadService DownloadService { get; }
         public ILocalStorageService LocalStorageService { get; }
@@ -39,14 +39,15 @@ namespace ModSink.Common.Client
 
         public async Task DownloadMissingFiles(Modpack modpack)
         {
-            log.Information("Gathering files to download for {modpack}", modpack.Name);
+            Log.Information("Gathering files to download for {modpack}", modpack.Name);
             foreach (var mod in modpack.Mods)
             foreach (var fh in mod.Mod.Files)
             {
                 var fileSignature = fh.Value;
-                var res = await LocalStorageService.WriteIfMissingOrInvalid(fileSignature);
-                if (!res.available)
-                    DownloadService.Add(new Download(GetDownloadUri(fileSignature), res.stream,
+                var (available, stream) = await LocalStorageService.WriteIfMissingOrInvalid(fileSignature);
+                Log.Debug("Check {fh}, Exists: {exists}", fileSignature.Hash, available);
+                if (!available)
+                    DownloadService.Add(new Download(GetDownloadUri(fileSignature), stream,
                         fileSignature.ToString()));
             }
         }
@@ -61,13 +62,13 @@ namespace ModSink.Common.Client
 
         public async Task<Repo> LoadRepo(Uri uri)
         {
-            log.Information("Loading repo from {url}", uri);
+            Log.Information("Loading repo from {url}", uri);
             var tempFile = Path.GetTempFileName();
-            log.Debug("Downloading repo to temp file {path}", tempFile);
+            Log.Debug("Downloading repo to temp file {path}", tempFile);
             var stream = new FileStream(tempFile, FileMode.Create);
             await Downloader.Download(uri, stream);
             stream = new FileStream(tempFile, FileMode.Open, FileAccess.Read);
-            log.Debug("Deserializing downloaded repo");
+            Log.Debug("Deserializing downloaded repo");
             var repo = (Repo) SerializationFormatter.Deserialize(stream);
             repo.BaseUri = new Uri(uri, ".");
             return repo;
