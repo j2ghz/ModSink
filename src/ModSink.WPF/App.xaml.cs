@@ -25,27 +25,6 @@ namespace ModSink.WPF
         private static string FullVersion => typeof(App).GetTypeInfo().Assembly
             .GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion;
 
-        protected override void OnStartup(StartupEventArgs e)
-        {
-            if (!Debugger.IsAttached)
-                ConsoleManager.Show();
-            SelfLog.Enable(Console.Error);
-            SetupLogging();
-            log.Information("Starting ModSink ({version})", FullVersion);
-#if !DEBUG
-            if (!Debugger.IsAttached)
-                CheckUpdates();
-#endif
-
-            base.OnStartup(e);
-
-            var container = BuildContainer();
-
-            log.Information("Starting UI");
-            var mw = container.Resolve<MainWindow>();
-            mw.Show();
-        }
-
         private IContainer BuildContainer()
         {
             //TODO: FIX:
@@ -99,6 +78,27 @@ namespace ModSink.WPF
             });
         }
 
+        protected override void OnStartup(StartupEventArgs e)
+        {
+            if (!Debugger.IsAttached)
+                ConsoleManager.Show();
+            SelfLog.Enable(Console.Error);
+            SetupLogging();
+            log.Information("Starting ModSink ({version})", FullVersion);
+#if !DEBUG
+            if (!Debugger.IsAttached)
+                CheckUpdates();
+#endif
+
+            base.OnStartup(e);
+
+            var container = BuildContainer();
+
+            log.Information("Starting UI");
+            var mw = container.Resolve<MainWindow>();
+            mw.Show();
+        }
+
         private void SetupLogging()
         {
             Log.Logger = new LoggerConfiguration()
@@ -110,7 +110,7 @@ namespace ModSink.WPF
                     outputTemplate:
                     "{Timestamp:o} [{Level:u3}] ({SourceContext}) {Properties} {Message}{NewLine}{Exception}")
                 .WriteTo.Sentry(
-                    "https://6e3a1e08759944bb932434095137f63b:ab9ff9be2ec74518bcb0c1d860d98cbe@sentry.j2ghz.com/2",
+                    "https://ed0faccfadff441ebe18267965502bf8:85d11ebd26374716b0f40cb3e046269b@sentry.j2ghz.com/2",
                     FullVersion?.Substring(0, 64))
                 .Enrich.FromLogContext()
                 .Enrich.WithThreadId()
@@ -140,7 +140,6 @@ namespace ModSink.WPF
                 log.ForContext(typeof(PresentationTraceSources)).Error(m);
             }));
             PresentationTraceSources.DataBindingSource.Switch.Level = SourceLevels.Warning | SourceLevels.Error;
-
         }
     }
 }
