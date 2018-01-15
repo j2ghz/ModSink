@@ -121,13 +121,13 @@ namespace ModSink.WPF
             AppDomain.CurrentDomain.UnhandledException += (sender, args) =>
             {
                 ConsoleManager.Show();
-                log.ForContext(sender.GetType()).Fatal(args.ExceptionObject as Exception, "{exception}",
+                log.ForContext(sender.GetType()).Fatal((args.ExceptionObject as Exception).Demystify(), "{exception}",
                     nameof(AppDomain.CurrentDomain.UnhandledException));
             };
             Current.DispatcherUnhandledException += (sender, args) =>
             {
                 ConsoleManager.Show();
-                log.ForContext(sender.GetType()).Fatal(args.Exception, "{exception}",
+                log.ForContext(sender.GetType()).Fatal(args.Exception.Demystify(), "{exception}",
                     nameof(DispatcherUnhandledException));
             };
             //AppDomain.CurrentDomain.FirstChanceException += (sender, args) =>
