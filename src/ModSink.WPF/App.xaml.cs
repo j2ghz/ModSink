@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics;
 using System.Net;
+using System.Reactive;
 using System.Reflection;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
@@ -11,6 +12,7 @@ using Autofac;
 using ModSink.Common.Client;
 using ModSink.Core;
 using ModSink.WPF.Helpers;
+using ReactiveUI;
 using Serilog;
 using Serilog.Debugging;
 using Serilog.Sinks.Sentry;
@@ -140,6 +142,25 @@ namespace ModSink.WPF
                 log.ForContext(typeof(PresentationTraceSources)).Error(m);
             }));
             PresentationTraceSources.DataBindingSource.Switch.Level = SourceLevels.Warning | SourceLevels.Error;
+            RxApp.DefaultExceptionHandler = Observer.Create<Exception>(
+                ex =>
+                {
+                    if (Debugger.IsAttached) Debugger.Break();
+                    log.ForContext(typeof(RxApp)).Fatal(ex, "An uncaught exception in ReactiveUI (probably binding)");
+                    Dispatcher.Invoke(() => throw ex);
+                },
+                ex =>
+                {
+                    if (Debugger.IsAttached) Debugger.Break();
+                    log.ForContext(typeof(RxApp)).Fatal(ex, "An uncaught exception in ReactiveUI (probably binding)");
+                    Dispatcher.Invoke(() => throw ex);
+                },
+                () =>
+                {
+                    if (Debugger.IsAttached) Debugger.Break();
+                    Dispatcher.Invoke(() => throw new NotImplementedException());
+                }
+            );
         }
     }
 }
