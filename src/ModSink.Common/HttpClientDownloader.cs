@@ -5,6 +5,7 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Threading.Tasks;
+using Fusillade;
 using Humanizer;
 using Humanizer.Bytes;
 using ModSink.Common.Client;
@@ -15,7 +16,7 @@ namespace ModSink.Common
 {
     public class HttpClientDownloader : IDownloader
     {
-        private readonly HttpClient client = new HttpClient();
+        private readonly HttpClient client = new HttpClient(NetCache.UserInitiated);
 
         public IConnectableObservable<DownloadProgress> Download(Uri source, Stream destination, ulong expectedLength = 0)
         {
