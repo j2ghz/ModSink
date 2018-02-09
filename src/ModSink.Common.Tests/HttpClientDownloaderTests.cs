@@ -4,7 +4,6 @@ using System.Reactive.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Humanizer.Bytes;
-using Microsoft.Reactive.Testing;
 using ModSink.Common;
 using ModSink.Core.Client;
 using Xunit;
@@ -19,18 +18,18 @@ namespace Modsink.Common.Tests
             var client = new HttpClientDownloader();
             using (var stream = new MemoryStream())
             {
-                var obs = client.Download(new Uri(@"http://ipv4.download.thinkbroadband.com/5MB.zip"), stream);
+                var obs = client.Download(new Uri(@"https://google.com/favicon.ico"), stream);
                 using (var d = obs.Connect())
                 {
                     var progress = await obs;
-                    progress.Downloaded.ShouldBeEquivalentTo(progress.Size);
-                    progress.Remaining.ShouldBeEquivalentTo(ByteSize.FromBits(0));
-                    progress.State.ShouldBeEquivalentTo(DownloadProgress.TransferState.Finished);
+                    if (progress.Size.Bits != 0)
+                    {
+                        progress.Downloaded.Bits.Should().Be(progress.Size.Bits);
+                        progress.Remaining.Bits.Should().Be(0);
+                    }
+                    progress.State.Should().Be(DownloadProgress.TransferState.Finished);
                 }
-
             }
         }
-
-        
     }
 }

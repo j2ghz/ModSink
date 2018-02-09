@@ -24,6 +24,12 @@ namespace ModSink.Core.Models.Repo
             return Value.SequenceEqual(other.Value);
         }
 
+        public override bool Equals(object obj)
+        {
+            if (obj is HashValue value) return Equals(value);
+            return base.Equals(obj);
+        }
+
         public override int GetHashCode()
         {
             return Value.GetHashCode();
