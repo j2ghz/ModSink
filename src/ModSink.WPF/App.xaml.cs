@@ -14,6 +14,7 @@ using ModSink.Core;
 using ModSink.WPF.Helpers;
 using ReactiveUI;
 using Serilog;
+using Serilog.Core;
 using Serilog.Debugging;
 using Serilog.Sinks.Sentry;
 using Squirrel;
@@ -116,6 +117,7 @@ namespace ModSink.WPF
                     FullVersion?.Substring(0, 64))
                 .Enrich.FromLogContext()
                 .Enrich.WithThreadId()
+                .Enrich.With<ExceptionEnricher>()
                 .MinimumLevel.Verbose()
                 .CreateLogger();
             log = Log.ForContext<App>();
@@ -123,13 +125,13 @@ namespace ModSink.WPF
             AppDomain.CurrentDomain.UnhandledException += (sender, args) =>
             {
                 ConsoleManager.Show();
-                log.ForContext(sender.GetType()).Fatal((args.ExceptionObject as Exception).Demystify(), "{exception}",
+                log.ForContext(sender.GetType()).Fatal((args.ExceptionObject as Exception), "{exception}",
                     nameof(AppDomain.CurrentDomain.UnhandledException));
             };
             Current.DispatcherUnhandledException += (sender, args) =>
             {
                 ConsoleManager.Show();
-                log.ForContext(sender.GetType()).Fatal(args.Exception.Demystify(), "{exception}",
+                log.ForContext(sender.GetType()).Fatal(args.Exception, "{exception}",
                     nameof(DispatcherUnhandledException));
             };
             //AppDomain.CurrentDomain.FirstChanceException += (sender, args) =>
