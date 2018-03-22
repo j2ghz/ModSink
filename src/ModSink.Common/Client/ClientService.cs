@@ -54,14 +54,15 @@ namespace ModSink.Common.Client
 
         public async Task DownloadMissingFiles(Modpack modpack)
         {
-            log.Information("Gathering files to download for {modpack}", modpack.Name);
+            Log.Information("Gathering files to download for {modpack}", modpack.Name);
             foreach (var mod in modpack.Mods)
             foreach (var fh in mod.Mod.Files)
             {
                 var fileSignature = fh.Value;
-                var res = await LocalStorageService.WriteIfMissingOrInvalid(fileSignature);
-                if (!res.available)
-                    DownloadService.Add(new Download(GetDownloadUri(fileSignature), res.stream,
+                var (available, stream) = await LocalStorageService.WriteIfMissingOrInvalid(fileSignature);
+                Log.Debug("Check {fh}, Exists: {exists}", fileSignature.Hash, available);
+                if (!available)
+                    DownloadService.Add(new Download(GetDownloadUri(fileSignature), stream,
                         fileSignature.ToString()));
             }
         }
