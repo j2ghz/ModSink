@@ -76,7 +76,7 @@ namespace ModSink.CLI
                         downloader, new BinaryFormatter());
 
                     Console.WriteLine("Downloading repo");
-                    client.RepoUrls.Add(uriStr);
+                    client.GroupUrls.Add(uriStr);
                     client.Modpacks.Connect().Subscribe(cs =>
                     {
                         foreach (var modpack in client.Modpacks.Items)
@@ -118,7 +118,7 @@ namespace ModSink.CLI
                             new BinaryFormatter());
 
                         Console.WriteLine("Downloading repo");
-                        client.RepoUrls.Add(uriStr);
+                        client.GroupUrls.Add(uriStr);
                         foreach (var repo in client.Repos.Items)
                             DumpRepo(repo);
                     }

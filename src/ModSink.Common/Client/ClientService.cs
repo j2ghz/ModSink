@@ -77,15 +77,16 @@ namespace ModSink.Common.Client
 
         private async Task<T> Load<T>(Uri uri) where T : IBaseUri
         {
-            var tempFile = Path.GetTempFileName();
-            log.Information("Loading {T} from {url} to {path}", typeof(T), uri, tempFile);
-            var stream = new FileStream(tempFile, FileMode.Create);
-            await Downloader.Download(uri, stream);
-            stream = new FileStream(tempFile, FileMode.Open, FileAccess.Read);
-            log.Debug("Deserializing");
-            var t = (T) SerializationFormatter.Deserialize(stream);
-            t.BaseUri = new Uri(uri, ".");
-            return t;
+            log.Information("Loading {T} from {url}", typeof(T), uri);
+            using (var mem = new MemoryStream()) 
+            {
+                await Downloader.Download(uri, mem);
+                log.Debug("Deserializing");
+                mem.Position = 0;
+                var t = (T) SerializationFormatter.Deserialize(mem);
+                t.BaseUri = new Uri(uri, ".");
+                return t;
+            }
         }
     }
 }
