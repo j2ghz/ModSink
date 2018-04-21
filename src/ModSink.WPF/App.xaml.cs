@@ -36,7 +36,7 @@ namespace ModSink.WPF
             var builder = new ContainerBuilder();
 
             builder.RegisterType<BinaryFormatter>().As<IFormatter>().SingleInstance();
-            builder.Register(_ => new LocalStorageService(new Uri(@"D:\modsink\"))).AsImplementedInterfaces()
+            builder.Register(_ => new LocalStorageService(new Uri(System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop),"ModSink_Data")))).AsImplementedInterfaces()
                 .SingleInstance();
             builder.RegisterAssemblyTypes(typeof(IModSink).Assembly, typeof(Common.ModSink).Assembly)
                 .Where(t => t.Name != "LocalStorageService").AsImplementedInterfaces().SingleInstance();
