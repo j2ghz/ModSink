@@ -398,7 +398,6 @@ namespace ModSink.CLI
             app.AddCheck();
 
             app.Execute(args.Length > 0 ? args : new[] {"--help"});
-            Console.ReadKey();
         }
     }
 }
