@@ -14,6 +14,7 @@ using ModSink.Core;
 using ModSink.WPF.Helpers;
 using ReactiveUI;
 using Serilog;
+using Serilog.Core;
 using Serilog.Debugging;
 using Serilog.Sinks.Sentry;
 using Squirrel;
@@ -35,7 +36,7 @@ namespace ModSink.WPF
             var builder = new ContainerBuilder();
 
             builder.RegisterType<BinaryFormatter>().As<IFormatter>().SingleInstance();
-            builder.Register(_ => new LocalStorageService(new Uri(@"D:\modsink\"))).AsImplementedInterfaces()
+            builder.Register(_ => new LocalStorageService(new Uri(System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop),"ModSink_Data")))).AsImplementedInterfaces()
                 .SingleInstance();
             builder.RegisterAssemblyTypes(typeof(IModSink).Assembly, typeof(Common.ModSink).Assembly)
                 .Where(t => t.Name != "LocalStorageService").AsImplementedInterfaces().SingleInstance();
@@ -116,6 +117,7 @@ namespace ModSink.WPF
                     FullVersion?.Substring(0, 64))
                 .Enrich.FromLogContext()
                 .Enrich.WithThreadId()
+                .Enrich.With<ExceptionEnricher>()
                 .MinimumLevel.Verbose()
                 .CreateLogger();
             log = Log.ForContext<App>();
@@ -123,13 +125,13 @@ namespace ModSink.WPF
             AppDomain.CurrentDomain.UnhandledException += (sender, args) =>
             {
                 ConsoleManager.Show();
-                log.ForContext(sender.GetType()).Fatal((args.ExceptionObject as Exception).Demystify(), "{exception}",
+                log.ForContext(sender.GetType()).Fatal((args.ExceptionObject as Exception), "{exception}",
                     nameof(AppDomain.CurrentDomain.UnhandledException));
             };
             Current.DispatcherUnhandledException += (sender, args) =>
             {
                 ConsoleManager.Show();
-                log.ForContext(sender.GetType()).Fatal(args.Exception.Demystify(), "{exception}",
+                log.ForContext(sender.GetType()).Fatal(args.Exception, "{exception}",
                     nameof(DispatcherUnhandledException));
             };
             //AppDomain.CurrentDomain.FirstChanceException += (sender, args) =>

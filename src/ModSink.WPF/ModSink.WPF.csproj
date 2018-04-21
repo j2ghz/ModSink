@@ -60,10 +60,10 @@
       <Version>4.6.2</Version>
     </PackageReference>
     <PackageReference Include="Ben.Demystifier">
-      <Version>0.0.8</Version>
+      <Version>0.1.0</Version>
     </PackageReference>
     <PackageReference Include="DynamicData.ReactiveUI">
-      <Version>6.0.4.2351</Version>
+      <Version>6.1.0.2366</Version>
     </PackageReference>
     <PackageReference Include="MahApps.Metro">
       <Version>1.5.0</Version>
@@ -71,8 +71,11 @@
     <PackageReference Include="ModSink.Common">
       <Version>0.2.1-ci0120</Version>
     </PackageReference>
-    <PackageReference Include="reactiveui-wpf">
-      <Version>8.0.0-alpha0094</Version>
+    <PackageReference Include="ReactiveUI.Events.WPF">
+      <Version>8.0.0-alpha0117</Version>
+    </PackageReference>
+    <PackageReference Include="ReactiveUI.WPF">
+      <Version>8.0.0-alpha0117</Version>
     </PackageReference>
     <PackageReference Include="Serilog">
       <Version>2.6.0</Version>
@@ -93,7 +96,7 @@
       <Version>2.1.0</Version>
     </PackageReference>
     <PackageReference Include="squirrel.windows">
-      <Version>1.7.8</Version>
+      <Version>1.7.9</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
@@ -101,6 +104,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Helpers\ExceptionEnricher.cs" />
     <Compile Include="Helpers\RelayTraceListener.cs" />
     <Compile Include="Model\SettingsModel.cs" />
     <Compile Include="ViewModel\DownloadsViewModel.cs" />
