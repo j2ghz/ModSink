@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace ModSink.Core.Models.Repo
 {
     [Serializable]
-    public class Repo
+    public class Repo : IBaseUri
     {
         public Uri BaseUri { get; set; }
 

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reactive.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Threading;
+using System.Threading.Tasks;
 using DynamicData;
 using Humanizer;
 using Microsoft.Extensions.CommandLineUtils;
@@ -12,6 +13,7 @@ using ModSink.Common;
 using ModSink.Common.Client;
 using ModSink.Core;
 using ModSink.Core.Client;
+using ModSink.Core.Models.Group;
 using ModSink.Core.Models.Repo;
 using Serilog;
 
@@ -76,7 +78,7 @@ namespace ModSink.CLI
                         downloader, new BinaryFormatter());
 
                     Console.WriteLine("Downloading repo");
-                    client.RepoUrls.Add(uriStr);
+                    client.GroupUrls.Add(uriStr);
                     client.Modpacks.Connect().Subscribe(cs =>
                     {
                         foreach (var modpack in client.Modpacks.Items)
@@ -118,7 +120,7 @@ namespace ModSink.CLI
                             new BinaryFormatter());
 
                         Console.WriteLine("Downloading repo");
-                        client.RepoUrls.Add(uriStr);
+                        client.GroupUrls.Add(uriStr);
                         foreach (var repo in client.Repos.Items)
                             DumpRepo(repo);
                     }
@@ -151,6 +153,7 @@ namespace ModSink.CLI
                             file.Delete();
                             continue;
                         }
+
                         var size = file.Length.Bytes();
                         var hashFromName = Path.GetFileNameWithoutExtension(file.FullName);
                         Console.Write($"{size.Humanize("#").PadLeft(10)}: {hashFromName} | ");
@@ -162,13 +165,16 @@ namespace ModSink.CLI
                             var speed = size.Per(DateTime.Now - start);
                             Console.Write($"{hash} | {speed.Humanize("#").PadLeft(10)} | ");
                         }
+
                         if (hash.ToString() != hashFromName)
                         {
                             Console.Write("DELETE");
                             file.Delete();
                         }
+
                         Console.WriteLine();
                     }
+
                     return 0;
                 });
             });
@@ -225,8 +231,10 @@ namespace ModSink.CLI
                                 Console.WriteLine(ex.ToString());
                             }
                         }
+
                         Console.WriteLine();
                     }
+
                     return 0;
                 });
             });
@@ -238,54 +246,93 @@ namespace ModSink.CLI
             {
                 command.Description = "Makes each subfolder of a given folder a mod";
                 command.HelpOption("-?|-h|--help");
-                var pathArg = command.Argument("[path]", "Path to the folder with mods");
+                var pathArg = command.Argument("[path]", "Path to the folder with mods in separate folder");
 
                 command.OnExecute(async () =>
                 {
-                    var hashing = new HashingService(new XXHash64());
+                    var path = new DirectoryInfo(Path.Combine(Directory.GetCurrentDirectory(), pathArg.Value ?? "."));
 
-                    var pathStr = pathArg.Value ?? ".";
-                    var path = new DirectoryInfo(Path.Combine(Directory.GetCurrentDirectory(), pathStr));
-                    var pathUri = new Uri(path.FullName);
-
-                    var files = new Dictionary<FileSignature, Uri>();
-                    var mods = new List<ModEntry>();
-
-                    foreach (var modFolder in path.EnumerateDirectories())
+                    var group = new Group { RepoInfos = new List<RepoInfo>() };
+                    foreach (var directory in path.EnumerateDirectories())
                     {
-                        Console.WriteLine($"Processing {modFolder.FullName}");
-                        var obs = hashing.GetFileHashes(modFolder, CancellationToken.None);
-                        var mod = new Mod
+                        var pathUri = new Uri(directory.FullName);
+                        var repo = await CreateRepo(directory);
+                        repo.BaseUri=new Uri(directory.FullName);
+                        var fileName = Path.Combine(directory.FullName, "repo.bin");
+                        using (var stream = new FileInfo(fileName).Create())
                         {
-                            Files = new Dictionary<Uri, FileSignature>(),
-                            Name = modFolder.Name,
-                            Version = "1.0"
-                        };
-                        foreach (var lazy in obs)
-                        {
-                            var fileHash = await lazy.Value;
-                            Console.WriteLine($"Processing {fileHash.File.FullName}");
-                            var fileSig = new FileSignature(fileHash.Hash, fileHash.File.Length);
-                            mod.Files.Add(new Uri(modFolder.FullName).MakeRelativeUri(new Uri(fileHash.File.FullName)),
-                                fileSig);
-                            files.Add(fileSig, pathUri.MakeRelativeUri(new Uri(fileHash.File.FullName)));
+                            new BinaryFormatter().Serialize(stream, repo);
                         }
-                        mods.Add(new ModEntry {Mod = mod});
+
+                        var repoInfo = new RepoInfo { Uri = pathUri.MakeRelativeUri(new Uri(fileName)) };
+                        group.RepoInfos.Add(repoInfo);
+
+                        DumpRepo(repo);
+                        Console.WriteLine($"Written to {fileName}");
                     }
-
-                    var repo = new Repo
+                    
+                    DumpGroup(group);
+                    var fileNameG = Path.Combine(path.FullName, "group.bin");
+                    using (var stream = new FileInfo(fileNameG).Create())
                     {
-                        Files = files,
-                        Modpacks = new List<Modpack> {new Modpack {Mods = mods, Name = "TestModpack"}}
-                    };
-
-                    var fileName = Path.Combine(pathUri.LocalPath, "repo.bin");
-                    new BinaryFormatter().Serialize(new FileInfo(fileName).Create(), repo);
-                    Console.WriteLine($"Written to {fileName}");
+                        new BinaryFormatter().Serialize(stream, group);
+                    }
+                    Console.WriteLine($"Written to {fileNameG}");
 
                     return 0;
                 });
             });
+        }
+
+        private static async Task<Mod> CreateMod(DirectoryInfo modFolder, Action<FileSignature, Uri> fileAction)
+        {
+            Console.WriteLine($"Processing {modFolder.FullName}");
+            var hashing = new HashingService(new XXHash64());
+            var obs = hashing.GetFileHashes(modFolder, CancellationToken.None);
+            var mod = new Mod
+            {
+                Files = new Dictionary<Uri, FileSignature>(),
+                Name = modFolder.Name,
+                Version = "1.0"
+            };
+            foreach (var lazy in obs)
+            {
+                var fileHash = await lazy.Value;
+                Console.WriteLine($"Processing {fileHash.File.FullName}");
+                var fileSig = new FileSignature(fileHash.Hash, fileHash.File.Length);
+                mod.Files.Add(new Uri(modFolder.FullName).MakeRelativeUri(new Uri(fileHash.File.FullName)),
+                    fileSig);
+                fileAction(fileSig,new Uri(fileHash.File.FullName));
+            }
+
+            return mod;
+        }
+
+        private static async Task<Modpack> CreateModpack(DirectoryInfo directory, Action<FileSignature,Uri> fileAction)
+        {
+            var modpack = new Modpack {Name = directory.Name, Mods = new List<ModEntry>()};
+            foreach (var modFolder in directory.EnumerateDirectories())
+            {
+                var mod = await CreateMod(modFolder, fileAction);
+                modpack.Mods.Add(new ModEntry {Mod = mod});
+            }
+
+            return modpack;
+        }
+
+        private static async Task<Repo> CreateRepo(DirectoryInfo directory)
+        {
+            var repo = new Repo {Modpacks = new List<Modpack>(), Files = new Dictionary<FileSignature, Uri>()};
+
+            foreach (var modPackFolder in directory.EnumerateDirectories())
+            {
+                var modpack = await CreateModpack(modPackFolder, (file, uri)=>{ repo.Files.Add(file,new Uri(directory.FullName).MakeRelativeUri(uri));});
+                repo.Modpacks.Add(modpack);
+            }
+
+            
+
+            return repo;
         }
 
         private static void DumpDownloadProgress(IObservable<DownloadProgress> obs, string name)
@@ -301,6 +348,29 @@ namespace ModSink.CLI
                     Console.WriteLine(
                         $"\t{prog.Current.State} {name.PadRight(23)} {prog.Current.Remaining.Humanize("#.#").PadLeft(8)} left @ {prog.Speed.Humanize("#.#").PadLeft(10)} ETA: {eta.Humanize()}");
                 }, ex => Console.WriteLine(ex.ToString()), () => Console.WriteLine("Done"));
+        }
+
+        private static void DumpGroup(Group group)
+        {
+            Console.WriteLine($"Group:");
+            foreach (var groupRepoInfo in group.RepoInfos) Console.WriteLine($"\tRepo: {groupRepoInfo.Uri}");
+        }
+
+        private static void DumpRepo(Repo repo)
+        {
+            Console.WriteLine($"Repo at {repo.BaseUri}");
+            Console.WriteLine("Files:");
+            foreach (var file in repo.Files)
+                Console.WriteLine($"\t{file.Key} at {new Uri(repo.BaseUri, file.Value)}");
+
+            Console.WriteLine("ModPacks:");
+            foreach (var modpack in repo.Modpacks)
+            {
+                Console.WriteLine($"\tModpack '{modpack.Name}'");
+                Console.WriteLine("\tMods:");
+                foreach (var mod in modpack.Mods)
+                    Console.WriteLine($"\t\tMod: '{mod.Mod.Name}' [{mod.Mod.Files.Count} files]");
+            }
         }
 
         public static void Main(string[] args)
@@ -328,23 +398,7 @@ namespace ModSink.CLI
             app.AddCheck();
 
             app.Execute(args.Length > 0 ? args : new[] {"--help"});
-        }
-
-        private static void DumpRepo(Repo repo)
-        {
-            Console.WriteLine($"Repo at {repo.BaseUri}");
-            Console.WriteLine("Files:");
-            foreach (var file in repo.Files)
-                Console.WriteLine($"\t{file.Key} at {new Uri(repo.BaseUri, file.Value)}");
-
-            Console.WriteLine("ModPacks:");
-            foreach (var modpack in repo.Modpacks)
-            {
-                Console.WriteLine($"\tModpack '{modpack.Name}'");
-                Console.WriteLine("\tMods:");
-                foreach (var mod in modpack.Mods)
-                    Console.WriteLine($"\t\tMod: '{mod.Mod.Name}' [{mod.Mod.Files.Count} files]");
-            }
+            Console.ReadKey();
         }
     }
 }
