@@ -20,12 +20,12 @@ namespace ModSink.WPF.ViewModel
                 var repoUrl = await DialogCoordinator.ShowInputAsync(this, "Add new Repo",
                     "Enter the url for the new Repo you want to add.\nIt usually looks like https://example.com/someFolder/repo.bin");
                 if (string.IsNullOrWhiteSpace(repoUrl)) return;
-                settings.Client.RepoUrls.Edit(l => l.Add(repoUrl));
+                settings.Client.GroupUrls.Edit(l => l.Add(repoUrl));
             });
             var isRepoSelected =
                 this.WhenAnyValue(x => x.RepoSelected,
                     r => !string.IsNullOrWhiteSpace(r));
-            RemoveRepoUrl = ReactiveCommand.Create(() => settings.Client.RepoUrls.Edit(l => l.Remove(RepoSelected)),
+            RemoveRepoUrl = ReactiveCommand.Create(() => settings.Client.GroupUrls.Edit(l => l.Remove(RepoSelected)),
                 isRepoSelected);
         }
 

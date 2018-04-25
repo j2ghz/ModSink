@@ -12,16 +12,16 @@ namespace ModSink.WPF.Model
         public SettingsModel(IClientService client)
         {
             Client = client;
-            client.RepoUrls.Connect().ObserveOnDispatcher()
-                .Bind(RepoUrls)
+            client.GroupUrls.Connect().ObserveOnDispatcher()
+                .Bind(GroupUrls)
                 .Subscribe();
 
             // Temporary to ease testing
-            client.RepoUrls.Add(@"https://a3.417rct.org/Swifty_repos/modsinktestrepo/repo.bin");
+            client.GroupUrls.Add(@"https://a3.417rct.org/Swifty_repos/modsinktestrepo/417RCT/group.bin");
         }
 
         public IClientService Client { get; }
 
-        public ObservableCollectionExtended<string> RepoUrls { get; } = new ObservableCollectionExtended<string>();
+        public ObservableCollectionExtended<string> GroupUrls { get; } = new ObservableCollectionExtended<string>();
     }
 }

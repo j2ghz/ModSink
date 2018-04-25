@@ -36,7 +36,7 @@
                     <Button Command="{Binding AddRepoUrl}" Content="Add" />
                     <Button Command="{Binding RemoveRepoUrl}" Content="Remove" />
                 </WrapPanel>
-                <ListBox ItemsSource="{Binding Settings.RepoUrls}" SelectedItem="{Binding RepoSelected}" />
+                <ListBox ItemsSource="{Binding Settings.GroupUrls}" SelectedItem="{Binding RepoSelected}" />
             </DockPanel>
         </TabItem>
 
