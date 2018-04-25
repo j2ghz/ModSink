@@ -9,6 +9,8 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using Autofac;
+using Microsoft.AppCenter;
+using Microsoft.AppCenter.Analytics;
 using ModSink.Common.Client;
 using ModSink.Core;
 using ModSink.WPF.Helpers;
@@ -163,6 +165,8 @@ namespace ModSink.WPF
                     Dispatcher.Invoke(() => throw new NotImplementedException());
                 }
             );
+            AppCenter.Start("5f28a034-bd8f-4f69-9eaa-7e5c228ed328", typeof(Analytics));
+            AppCenter.LogLevel = LogLevel.Verbose;
         }
     }
 }
