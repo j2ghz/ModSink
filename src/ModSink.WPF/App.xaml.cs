@@ -1,5 +1,6 @@
 using System;
 using System.Diagnostics;
+using System.IO;
 using System.Net;
 using System.Reactive;
 using System.Reflection;
@@ -11,12 +12,12 @@ using System.Windows.Controls;
 using Autofac;
 using Microsoft.AppCenter;
 using Microsoft.AppCenter.Analytics;
+using Microsoft.AppCenter.Crashes;
 using ModSink.Common.Client;
 using ModSink.Core;
 using ModSink.WPF.Helpers;
 using ReactiveUI;
 using Serilog;
-using Serilog.Core;
 using Serilog.Debugging;
 using Serilog.Sinks.Sentry;
 using Squirrel;
@@ -38,7 +39,10 @@ namespace ModSink.WPF
             var builder = new ContainerBuilder();
 
             builder.RegisterType<BinaryFormatter>().As<IFormatter>().SingleInstance();
-            builder.Register(_ => new LocalStorageService(new Uri(System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop),"ModSink_Data")))).AsImplementedInterfaces()
+            builder.Register(_ =>
+                    new LocalStorageService(new Uri(
+                        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "ModSink_Data"))))
+                .AsImplementedInterfaces()
                 .SingleInstance();
             builder.RegisterAssemblyTypes(typeof(IModSink).Assembly, typeof(Common.ModSink).Assembly)
                 .Where(t => t.Name != "LocalStorageService").AsImplementedInterfaces().SingleInstance();
@@ -83,6 +87,18 @@ namespace ModSink.WPF
             });
         }
 
+        private void FatalException(Exception e, string message, Type source)
+        {
+            ConsoleManager.Show();
+            log.ForContext(source).Fatal(e, "{exception}", message);
+            if (Debugger.IsAttached == false)
+            {
+                Console.WriteLine("Press any key to continue shutdown after unhadled exception...");
+                Console.ReadKey();
+                Current.Shutdown(1);
+            }
+        }
+
         protected override void OnStartup(StartupEventArgs e)
         {
             if (!Debugger.IsAttached)
@@ -124,49 +140,48 @@ namespace ModSink.WPF
                 .CreateLogger();
             log = Log.ForContext<App>();
             log.Information("Log initialized");
-            AppDomain.CurrentDomain.UnhandledException += (sender, args) =>
+            if (!Debugger.IsAttached)
             {
-                ConsoleManager.Show();
-                log.ForContext(sender.GetType()).Fatal((args.ExceptionObject as Exception), "{exception}",
-                    nameof(AppDomain.CurrentDomain.UnhandledException));
-            };
-            Current.DispatcherUnhandledException += (sender, args) =>
-            {
-                ConsoleManager.Show();
-                log.ForContext(sender.GetType()).Fatal(args.Exception, "{exception}",
-                    nameof(DispatcherUnhandledException));
-            };
-            //AppDomain.CurrentDomain.FirstChanceException += (sender, args) =>
-            //{
-            //    log.ForContext(sender.GetType()).Verbose(args.Exception, "FirstChanceException");
-            //};
+                AppDomain.CurrentDomain.UnhandledException += (sender, args) =>
+                {
+                    FatalException(args.ExceptionObject as Exception,
+                        nameof(AppDomain.CurrentDomain.UnhandledException),
+                        sender.GetType());
+                };
+                Current.DispatcherUnhandledException += (sender, args) =>
+                {
+                    args.Handled = true;
+                    FatalException(args.Exception, nameof(DispatcherUnhandledException), sender.GetType());
+                };
+
+                RxApp.DefaultExceptionHandler = Observer.Create<Exception>(
+                    ex =>
+                    {
+                        if (Debugger.IsAttached) Debugger.Break();
+                        log.ForContext(typeof(RxApp))
+                            .Error(ex, "An uncaught exception in ReactiveUI (probably binding)");
+                        Dispatcher.Invoke(() => throw ex);
+                    },
+                    ex =>
+                    {
+                        if (Debugger.IsAttached) Debugger.Break();
+                        Dispatcher.Invoke(() => throw new NotImplementedException());
+                    },
+                    () =>
+                    {
+                        if (Debugger.IsAttached) Debugger.Break();
+                        Dispatcher.Invoke(() => throw new NotImplementedException());
+                    }
+                );
+            }
+
             PresentationTraceSources.Refresh();
             PresentationTraceSources.DataBindingSource.Listeners.Add(new RelayTraceListener(m =>
             {
-                log.ForContext(typeof(PresentationTraceSources)).Error(m);
+                log.ForContext(typeof(PresentationTraceSources)).Warning(m);
             }));
             PresentationTraceSources.DataBindingSource.Switch.Level = SourceLevels.Warning | SourceLevels.Error;
-            RxApp.DefaultExceptionHandler = Observer.Create<Exception>(
-                ex =>
-                {
-                    if (Debugger.IsAttached) Debugger.Break();
-                    log.ForContext(typeof(RxApp)).Fatal(ex, "An uncaught exception in ReactiveUI (probably binding)");
-                    Dispatcher.Invoke(() => throw ex);
-                },
-                ex =>
-                {
-                    if (Debugger.IsAttached) Debugger.Break();
-                    log.ForContext(typeof(RxApp)).Fatal(ex, "An uncaught exception in ReactiveUI (probably binding)");
-                    Dispatcher.Invoke(() => throw ex);
-                },
-                () =>
-                {
-                    if (Debugger.IsAttached) Debugger.Break();
-                    Dispatcher.Invoke(() => throw new NotImplementedException());
-                }
-            );
-            AppCenter.Start("5f28a034-bd8f-4f69-9eaa-7e5c228ed328", typeof(Analytics));
-            AppCenter.LogLevel = LogLevel.Verbose;
+            AppCenter.Start("5f28a034-bd8f-4f69-9eaa-7e5c228ed328", typeof(Analytics), typeof(Crashes));
         }
     }
 }

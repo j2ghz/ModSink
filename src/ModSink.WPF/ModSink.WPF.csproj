@@ -71,6 +71,9 @@
     <PackageReference Include="Microsoft.AppCenter.Analytics">
       <Version>1.0.2-r0004-e44d856</Version>
     </PackageReference>
+    <PackageReference Include="Microsoft.AppCenter.Crashes">
+      <Version>1.0.2-r0004-e44d856</Version>
+    </PackageReference>
     <PackageReference Include="ModSink.Common">
       <Version>0.2.1-ci0127</Version>
     </PackageReference>
