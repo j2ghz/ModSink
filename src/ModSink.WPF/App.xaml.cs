@@ -62,6 +62,7 @@ namespace ModSink.WPF
 
         private void CheckUpdates()
         {
+            Analytics.TrackEvent(nameof(CheckUpdates));
             var updateLog = Log.ForContext<UpdateManager>();
             Task.Factory.StartNew(async () =>
             {
@@ -87,13 +88,13 @@ namespace ModSink.WPF
             });
         }
 
-        private void FatalException(Exception e, string message, Type source)
+        private void FatalException(Exception e, Type source)
         {
             ConsoleManager.Show();
-            log.ForContext(source).Fatal(e, "{exception}", message);
+            log.ForContext(source).Fatal(e, "{exceptionText}", e.Demystify().ToString());
             if (Debugger.IsAttached == false)
             {
-                Console.WriteLine("Press any key to continue shutdown after unhadled exception...");
+                Console.WriteLine(WPF.Properties.Resources.FatalExceptionPressAnyKeyToContinue);
                 Console.ReadKey();
                 Current.Shutdown(1);
             }
@@ -145,13 +146,12 @@ namespace ModSink.WPF
                 AppDomain.CurrentDomain.UnhandledException += (sender, args) =>
                 {
                     FatalException(args.ExceptionObject as Exception,
-                        nameof(AppDomain.CurrentDomain.UnhandledException),
                         sender.GetType());
                 };
                 Current.DispatcherUnhandledException += (sender, args) =>
                 {
                     args.Handled = true;
-                    FatalException(args.Exception, nameof(DispatcherUnhandledException), sender.GetType());
+                    FatalException(args.Exception, sender.GetType());
                 };
 
                 RxApp.DefaultExceptionHandler = Observer.Create<Exception>(
@@ -182,6 +182,7 @@ namespace ModSink.WPF
             }));
             PresentationTraceSources.DataBindingSource.Switch.Level = SourceLevels.Warning | SourceLevels.Error;
             AppCenter.Start("5f28a034-bd8f-4f69-9eaa-7e5c228ed328", typeof(Analytics), typeof(Crashes));
+            
         }
     }
 }
