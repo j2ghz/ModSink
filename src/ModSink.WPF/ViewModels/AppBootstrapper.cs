@@ -1,10 +1,5 @@
 ﻿using ReactiveUI;
 using Splat;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ModSink.WPF.ViewModels
 {
@@ -26,13 +21,13 @@ namespace ModSink.WPF.ViewModels
             Router.Navigate.Execute(new WelcomeViewModel(this));
         }
 
-        public RoutingState Router { get; private set; }
+        public RoutingState Router { get; }
 
         private void RegisterParts(IMutableDependencyResolver dependencyResolver)
         {
             dependencyResolver.RegisterConstant(this, typeof(IScreen));
 
-            dependencyResolver.Register(() => new WelcomeView(), typeof(IViewFor<WelcomeViewModel>));
+            //dependencyResolver.Register(() => new WelcomeView(), typeof(IViewFor<WelcomeViewModel>));
         }
     }
 }
