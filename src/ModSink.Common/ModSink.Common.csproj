@@ -8,8 +8,10 @@
     <PackageLicenseUrl>https://github.com/j2ghz/ModSink.Common/blob/master/LICENSE</PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/j2ghz/ModSink.Common</PackageProjectUrl>
     <Copyright>Copyright (C) 2017 Jozef Hollý</Copyright>
+    <LangVersion>latest</LangVersion>
+    <DebugType>embedded</DebugType>
+    <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
-
 
   <ItemGroup>
     <PackageReference Include="fusillade" Version="1.0.0" />

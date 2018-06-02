@@ -4,6 +4,11 @@
     <TargetFramework>net461</TargetFramework>
     <OutputType>Exe</OutputType>
     <StartupObject />
+    <Authors>J2ghz</Authors>
+    <Product>ModSink</Product>
+    <LangVersion>latest</LangVersion>
+    <DebugType>embedded</DebugType>
+    <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
 
   <ItemGroup>
@@ -47,6 +52,7 @@
     <PackageReference Include="Serilog.Sinks.RollingFile" Version="3.3.0" />
     <PackageReference Include="Serilog.Sinks.Sentry" Version="2.1.0" />
     <PackageReference Include="squirrel.windows" Version="1.7.9" />
+    <PackageReference Include="System.Net.Http" Version="4.3.3" />
   </ItemGroup>
 
   <ItemGroup>

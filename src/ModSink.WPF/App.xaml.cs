@@ -131,9 +131,9 @@ namespace ModSink.WPF
                     "../Logs/{Date}.log",
                     outputTemplate:
                     "{Timestamp:o} [{Level:u3}] ({SourceContext}) {Properties} {Message}{NewLine}{Exception}")
-                .WriteTo.Sentry(
-                    "https://ed0faccfadff441ebe18267965502bf8:85d11ebd26374716b0f40cb3e046269b@sentry.j2ghz.com/2",
-                    FullVersion?.Substring(0, 64))
+                //.WriteTo.Sentry(
+                //    "https://ed0faccfadff441ebe18267965502bf8:85d11ebd26374716b0f40cb3e046269b@sentry.j2ghz.com/2",
+                //    FullVersion?.Substring(0, 64))
                 .Enrich.FromLogContext()
                 .Enrich.WithThreadId()
                 .Enrich.With<ExceptionEnricher>()
