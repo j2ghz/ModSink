@@ -19,8 +19,9 @@ using ModSink.WPF.Helpers;
 using ReactiveUI;
 using Serilog;
 using Serilog.Debugging;
-using Serilog.Sinks.Sentry;
 using Squirrel;
+
+//using Serilog.Sinks.Sentry;
 
 namespace ModSink.WPF
 {
@@ -60,6 +61,18 @@ namespace ModSink.WPF
             return builder.Build();
         }
 
+        private void FatalException(Exception e, Type source)
+        {
+            ConsoleManager.Show();
+            log.ForContext(source).Fatal(e, "{exceptionText}", e.Demystify().ToString());
+            if (Debugger.IsAttached == false)
+            {
+                Console.WriteLine(WPF.Properties.Resources.FatalExceptionPressAnyKeyToContinue);
+                Console.ReadKey();
+                Current.Shutdown(1);
+            }
+        }
+
         private void CheckUpdates()
         {
             Analytics.TrackEvent(nameof(CheckUpdates));
@@ -86,18 +99,6 @@ namespace ModSink.WPF
                     updateLog.Debug("Update check finished");
                 }
             });
-        }
-
-        private void FatalException(Exception e, Type source)
-        {
-            ConsoleManager.Show();
-            log.ForContext(source).Fatal(e, "{exceptionText}", e.Demystify().ToString());
-            if (Debugger.IsAttached == false)
-            {
-                Console.WriteLine(WPF.Properties.Resources.FatalExceptionPressAnyKeyToContinue);
-                Console.ReadKey();
-                Current.Shutdown(1);
-            }
         }
 
         protected override void OnStartup(StartupEventArgs e)
@@ -182,7 +183,6 @@ namespace ModSink.WPF
             }));
             PresentationTraceSources.DataBindingSource.Switch.Level = SourceLevels.Warning | SourceLevels.Error;
             AppCenter.Start("5f28a034-bd8f-4f69-9eaa-7e5c228ed328", typeof(Analytics), typeof(Crashes));
-            
         }
     }
 }

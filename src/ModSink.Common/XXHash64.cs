@@ -1,25 +1,28 @@
-﻿using ModSink.Core;
-using ModSink.Core.Models.Repo;
+﻿using System.Data.HashFunction.xxHash;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using System;
+using ModSink.Core;
+using ModSink.Core.Models.Repo;
 
 namespace ModSink.Common
 {
-    public class XXHash64 : System.Data.HashFunction.xxHash, IHashFunction
+    public class XXHash64 : IHashFunction
     {
-        public XXHash64() : base(64)
-        {
-        }
+        private readonly IxxHash xx;
 
-        public HashValue HashOfEmpty => new HashValue(new byte[] { 0x99, 0xE9, 0xD8, 0x51, 0x37, 0xDB, 0x46, 0xEF });
+        public XXHash64()
+        {
+            xx = xxHashFactory.Instance.Create(new xxHashConfig {HashSizeInBits = 64});
+        }
 
         public async Task<HashValue> ComputeHashAsync(Stream data, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            var hash = await base.ComputeHashAsync(data);
-            return new HashValue(hash);
+            var hash = await xx.ComputeHashAsync(data, cancellationToken);
+            return new HashValue(hash.Hash);
         }
+
+        public HashValue HashOfEmpty => new HashValue(new byte[] {0x99, 0xE9, 0xD8, 0x51, 0x37, 0xDB, 0x46, 0xEF});
     }
 }

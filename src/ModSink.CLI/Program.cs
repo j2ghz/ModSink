@@ -252,31 +252,32 @@ namespace ModSink.CLI
                 {
                     var path = new DirectoryInfo(Path.Combine(Directory.GetCurrentDirectory(), pathArg.Value ?? "."));
 
-                    var group = new Group { RepoInfos = new List<RepoInfo>() };
+                    var group = new Group {RepoInfos = new List<RepoInfo>()};
                     foreach (var directory in path.EnumerateDirectories())
                     {
                         var pathUri = new Uri(directory.FullName);
                         var repo = await CreateRepo(directory);
-                        repo.BaseUri=new Uri(directory.FullName);
+                        repo.BaseUri = new Uri(directory.FullName);
                         var fileName = Path.Combine(directory.FullName, "repo.bin");
                         using (var stream = new FileInfo(fileName).Create())
                         {
                             new BinaryFormatter().Serialize(stream, repo);
                         }
 
-                        var repoInfo = new RepoInfo { Uri = pathUri.MakeRelativeUri(new Uri(fileName)) };
+                        var repoInfo = new RepoInfo {Uri = pathUri.MakeRelativeUri(new Uri(fileName))};
                         group.RepoInfos.Add(repoInfo);
 
                         DumpRepo(repo);
                         Console.WriteLine($"Written to {fileName}");
                     }
-                    
+
                     DumpGroup(group);
                     var fileNameG = Path.Combine(path.FullName, "group.bin");
                     using (var stream = new FileInfo(fileNameG).Create())
                     {
                         new BinaryFormatter().Serialize(stream, group);
                     }
+
                     Console.WriteLine($"Written to {fileNameG}");
 
                     return 0;
@@ -302,13 +303,13 @@ namespace ModSink.CLI
                 var fileSig = new FileSignature(fileHash.Hash, fileHash.File.Length);
                 mod.Files.Add(new Uri(modFolder.FullName).MakeRelativeUri(new Uri(fileHash.File.FullName)),
                     fileSig);
-                fileAction(fileSig,new Uri(fileHash.File.FullName));
+                fileAction(fileSig, new Uri(fileHash.File.FullName));
             }
 
             return mod;
         }
 
-        private static async Task<Modpack> CreateModpack(DirectoryInfo directory, Action<FileSignature,Uri> fileAction)
+        private static async Task<Modpack> CreateModpack(DirectoryInfo directory, Action<FileSignature, Uri> fileAction)
         {
             var modpack = new Modpack {Name = directory.Name, Mods = new List<ModEntry>()};
             foreach (var modFolder in directory.EnumerateDirectories())
@@ -326,11 +327,11 @@ namespace ModSink.CLI
 
             foreach (var modPackFolder in directory.EnumerateDirectories())
             {
-                var modpack = await CreateModpack(modPackFolder, (file, uri)=>{ repo.Files.Add(file,new Uri(directory.FullName).MakeRelativeUri(uri));});
+                var modpack = await CreateModpack(modPackFolder,
+                    (file, uri) => { repo.Files.Add(file, new Uri(directory.FullName).MakeRelativeUri(uri)); });
                 repo.Modpacks.Add(modpack);
             }
 
-            
 
             return repo;
         }
