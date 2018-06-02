@@ -11,6 +11,5 @@ before_build:
 
 build:
   verbosity: minimal
-  publish_nuget: true
 artifacts:
-- path: src\ModSink.WPF\bin\*\*\**\*
+- path: Releases/**/*
