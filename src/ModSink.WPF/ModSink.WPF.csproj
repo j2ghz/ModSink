@@ -38,7 +38,6 @@
     <PackageReference Include="MahApps.Metro" Version="1.5.0" />
     <PackageReference Include="Microsoft.AppCenter.Analytics" Version="1.0.2-r0004-e44d856" />
     <PackageReference Include="Microsoft.AppCenter.Crashes" Version="1.0.2-r0004-e44d856" />
-    <PackageReference Include="ModSink.Common" Version="0.2.1-ci0127" />
     <PackageReference Include="ReactiveUI.Events.WPF" Version="8.0.0-alpha0117" />
     <PackageReference Include="ReactiveUI.WPF" Version="8.0.0-alpha0117" />
     <PackageReference Include="Serilog" Version="2.6.0" />
