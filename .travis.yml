@@ -2,4 +2,3 @@ language: csharp
 script:
   - ./build.sh
 os:
-  - linux
