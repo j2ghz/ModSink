@@ -1,0 +1,49 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27703.2018
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModSink.Common", "src\ModSink.Common\ModSink.Common.csproj", "{783848A9-63F2-44D3-B50C-5E1236AAE1CD}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModSink.Common.Tests", "src\ModSink.Common.Tests\ModSink.Common.Tests.csproj", "{28E3B171-3AA0-49A5-828A-DD5A77A49DC8}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModSink.Core", "src\ModSink.Core\ModSink.Core.csproj", "{21677460-8C06-4137-B130-5776F2E56086}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModSink.CLI", "src\ModSink.CLI\ModSink.CLI.csproj", "{8F228229-93D4-4717-8D14-9D31A188DC69}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModSink.WPF", "src\ModSink.WPF\ModSink.WPF.csproj", "{09EF7B2D-08FB-4320-A945-F2276D337509}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{783848A9-63F2-44D3-B50C-5E1236AAE1CD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{783848A9-63F2-44D3-B50C-5E1236AAE1CD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{783848A9-63F2-44D3-B50C-5E1236AAE1CD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{783848A9-63F2-44D3-B50C-5E1236AAE1CD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{28E3B171-3AA0-49A5-828A-DD5A77A49DC8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{28E3B171-3AA0-49A5-828A-DD5A77A49DC8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{28E3B171-3AA0-49A5-828A-DD5A77A49DC8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{28E3B171-3AA0-49A5-828A-DD5A77A49DC8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{21677460-8C06-4137-B130-5776F2E56086}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{21677460-8C06-4137-B130-5776F2E56086}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{21677460-8C06-4137-B130-5776F2E56086}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{21677460-8C06-4137-B130-5776F2E56086}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8F228229-93D4-4717-8D14-9D31A188DC69}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8F228229-93D4-4717-8D14-9D31A188DC69}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8F228229-93D4-4717-8D14-9D31A188DC69}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8F228229-93D4-4717-8D14-9D31A188DC69}.Release|Any CPU.Build.0 = Release|Any CPU
+		{09EF7B2D-08FB-4320-A945-F2276D337509}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{09EF7B2D-08FB-4320-A945-F2276D337509}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{09EF7B2D-08FB-4320-A945-F2276D337509}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{09EF7B2D-08FB-4320-A945-F2276D337509}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {8A162A5F-03F2-428E-8951-FD2FBE565EA5}
+	EndGlobalSection
+EndGlobal
