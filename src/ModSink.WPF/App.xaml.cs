@@ -118,8 +118,7 @@ namespace ModSink.WPF
             var container = BuildContainer();
 
             log.Information("Starting UI");
-            var mw = container.Resolve<MainWindow>();
-            mw.Show();
+            this.MainWindow = container.Resolve<MainWindow>();
         }
 
         private void SetupLogging()
