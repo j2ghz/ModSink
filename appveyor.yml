@@ -19,7 +19,7 @@ artifacts:
 deploy:
 - provider: GitHub
   auth_token:
-    secure: CcvNP/hv82vyVTev+PNOqw==
+    secure: TLChfAMJcjhyw7dQ6WNllA/sc420Hq4fk9V9/VUD1kFOm4ZJpfiBlwaqdVRPbQeP
   artifact: Squirrel
   prerelease: true
   on:
