@@ -11,5 +11,16 @@ before_build:
 
 build:
   verbosity: minimal
+
 artifacts:
-- path: Releases/**/*
+- path: src\ModSink.WPF\Releases
+  name: Squirrel
+
+deploy:
+- provider: GitHub
+  auth_token:
+    secure: CcvNP/hv82vyVTev+PNOqw==
+  artifact: Squirrel
+  prerelease: true
+  on:
+    branch: master
