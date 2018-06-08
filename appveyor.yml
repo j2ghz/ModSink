@@ -13,7 +13,7 @@ build:
   verbosity: minimal
 
 artifacts:
-- path: src\ModSink.WPF\Releases
+- path: src\ModSink.WPF\Releases\*
   name: Squirrel
 
 deploy:
