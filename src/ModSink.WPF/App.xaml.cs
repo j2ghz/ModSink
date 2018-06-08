@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Reactive;
 using System.Reflection;
@@ -10,9 +11,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using Autofac;
-using Microsoft.AppCenter;
-using Microsoft.AppCenter.Analytics;
-using Microsoft.AppCenter.Crashes;
+using CountlySDK;
 using ModSink.Common.Client;
 using ModSink.Core;
 using ModSink.WPF.Helpers;
@@ -69,25 +68,38 @@ namespace ModSink.WPF
             {
                 Console.WriteLine(WPF.Properties.Resources.FatalExceptionPressAnyKeyToContinue);
                 Console.ReadKey();
-                Current.Shutdown(1);
             }
+        }
+
+        protected override void OnExit(ExitEventArgs e)
+        {
+            Countly.EndSession();
+            base.OnExit(e);
         }
 
         private void CheckUpdates()
         {
-            Analytics.TrackEvent(nameof(CheckUpdates));
             var updateLog = Log.ForContext<UpdateManager>();
             Task.Factory.StartNew(async () =>
             {
                 log.Information("Looking for updates");
+                Countly.RecordEvent("UpdateCheck");
                 try
                 {
                     using (var mgr =
                         await UpdateManager.GitHubUpdateManager("https://github.com/j2ghz/ModSink", prerelease: true))
                     {
-                        var release = await mgr.UpdateApp(i =>
-                            updateLog.Debug("Downloading file, progress: {progress}", i));
-                        log.Information("Latest version: {version}", release.Version);
+                        var updates = await mgr.CheckForUpdate(false, i =>
+                            updateLog.Debug("Checking for updates {progress:P0}", i));
+                        var rel = updates.ReleasesToApply;
+                        if (!rel.Any()) return;
+                        Countly.RecordEvent("UpdateInProgress");
+                        await mgr.DownloadReleases(rel, i =>
+                              updateLog.Debug("Downloading updates {progress:P0}", i));
+                        await mgr.ApplyReleases(updates, i =>
+                               updateLog.Debug("Installing updates {progress:P0}", i));
+                        log.Information("Installed version: {version}", updates.FutureReleaseEntry.Version);
+                        Countly.RecordEvent("UpdateFinished");
                     }
                 }
                 catch (Exception e)
@@ -119,6 +131,7 @@ namespace ModSink.WPF
 
             log.Information("Starting UI");
             this.MainWindow = container.Resolve<MainWindow>();
+            this.MainWindow.Show();
         }
 
         private void SetupLogging()
@@ -131,9 +144,6 @@ namespace ModSink.WPF
                     "../Logs/{Date}.log",
                     outputTemplate:
                     "{Timestamp:o} [{Level:u3}] ({SourceContext}) {Properties} {Message}{NewLine}{Exception}")
-                //.WriteTo.Sentry(
-                //    "https://ed0faccfadff441ebe18267965502bf8:85d11ebd26374716b0f40cb3e046269b@sentry.j2ghz.com/2",
-                //    FullVersion?.Substring(0, 64))
                 .Enrich.FromLogContext()
                 .Enrich.WithThreadId()
                 .Enrich.With<ExceptionEnricher>()
@@ -150,29 +160,8 @@ namespace ModSink.WPF
                 };
                 Current.DispatcherUnhandledException += (sender, args) =>
                 {
-                    args.Handled = true;
                     FatalException(args.Exception, sender.GetType());
                 };
-
-                RxApp.DefaultExceptionHandler = Observer.Create<Exception>(
-                    ex =>
-                    {
-                        if (Debugger.IsAttached) Debugger.Break();
-                        log.ForContext(typeof(RxApp))
-                            .Error(ex, "An uncaught exception in ReactiveUI (probably binding)");
-                        Dispatcher.Invoke(() => throw ex);
-                    },
-                    ex =>
-                    {
-                        if (Debugger.IsAttached) Debugger.Break();
-                        Dispatcher.Invoke(() => throw new NotImplementedException());
-                    },
-                    () =>
-                    {
-                        if (Debugger.IsAttached) Debugger.Break();
-                        Dispatcher.Invoke(() => throw new NotImplementedException());
-                    }
-                );
             }
 
             PresentationTraceSources.Refresh();
@@ -181,7 +170,8 @@ namespace ModSink.WPF
                 log.ForContext(typeof(PresentationTraceSources)).Warning(m);
             }));
             PresentationTraceSources.DataBindingSource.Switch.Level = SourceLevels.Warning | SourceLevels.Error;
-            AppCenter.Start("5f28a034-bd8f-4f69-9eaa-7e5c228ed328", typeof(Analytics), typeof(Crashes));
+            Countly.StartSession("https://countly.j2ghz.com", "54c6bf3a77021fadb7bd5b2a66490b465d4382ac", FullVersion);
+            Countly.UserDetails.Username = Environment.UserName;
         }
     }
 }
