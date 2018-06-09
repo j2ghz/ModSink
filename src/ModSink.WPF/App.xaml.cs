@@ -1,11 +1,7 @@
 using System;
-using System.Collections.Generic;
-using System.Data.HashFunction.xxHash;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Net;
-using System.Reactive;
 using System.Reflection;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
@@ -17,7 +13,6 @@ using CountlySDK;
 using ModSink.Common.Client;
 using ModSink.Core;
 using ModSink.WPF.Helpers;
-using ReactiveUI;
 using Serilog;
 using Serilog.Debugging;
 using Squirrel;
@@ -72,12 +67,6 @@ namespace ModSink.WPF
             }
         }
 
-        protected override void OnExit(ExitEventArgs e)
-        {
-            Countly.EndSession().GetAwaiter().GetResult();
-            base.OnExit(e);
-        }
-
         private void CheckUpdates()
         {
             var updateLog = Log.ForContext<UpdateManager>();
@@ -90,19 +79,8 @@ namespace ModSink.WPF
                     using (var mgr =
                         await UpdateManager.GitHubUpdateManager("https://github.com/j2ghz/ModSink", prerelease: true))
                     {
-                        var updates = await mgr.CheckForUpdate(false, i =>
-                            updateLog.Debug("Checking for updates {progress:P0}", i));
-                        var rel = updates.ReleasesToApply;
-                        if (!rel.Any()) return;
-                        Countly.RecordEvent("UpdateInProgress");
-                        await mgr.DownloadReleases(rel, i =>
-                            updateLog.Debug("Downloading updates {progress:P0}", i));
-                        await mgr.ApplyReleases(updates, i =>
-                            updateLog.Debug("Installing updates {progress:P0}", i));
-                        mgr.CreateShortcutForThisExe();
-                        await mgr.CreateUninstallerRegistryEntry();
-                        log.Information("Installed version: {version}", updates.FutureReleaseEntry.Version);
-                        Countly.RecordEvent("UpdateFinished");
+                        var latest = await mgr.UpdateApp(i => updateLog.Debug("Updating: {0:P0}", i));
+                        updateLog.Information("Latest version: {version}", latest.Version);
                     }
                 }
                 catch (Exception e)
@@ -114,6 +92,12 @@ namespace ModSink.WPF
                     updateLog.Debug("Update check finished");
                 }
             });
+        }
+
+        protected override void OnExit(ExitEventArgs e)
+        {
+            Countly.EndSession().GetAwaiter().GetResult();
+            base.OnExit(e);
         }
 
         protected override void OnStartup(StartupEventArgs e)
@@ -131,9 +115,9 @@ namespace ModSink.WPF
             var container = BuildContainer();
 
             log.Information("Starting UI");
-            this.MainWindow = container.Resolve<MainWindow>();
-            this.ShutdownMode = ShutdownMode.OnMainWindowClose;
-            this.MainWindow.Show();
+            MainWindow = container.Resolve<MainWindow>();
+            ShutdownMode = ShutdownMode.OnMainWindowClose;
+            MainWindow.Show();
         }
 
         private void SetupLogging()
