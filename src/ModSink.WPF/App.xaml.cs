@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Data.HashFunction.xxHash;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -61,7 +63,8 @@ namespace ModSink.WPF
         private void FatalException(Exception e, Type source)
         {
             ConsoleManager.Show();
-            log.ForContext(source).Fatal(e, "{exceptionText}", e.Demystify().ToString());
+            log.ForContext(source).Fatal(e, "{exceptionText}", e.ToStringDemystified());
+            Countly.RecordException(e.Message, e.ToStringDemystified(), null, true);
             if (Debugger.IsAttached == false)
             {
                 Console.WriteLine(WPF.Properties.Resources.FatalExceptionPressAnyKeyToContinue);
@@ -96,6 +99,8 @@ namespace ModSink.WPF
                             updateLog.Debug("Downloading updates {progress:P0}", i));
                         await mgr.ApplyReleases(updates, i =>
                             updateLog.Debug("Installing updates {progress:P0}", i));
+                        mgr.CreateShortcutForThisExe();
+                        await mgr.CreateUninstallerRegistryEntry();
                         log.Information("Installed version: {version}", updates.FutureReleaseEntry.Version);
                         Countly.RecordEvent("UpdateFinished");
                     }
@@ -127,6 +132,7 @@ namespace ModSink.WPF
 
             log.Information("Starting UI");
             this.MainWindow = container.Resolve<MainWindow>();
+            this.ShutdownMode = ShutdownMode.OnMainWindowClose;
             this.MainWindow.Show();
         }
 
