@@ -12,17 +12,15 @@
                       Title="MainWindow" Height="600" Width="1000"
                       WindowStartupLocation="CenterScreen"
                       d:DataContext="{d:DesignInstance vm:MainWindowViewModel}">
-    <DockPanel LastChildFill="True">
-        <Controls:MetroTabControl Controls:TabControlHelper.Underlined="TabPanel">
-            <TabItem Header="Library">
-                <v:LibraryView DataContext="{Binding LibraryVM}" />
-            </TabItem>
-            <TabItem Header="Downloads">
-                <v:DownloadsView DataContext="{Binding DownloadsVM}" />
-            </TabItem>
-            <TabItem Header="Settings">
-                <v:SettingsView DataContext="{Binding SettingsVM}" />
-            </TabItem>
-        </Controls:MetroTabControl>
-    </DockPanel>
+    <Controls:MetroTabControl Controls:TabControlHelper.Underlined="TabPanel">
+        <TabItem Header="Library">
+            <v:LibraryView DataContext="{Binding LibraryVM}" />
+        </TabItem>
+        <TabItem Header="Downloads">
+            <v:DownloadsView DataContext="{Binding DownloadsVM}" />
+        </TabItem>
+        <TabItem Header="Settings">
+            <v:SettingsView DataContext="{Binding SettingsVM}" />
+        </TabItem>
+    </Controls:MetroTabControl>
 </Controls:MetroWindow>

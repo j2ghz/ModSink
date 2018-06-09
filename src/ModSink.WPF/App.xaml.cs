@@ -20,8 +20,6 @@ using Serilog;
 using Serilog.Debugging;
 using Squirrel;
 
-//using Serilog.Sinks.Sentry;
-
 namespace ModSink.WPF
 {
     public partial class App : Application
@@ -73,7 +71,7 @@ namespace ModSink.WPF
 
         protected override void OnExit(ExitEventArgs e)
         {
-            Countly.EndSession();
+            Countly.EndSession().GetAwaiter().GetResult();
             base.OnExit(e);
         }
 
@@ -95,9 +93,9 @@ namespace ModSink.WPF
                         if (!rel.Any()) return;
                         Countly.RecordEvent("UpdateInProgress");
                         await mgr.DownloadReleases(rel, i =>
-                              updateLog.Debug("Downloading updates {progress:P0}", i));
+                            updateLog.Debug("Downloading updates {progress:P0}", i));
                         await mgr.ApplyReleases(updates, i =>
-                               updateLog.Debug("Installing updates {progress:P0}", i));
+                            updateLog.Debug("Installing updates {progress:P0}", i));
                         log.Information("Installed version: {version}", updates.FutureReleaseEntry.Version);
                         Countly.RecordEvent("UpdateFinished");
                     }
@@ -120,10 +118,8 @@ namespace ModSink.WPF
             SelfLog.Enable(Console.Error);
             SetupLogging();
             log.Information("Starting ModSink ({version})", FullVersion);
-#if !DEBUG
             if (!Debugger.IsAttached)
                 CheckUpdates();
-#endif
 
             base.OnStartup(e);
 
