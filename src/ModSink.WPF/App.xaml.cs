@@ -80,6 +80,8 @@ namespace ModSink.WPF
                         await UpdateManager.GitHubUpdateManager("https://github.com/j2ghz/ModSink", prerelease: true))
                     {
                         var latest = await mgr.UpdateApp(i => updateLog.Debug("Updating: {0:P0}", i));
+                        mgr.RemoveShortcutForThisExe();
+                        mgr.CreateShortcutForThisExe();
                         updateLog.Information("Latest version: {version}", latest.Version);
                     }
                 }
