@@ -30,14 +30,7 @@ Setup(context =>
     Information("Full version info: "+ v.InformationalVersion);
 });
 
-Task("Build")
-    .Does(() =>
-    {
-        MSBuild(modSinkWpf_csproj, configurator => configurator.SetConfiguration(configuration).WithTarget("Restore").WithTarget("Build"));        
-    });
-
 Task("Pack")
-    .IsDependentOn("Build")
     .Does(()=>{
         CreateDirectory(out_squirrel_nupkg);
         NuGetPack(modSinkWpf_nuspec, new NuGetPackSettings{ BasePath = modSinkWpf_dir + Directory("bin") + Directory(configuration) + Directory("net461"), OutputDirectory = out_squirrel_nupkg, Version = SquirrelVersion, Verbosity = NuGetVerbosity.Detailed });
@@ -45,7 +38,6 @@ Task("Pack")
     });
 
 Task("Default")
-    .IsDependentOn("Build")
     .IsDependentOn("Pack");
 
 RunTarget(target);

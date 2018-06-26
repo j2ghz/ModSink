@@ -3,15 +3,15 @@ skip_tags: true
 image: Visual Studio 2017
 configuration: Release
 
-install:
-  - choco install gitversion.portable -pre -y
-
 before_build:
   - ps: gitversion /l console /output buildserver /updateAssemblyInfo
   - ps: msbuild /t:Restore /v:m
 
 build:
   verbosity: minimal
+
+after_build:
+- ps: ./build.ps1
 
 artifacts:
 - path: Releases\*
