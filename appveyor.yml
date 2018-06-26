@@ -14,7 +14,7 @@ build:
   verbosity: minimal
 
 artifacts:
-- path: src/ModSink.WPF/bin/Release/net461/*
+- path: src/ModSink.WPF/bin/Release/net461
   name: binaries
 
 deploy:
