@@ -15,7 +15,6 @@ using ModSink.Core;
 using ModSink.WPF.Helpers;
 using Serilog;
 using Serilog.Debugging;
-using Squirrel;
 
 namespace ModSink.WPF
 {
@@ -67,35 +66,6 @@ namespace ModSink.WPF
             }
         }
 
-        private void CheckUpdates()
-        {
-            var updateLog = Log.ForContext<UpdateManager>();
-            Task.Factory.StartNew(async () =>
-            {
-                log.Information("Looking for updates");
-                Countly.RecordEvent("UpdateCheck");
-                try
-                {
-                    using (var mgr =
-                        await UpdateManager.GitHubUpdateManager("https://github.com/j2ghz/ModSink", prerelease: true))
-                    {
-                        var latest = await mgr.UpdateApp(i => updateLog.Debug("Updating: {0:P0}", i));
-                        mgr.RemoveShortcutForThisExe();
-                        mgr.CreateShortcutForThisExe();
-                        updateLog.Information("Latest version: {version}", latest.Version);
-                    }
-                }
-                catch (Exception e)
-                {
-                    updateLog.Error(e, "Exception during update checking");
-                }
-                finally
-                {
-                    updateLog.Debug("Update check finished");
-                }
-            });
-        }
-
         protected override void OnExit(ExitEventArgs e)
         {
             Countly.EndSession().GetAwaiter().GetResult();
@@ -109,8 +79,6 @@ namespace ModSink.WPF
             SelfLog.Enable(Console.Error);
             SetupLogging();
             log.Information("Starting ModSink ({version})", FullVersion);
-            if (!Debugger.IsAttached)
-                CheckUpdates();
 
             base.OnStartup(e);
 
