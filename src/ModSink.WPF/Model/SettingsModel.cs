@@ -17,7 +17,7 @@ namespace ModSink.WPF.Model
                 .Subscribe();
 
             // Temporary to ease testing
-            client.GroupUrls.Add(@"https://a3.417rct.org/Swifty_repos/modsinktestrepo/417RCT/group.bin");
+            client.GroupUrls.Add(@"https://modsink.j2ghz.com/group.bin");
         }
 
         public IClientService Client { get; }
