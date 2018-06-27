@@ -3,18 +3,20 @@ using System.Diagnostics;
 using System.IO;
 using System.Net;
 using System.Reflection;
-using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using Autofac;
 using CountlySDK;
+using ModSink.Common;
 using ModSink.Common.Client;
-using ModSink.Core;
 using ModSink.WPF.Helpers;
+using ModSink.WPF.Model;
+using ModSink.WPF.ViewModel;
+using ReactiveUI;
 using Serilog;
 using Serilog.Debugging;
+using Splat;
+using Splat.Serilog;
+using ILogger = Serilog.ILogger;
 
 namespace ModSink.WPF
 {
@@ -25,33 +27,21 @@ namespace ModSink.WPF
         private static string FullVersion => typeof(App).GetTypeInfo().Assembly
             .GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion;
 
-        private IContainer BuildContainer()
+        private void InitializeDependencyInjection()
         {
             //TODO: FIX:
             ServicePointManager.DefaultConnectionLimit = 10;
 
-            var builder = new ContainerBuilder();
-
-            builder.RegisterType<BinaryFormatter>().As<IFormatter>().SingleInstance();
-            builder.Register(_ =>
-                    new LocalStorageService(new Uri(
-                        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "ModSink_Data"))))
-                .AsImplementedInterfaces()
-                .SingleInstance();
-            builder.RegisterAssemblyTypes(typeof(IModSink).Assembly, typeof(Common.ModSink).Assembly)
-                .Where(t => t.Name != "LocalStorageService").AsImplementedInterfaces().SingleInstance();
-
-            builder.RegisterAssemblyTypes(typeof(App).Assembly).Where(t => t.Name.EndsWith("Model"))
-                .AsImplementedInterfaces().AsSelf().SingleInstance();
-            builder.RegisterAssemblyTypes(typeof(App).Assembly).Where(t => t.Name.EndsWith("ViewModel"))
-                .AsImplementedInterfaces().AsSelf().SingleInstance();
-            builder.RegisterAssemblyTypes(typeof(App).Assembly).Where(t => t.IsAssignableTo<TabItem>()).AsSelf()
-                .As<TabItem>().SingleInstance();
-            builder.RegisterType<MainWindow>().AsSelf().SingleInstance();
+            Locator.CurrentMutable.InitializeSplat();
+            Registration.Register(log.ForContext<Splat.ILogger>());
+            Locator.CurrentMutable.InitializeReactiveUI();
+            Locator.CurrentMutable.RegisterViewsForViewModels(typeof(App).Assembly);
+            Locator.CurrentMutable.RegisterLazySingleton(() => new BinaryFormatter());
+            Locator.CurrentMutable.RegisterLazySingleton(() =>
+                new LocalStorageService(new Uri(
+                    Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "ModSink_Data"))));
 
             //TODO: Load plugins, waiting on https://stackoverflow.com/questions/46351411
-
-            return builder.Build();
         }
 
         private void FatalException(Exception e, Type source)
@@ -82,10 +72,14 @@ namespace ModSink.WPF
 
             base.OnStartup(e);
 
-            var container = BuildContainer();
+            InitializeDependencyInjection();
 
             log.Information("Starting UI");
-            MainWindow = container.Resolve<MainWindow>();
+            var cs = new ClientService(new DownloadService(new HttpClientDownloader()), new LocalStorageService(new Uri(
+                    Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "ModSink_Data"))),
+                new HttpClientDownloader(), new BinaryFormatter());
+            MainWindow = new MainWindow(new MainWindowViewModel(new DownloadsViewModel(cs), new LibraryViewModel(cs),
+                new SettingsViewModel(new SettingsModel(cs))));
             ShutdownMode = ShutdownMode.OnMainWindowClose;
             MainWindow.Show();
         }

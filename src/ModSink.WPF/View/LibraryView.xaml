@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="ModSink.WPF.View.LibraryView"
+﻿<rxui:ReactiveUserControl x:TypeArguments="vm:LibraryViewModel" x:Class="ModSink.WPF.View.LibraryView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -7,19 +7,29 @@
              xmlns:local="clr-namespace:ModSink.WPF.View"
              xmlns:repoModels="clr-namespace:ModSink.Core.Models.Repo;assembly=ModSink.Core"
              xmlns:vm="clr-namespace:ModSink.WPF.ViewModel"
+             xmlns:rxui="http://reactiveui.net"
              mc:Ignorable="d"
              d:DesignHeight="300" d:DesignWidth="500"
              d:DataContext="{d:DesignInstance vm:LibraryViewModel}">
     <DockPanel LastChildFill="True">
         <DockPanel LastChildFill="True" DockPanel.Dock="Left">
             <TextBox Controls:TextBoxHelper.Watermark="Search" DockPanel.Dock="Top" />
-            <ListBox MinWidth="120" ItemsSource="{Binding Modpacks}" SelectedItem="{Binding SelectedModpack}">
-                <ListBox.ItemTemplate>
+            <ListView x:Name="lvModpacks" MinWidth="120" SelectedItem="{Binding SelectedModpack}">
+                <ListView.ItemTemplate>
                     <DataTemplate>
                         <TextBlock Text="{Binding Modpack.Name}" />
                     </DataTemplate>
-                </ListBox.ItemTemplate>
-            </ListBox>
+                </ListView.ItemTemplate>
+                <ListView.GroupStyle>
+                    <GroupStyle>
+                        <GroupStyle.HeaderTemplate>
+                            <DataTemplate>
+                                <TextBlock FontSize="15" FontWeight="Bold" Text="{Binding Repo}"/>
+                            </DataTemplate>
+                        </GroupStyle.HeaderTemplate>
+                    </GroupStyle>
+                </ListView.GroupStyle>
+            </ListView>
         </DockPanel>
         <DockPanel LastChildFill="True" Margin="5">
             <TextBlock Text="{Binding SelectedModpack.Modpack.Name}" FontSize="32" DockPanel.Dock="Top" Padding="5" />
@@ -44,4 +54,4 @@
             </TreeView>
         </DockPanel>
     </DockPanel>
-</UserControl>
+</rxui:ReactiveUserControl>

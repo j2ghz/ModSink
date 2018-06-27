@@ -35,10 +35,6 @@ namespace ModSink.Common.Client
                 .TransformMany(g => g.RepoInfos.Select(r => new Uri(g.BaseUri, r.Uri)))
                 .TransformAsync(Load<Repo>)
                 .AsObservableList();
-            Modpacks = Repos
-                .Connect()
-                .TransformMany(r => r.Modpacks)
-                .AsObservableList();
         }
 
         public IDownloader Downloader { get; }
@@ -48,7 +44,6 @@ namespace ModSink.Common.Client
         public ISourceList<string> GroupUrls { get; } = new SourceList<string>();
         public IDownloadService DownloadService { get; }
         public ILocalStorageService LocalStorageService { get; }
-        public IObservableList<Modpack> Modpacks { get; }
         public IObservableList<Repo> Repos { get; }
 
 

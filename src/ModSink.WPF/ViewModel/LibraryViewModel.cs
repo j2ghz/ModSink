@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
 using DynamicData;
@@ -16,9 +17,9 @@ namespace ModSink.WPF.ViewModel
         public LibraryViewModel(IClientService clientService)
         {
             ClientService = clientService;
-            ClientService.Modpacks
+            ClientService.Repos
                 .Connect()
-                .Transform(m => new ModpackViewModel(m))
+                .TransformMany(r => r.Modpacks.Select(m=>new ModpackViewModel(m,r)))
                 .ObserveOnDispatcher()
                 .Bind(Modpacks)
                 .Subscribe();

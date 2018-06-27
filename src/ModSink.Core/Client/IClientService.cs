@@ -10,7 +10,6 @@ namespace ModSink.Core.Client
     {
         IDownloadService DownloadService { get; }
         ILocalStorageService LocalStorageService { get; }
-        IObservableList<Modpack> Modpacks { get; }
         IObservableList<Repo> Repos { get; }
         ISourceList<string> GroupUrls { get; }
         Task DownloadMissingFiles(Modpack modpack);

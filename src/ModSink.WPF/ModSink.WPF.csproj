@@ -31,7 +31,6 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="akavache" Version="6.0.0-alpha0038" />
-    <PackageReference Include="Autofac" Version="4.8.1" />
     <PackageReference Include="Ben.Demystifier" Version="0.1.1" />
     <PackageReference Include="Countly" Version="18.1.0" />
     <PackageReference Include="DynamicData.ReactiveUI" Version="6.3.1.2409" />
@@ -43,7 +42,7 @@
     <PackageReference Include="Serilog.Enrichers.Thread" Version="3.0.0" />
     <PackageReference Include="Serilog.Sinks.Literate" Version="3.0.0" />
     <PackageReference Include="Serilog.Sinks.RollingFile" Version="3.3.0" />
-    <PackageReference Include="Serilog.Sinks.Sentry" Version="2.1.4" />
+    <PackageReference Include="Splat.Serilog" Version="1.0.3-Beta" />
     <PackageReference Include="System.Net.Http" Version="4.3.3" />
     <PackageReference Include="GitVersionTask" Version="4.0.0-beta*">
       <PrivateAssets>All</PrivateAssets>

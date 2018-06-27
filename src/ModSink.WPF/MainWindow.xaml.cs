@@ -1,5 +1,4 @@
-﻿using Autofac;
-using ModSink.Common.Client;
+﻿using ModSink.Common.Client;
 using ModSink.Core;
 using ModSink.WPF.Helpers;
 using ModSink.WPF.View;

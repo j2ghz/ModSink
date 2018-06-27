@@ -58,43 +58,6 @@ namespace ModSink.CLI
             });
         }
 
-        private static void AddDownload(this CommandLineApplication app)
-        {
-            app.Command("download", command =>
-            {
-                command.Description = "Downloads a missing files from a repo";
-                command.HelpOption("-?|-h|--help");
-                var uriArg = command.Argument("[uri]", "Uri to repo to download");
-                var pathArg = command.Argument("[path]", "Path to local repo");
-
-                command.OnExecute(async () =>
-                {
-                    var uriStr = uriArg.Value;
-                    var uri = new Uri(uriStr);
-                    var localStr = pathArg.Value;
-                    var localUri = new Uri(localStr);
-                    var downloader = new HttpClientDownloader();
-                    var client = new ClientService(new DownloadService(downloader), new LocalStorageService(localUri),
-                        downloader, new BinaryFormatter());
-
-                    Console.WriteLine("Downloading repo");
-                    client.GroupUrls.Add(uriStr);
-                    client.Modpacks.Connect().Subscribe(cs =>
-                    {
-                        foreach (var modpack in client.Modpacks.Items)
-                        {
-                            Console.WriteLine($"Scheduling {modpack.Name} [{modpack.Mods.Count} mods]");
-                            client.DownloadMissingFiles(modpack).GetAwaiter().GetResult();
-                        }
-                    });
-
-
-                    Console.ReadKey();
-                    return 0;
-                });
-            });
-        }
-
         private static void AddDump(this CommandLineApplication app)
         {
             app.Command("dump", command =>
@@ -393,7 +356,6 @@ namespace ModSink.CLI
 
             app.AddColCheck();
             app.AddSampleRepo();
-            app.AddDownload();
             app.AddImport();
             app.AddDump();
             app.AddCheck();
