@@ -14,9 +14,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="DynamicData" Version="6.3.1.2409" />
-    <PackageReference Include="Humanizer" Version="2.2.0" />
-    <PackageReference Include="reactiveui" Version="8.2.1" />
+    <PackageReference Include="DynamicData" Version="6.4.0.2419" />
+    <PackageReference Include="Humanizer" Version="2.3.3" />
+    <PackageReference Include="reactiveui" Version="8.3.1" />
     <PackageReference Include="System.Interactive" Version="3.1.1" />
     <PackageReference Include="System.ValueTuple" Version="4.5.0" />
   </ItemGroup>
