@@ -7,15 +7,11 @@ namespace ModSink.Common
 {
     public class ModSink : IModSink
     {
-        public ModSink(IHashFunction hashFunction, IClientService client, IServerManager server)
+        public ModSink( IClientService client)
         {
-            this.HashFunction = hashFunction;
             this.Client = client;
-            this.Server = server;
         }
 
         public IClientService Client { get; }
-        public IHashFunction HashFunction { get; }
-        public IServerManager Server { get; }
     }
 }

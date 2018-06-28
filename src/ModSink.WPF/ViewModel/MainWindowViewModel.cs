@@ -11,9 +11,12 @@ namespace ModSink.WPF.ViewModel
     {
         public MainWindowViewModel()
         {
-            var cs = new ClientService(new DownloadService(new HttpClientDownloader()),
-                new LocalStorageService(PathProvider.Downloads),
-                new HttpClientDownloader(), new BinaryFormatter());
+            var modsink = new ModSinkBuilder()
+                .WithDownloader(new HttpClientDownloader())
+                .WithFormatter(new BinaryFormatter())
+                .InDirectory(PathProvider.Downloads)
+                .Build();
+            var cs = modsink.Client;
             DownloadsVM = new DownloadsViewModel(cs);
             LibraryVM = new LibraryViewModel(cs);
             SettingsVM = new SettingsViewModel(new SettingsModel(cs));

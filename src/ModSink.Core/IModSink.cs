@@ -9,7 +9,5 @@ namespace ModSink.Core
     public interface IModSink
     {
         IClientService Client { get; }
-        IHashFunction HashFunction { get; }
-        IServerManager Server { get; }
     }
 }
