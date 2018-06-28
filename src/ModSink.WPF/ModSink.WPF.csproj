@@ -9,7 +9,7 @@
     <LangVersion>latest</LangVersion>
     <DebugType>full</DebugType>
     <DebugSymbols>true</DebugSymbols>
-    <ApplicationIcon />
+    <ApplicationIcon>modsink_x3S_icon.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
     <!-- App.xaml -->
