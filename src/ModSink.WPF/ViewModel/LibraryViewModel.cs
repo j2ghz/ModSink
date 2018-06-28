@@ -10,7 +10,7 @@ using ReactiveUI;
 
 namespace ModSink.WPF.ViewModel
 {
-    public class LibraryViewModel : ReactiveObject
+    public class LibraryViewModel : ReactiveObject, IRoutableViewModel
     {
         private Modpack _selectedModpack;
 
@@ -48,5 +48,8 @@ namespace ModSink.WPF.ViewModel
             get => _selectedModpack;
             set => this.RaiseAndSetIfChanged(ref _selectedModpack, value);
         }
+
+        public string UrlPathSegment => "Library";
+        public IScreen HostScreen { get; }
     }
 }

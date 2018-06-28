@@ -1,4 +1,5 @@
-﻿using System.Runtime.Serialization.Formatters.Binary;
+﻿using System;
+using System.Runtime.Serialization.Formatters.Binary;
 using ModSink.Common;
 using ModSink.Common.Client;
 using ModSink.WPF.Helpers;
@@ -7,7 +8,7 @@ using ReactiveUI;
 
 namespace ModSink.WPF.ViewModel
 {
-    public class MainWindowViewModel : ReactiveObject
+    public class MainWindowViewModel : ReactiveObject, IScreen
     {
         public MainWindowViewModel()
         {
@@ -16,14 +17,12 @@ namespace ModSink.WPF.ViewModel
                 .WithFormatter(new BinaryFormatter())
                 .InDirectory(PathProvider.Downloads)
                 .Build();
-            var cs = modsink.Client;
-            DownloadsVM = new DownloadsViewModel(cs);
-            LibraryVM = new LibraryViewModel(cs);
-            SettingsVM = new SettingsViewModel(new SettingsModel(cs));
-        }
 
-        public SettingsViewModel SettingsVM { get; set; }
-        public DownloadsViewModel DownloadsVM { get; }
-        public LibraryViewModel LibraryVM { get; }
+            Router
+                .NavigateAndReset
+                .Execute(new LibraryViewModel(modsink.Client))
+                .Subscribe();
+        }
+        public RoutingState Router { get; } = new RoutingState();
     }
 }
