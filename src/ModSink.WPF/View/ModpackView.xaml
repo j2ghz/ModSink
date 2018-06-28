@@ -1,0 +1,36 @@
+﻿<rxui:ReactiveUserControl x:TypeArguments="vm:ModpackViewModel" x:Class="ModSink.WPF.View.ModpackView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:ModSink.WPF.View"
+             xmlns:rxui="http://reactiveui.net"
+             xmlns:vm="clr-namespace:ModSink.WPF.ViewModel"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <DockPanel LastChildFill="True" Margin="5">
+        <TextBlock x:Name="TbName" FontSize="32" DockPanel.Dock="Top" Padding="5" />
+        <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" Margin="2">
+            <TextBlock Text="{Binding SelectedModpack.Size, StringFormat=~{0}}" />
+            <Button Content="Install" Command="{Binding Install}" Margin="15,5" />
+        </StackPanel>
+        <TreeView Margin="5" ItemsSource="{Binding SelectedModpack.Modpack.Mods}">
+            <TreeView.ItemTemplate>
+                <HierarchicalDataTemplate ItemsSource="{Binding Mod.Files}">
+                    <TextBlock Text="{Binding Mod.Name}" />
+                    <HierarchicalDataTemplate.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="{Binding Value}" FontFamily="Consolas" MinWidth="200" />
+                                <TextBlock Text="{Binding Key}" />
+                            </StackPanel>
+                        </DataTemplate>
+                    </HierarchicalDataTemplate.ItemTemplate>
+                </HierarchicalDataTemplate>
+            </TreeView.ItemTemplate>
+        </TreeView>
+    </DockPanel>
+</rxui:ReactiveUserControl>
+
+
+

@@ -14,7 +14,7 @@
                       d:DataContext="{d:DesignInstance vm:MainWindowViewModel}">
     <Controls:MetroTabControl Controls:TabControlHelper.Underlined="TabPanel">
         <TabItem Header="Library">
-            <rx:ViewModelViewHost ViewModel="{Binding LibraryVM}" />
+            <rx:ViewModelViewHost x:Name="VmvhLibrary" />
         </TabItem>
         <TabItem Header="Downloads">
             <v:DownloadsView DataContext="{Binding DownloadsVM}" />

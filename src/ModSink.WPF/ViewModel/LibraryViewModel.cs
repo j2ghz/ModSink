@@ -1,36 +1,35 @@
 ﻿using System;
-using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
 using Anotar.Serilog;
 using DynamicData;
 using DynamicData.Binding;
 using ModSink.Core.Client;
+using ModSink.Core.Models.Repo;
 using ReactiveUI;
-using Serilog;
 
 namespace ModSink.WPF.ViewModel
 {
     public class LibraryViewModel : ReactiveObject
     {
-        private ModpackViewModel selectedModpack;
+        private Modpack _selectedModpack;
 
         public LibraryViewModel(IClientService clientService)
         {
             ClientService = clientService;
             ClientService.Repos
                 .Connect()
-                .TransformMany(r => r.Modpacks.Select(m=>new ModpackViewModel(m,r)))
+                .TransformMany(r => r.Modpacks)
                 .ObserveOnDispatcher()
                 .Bind(Modpacks)
                 .Subscribe();
 
-            var canInstall = this.WhenAnyValue(x => x.SelectedModpack).Select(m => m?.Modpack != null);
+            var canInstall = this.WhenAnyValue(x => x.SelectedModpack).Select(m => m != null);
             Install = ReactiveCommand.CreateFromTask(
                 async () =>
                 {
-                    LogTo.Information("Installing modpack {modpack_name}", SelectedModpack.Modpack.Name);
-                    await clientService.DownloadMissingFiles(SelectedModpack.Modpack);
+                    LogTo.Information("Installing modpack {modpack_name}", SelectedModpack.Name);
+                    await clientService.DownloadMissingFiles(SelectedModpack);
                 },
                 canInstall);
             LogTo.Verbose("Library initialized");
@@ -38,16 +37,16 @@ namespace ModSink.WPF.ViewModel
 
         public ReactiveCommand<Unit, Unit> Install { get; set; }
 
-        public ObservableCollectionExtended<ModpackViewModel> Modpacks { get; } =
-            new ObservableCollectionExtended<ModpackViewModel>();
+        public ObservableCollectionExtended<Modpack> Modpacks { get; } =
+            new ObservableCollectionExtended<Modpack>();
 
 
         public IClientService ClientService { get; }
 
-        public ModpackViewModel SelectedModpack
+        public Modpack SelectedModpack
         {
-            get => selectedModpack;
-            set => this.RaiseAndSetIfChanged(ref selectedModpack, value);
+            get => _selectedModpack;
+            set => this.RaiseAndSetIfChanged(ref _selectedModpack, value);
         }
     }
 }

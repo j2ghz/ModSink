@@ -8,26 +8,36 @@ using Splat;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Reactive.Disposables;
 using System.Reflection;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Windows;
 using System.Windows.Controls;
+using MahApps.Metro.Controls;
 
 namespace ModSink.WPF
 {
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
-    public partial class MainWindow
+    public partial class MainWindow : MetroWindow, IViewFor<MainWindowViewModel>
     {
-        public MainWindow(MainWindowViewModel viewModel)
+        public MainWindow()
         {
-            DataContext = viewModel;
-
             InitializeComponent();
 
-            this.Title = $"Modsink {typeof(App).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion}";
+            this.Title = $"ModSink {typeof(App).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion}";
+
+            this.WhenActivated(d =>
+                {
+                    this.OneWayBind(ViewModel, vm => vm.LibraryVM, v => v.VmvhLibrary.ViewModel).DisposeWith(d);
+                });
         }
+
+        object IViewFor.ViewModel
+        {
+            get => ViewModel;
+            set => ViewModel = (MainWindowViewModel)value  ;
+        }
+
+        public MainWindowViewModel ViewModel { get; set; }
     }
 }

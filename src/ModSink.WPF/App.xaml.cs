@@ -35,9 +35,6 @@ namespace ModSink.WPF
             Registration.Register(Log.ForContext<Splat.ILogger>());
             Locator.CurrentMutable.InitializeReactiveUI();
             Locator.CurrentMutable.RegisterViewsForViewModels(typeof(App).Assembly);
-            Locator.CurrentMutable.RegisterLazySingleton(() => new BinaryFormatter());
-            Locator.CurrentMutable.RegisterLazySingleton(() =>
-                new LocalStorageService(PathProvider.Downloads));
 
             //TODO: Load plugins, waiting on https://stackoverflow.com/questions/46351411
         }
@@ -77,10 +74,8 @@ namespace ModSink.WPF
             InitializeDependencyInjection();
 
             Log.Information("Starting UI");
-            var cs = new ClientService(new DownloadService(new HttpClientDownloader()), new LocalStorageService(PathProvider.Downloads),
-                new HttpClientDownloader(), new BinaryFormatter());
-            MainWindow = new MainWindow(new MainWindowViewModel(new DownloadsViewModel(cs), new LibraryViewModel(cs),
-                new SettingsViewModel(new SettingsModel(cs))));
+            
+            MainWindow = new MainWindow(){ViewModel = new MainWindowViewModel()};
             ShutdownMode = ShutdownMode.OnMainWindowClose;
             MainWindow.Show();
         }
