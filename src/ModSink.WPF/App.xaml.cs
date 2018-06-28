@@ -5,6 +5,7 @@ using System.Net;
 using System.Reflection;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Windows;
+using Anotar.Serilog;
 using CountlySDK;
 using ModSink.Common;
 using ModSink.Common.Client;
@@ -16,13 +17,11 @@ using Serilog;
 using Serilog.Debugging;
 using Splat;
 using Splat.Serilog;
-using ILogger = Serilog.ILogger;
 
 namespace ModSink.WPF
 {
     public partial class App : Application
     {
-        private ILogger log;
 
         private static string FullVersion => typeof(App).GetTypeInfo().Assembly
             .GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion;
@@ -33,7 +32,7 @@ namespace ModSink.WPF
             ServicePointManager.DefaultConnectionLimit = 10;
 
             Locator.CurrentMutable.InitializeSplat();
-            Registration.Register(log.ForContext<Splat.ILogger>());
+            Registration.Register(Log.ForContext<Splat.ILogger>());
             Locator.CurrentMutable.InitializeReactiveUI();
             Locator.CurrentMutable.RegisterViewsForViewModels(typeof(App).Assembly);
             Locator.CurrentMutable.RegisterLazySingleton(() => new BinaryFormatter());
@@ -47,7 +46,7 @@ namespace ModSink.WPF
         private void FatalException(Exception e, Type source)
         {
             ConsoleManager.Show();
-            log.ForContext(source).Fatal(e, "{exceptionText}", e.ToStringDemystified());
+            Log.ForContext(source).Fatal(e, "{exceptionText}", e.ToStringDemystified());
             Countly.RecordException(e.Message, e.ToStringDemystified(), null, true);
             if (Debugger.IsAttached == false)
             {
@@ -62,19 +61,23 @@ namespace ModSink.WPF
             base.OnExit(e);
         }
 
-        protected override void OnStartup(StartupEventArgs e)
+        public App() : base()
         {
             if (!Debugger.IsAttached)
                 ConsoleManager.Show();
             SelfLog.Enable(Console.Error);
             SetupLogging();
-            log.Information("Starting ModSink ({version})", FullVersion);
+        }
+
+        protected override void OnStartup(StartupEventArgs e)
+        {
+            Log.Information("Starting ModSink ({version})", FullVersion);
 
             base.OnStartup(e);
 
             InitializeDependencyInjection();
 
-            log.Information("Starting UI");
+            Log.Information("Starting UI");
             var cs = new ClientService(new DownloadService(new HttpClientDownloader()), new LocalStorageService(new Uri(
                     Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "ModSink_Data"))),
                 new HttpClientDownloader(), new BinaryFormatter());
@@ -89,9 +92,9 @@ namespace ModSink.WPF
             Log.Logger = new LoggerConfiguration()
                 .WriteTo.LiterateConsole(
                     outputTemplate:
-                    "{Timestamp:HH:mm:ss} {Level:u3} {ThreadId} [{SourceContext}] {Properties} {Message:lj}{NewLine}{Exception}")
+                    "{Timestamp:HH:mm:ss} {Level:u3} [{SourceContext}@{ThreadId}] {Message:lj} {Properties}{NewLine}{Exception}")
                 .WriteTo.RollingFile(
-                    "../Logs/{Date}.log",
+                    "./Logs/{Date}.log",
                     outputTemplate:
                     "{Timestamp:o} [{Level:u3}] ({SourceContext}) {Properties} {Message}{NewLine}{Exception}")
                 .Enrich.FromLogContext()
@@ -99,8 +102,7 @@ namespace ModSink.WPF
                 .Enrich.With<ExceptionEnricher>()
                 .MinimumLevel.Verbose()
                 .CreateLogger();
-            log = Log.ForContext<App>();
-            log.Information("Log initialized");
+            Log.Information("Log initialized");
             if (!Debugger.IsAttached)
             {
                 AppDomain.CurrentDomain.UnhandledException += (sender, args) =>
@@ -117,7 +119,7 @@ namespace ModSink.WPF
             PresentationTraceSources.Refresh();
             PresentationTraceSources.DataBindingSource.Listeners.Add(new RelayTraceListener(m =>
             {
-                log.ForContext(typeof(PresentationTraceSources)).Warning(m);
+                Log.ForContext(typeof(PresentationTraceSources)).Warning(m);
             }));
             PresentationTraceSources.DataBindingSource.Switch.Level = SourceLevels.Warning | SourceLevels.Error;
             Countly.StartSession("https://countly.j2ghz.com", "54c6bf3a77021fadb7bd5b2a66490b465d4382ac", FullVersion);
