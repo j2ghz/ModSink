@@ -69,14 +69,13 @@ namespace ModSink.WPF
         {
             Log.Information("Starting ModSink ({version})", FullVersion);
 
-            base.OnStartup(e);
-
             InitializeDependencyInjection();
 
             Log.Information("Starting UI");
             
             MainWindow = new MainWindow(){ViewModel = new MainWindowViewModel()};
             ShutdownMode = ShutdownMode.OnMainWindowClose;
+            base.OnStartup(e);
             MainWindow.Show();
         }
 
@@ -114,6 +113,10 @@ namespace ModSink.WPF
             PresentationTraceSources.DataBindingSource.Listeners.Add(new RelayTraceListener(m =>
             {
                 Log.ForContext(typeof(PresentationTraceSources)).Warning(m);
+                if (Debugger.IsAttached)
+                {
+                    Debugger.Break();
+                }
             }));
             PresentationTraceSources.DataBindingSource.Switch.Level = SourceLevels.Warning | SourceLevels.Error;
             Countly.UserDetails.Username = Environment.UserName;

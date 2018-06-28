@@ -2,10 +2,11 @@
 using Humanizer;
 using Humanizer.Bytes;
 using ModSink.Core.Models.Repo;
+using ReactiveUI;
 
 namespace ModSink.WPF.ViewModel
 {
-    public class ModpackViewModel
+    public class ModpackViewModel : ReactiveObject
     {
         public ModpackViewModel(Modpack modpack)
         {

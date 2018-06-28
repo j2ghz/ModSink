@@ -14,7 +14,14 @@ namespace ModSink.WPF.View
             {
                 this.OneWayBind(ViewModel, vm => vm.Modpacks, v => v.LbModpacks.ItemsSource).DisposeWith(d);
                 this.Bind(ViewModel, vm => vm.SelectedModpack, v => v.LbModpacks.SelectedItem);
-                this.OneWayBind(ViewModel, vm => vm.SelectedModpack, v => v.VmvhModpack.ViewModel,m=>new ModpackViewModel(m));
+                this.OneWayBind(ViewModel, vm => vm.SelectedModpack, v => v.VmvhModpack.ViewModel, m =>
+                {
+                    if (m != null)
+                    {
+                        return new ModpackViewModel(m);
+                    }
+                    else return null;
+                });
             });
         }
     }
