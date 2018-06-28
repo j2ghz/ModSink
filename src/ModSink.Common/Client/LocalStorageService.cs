@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Threading.Tasks;
+using ModSink.Core;
 using ModSink.Core.Client;
 using ModSink.Core.Models.Repo;
 
@@ -8,12 +9,11 @@ namespace ModSink.Common.Client
 {
     public class LocalStorageService : ILocalStorageService
     {
-        private readonly Uri localPath;
+        private readonly DirectoryInfo localDir;
 
-        public LocalStorageService(Uri localPath)
+        public LocalStorageService(DirectoryInfo localDir)
         {
-            this.localPath = localPath;
-            var localDir = new DirectoryInfo(localPath.LocalPath);
+            this.localDir = localDir;
             if (!localDir.Exists)
                 localDir.Create();
         }
@@ -26,7 +26,7 @@ namespace ModSink.Common.Client
 
         public async Task<FileInfo> GetFileInfo(FileSignature fileSignature)
         {
-            return await Task.Run(() => new FileInfo(GetFileUri(fileSignature).LocalPath));
+            return await Task.Run(() => new FileInfo(GetFileUri(fileSignature).FullName));
         }
 
         public string GetFileName(FileSignature fileSignature)
@@ -34,9 +34,9 @@ namespace ModSink.Common.Client
             return fileSignature.Hash.ToString();
         }
 
-        public Uri GetFileUri(FileSignature fileSignature)
+        public FileInfo GetFileUri(FileSignature fileSignature)
         {
-            return new Uri(localPath, GetFileName(fileSignature));
+            return localDir.ChildFile(GetFileName(fileSignature));
         }
 
         public async Task<bool> IsFileAvailable(FileSignature fileSignature)

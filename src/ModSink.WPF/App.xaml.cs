@@ -37,8 +37,7 @@ namespace ModSink.WPF
             Locator.CurrentMutable.RegisterViewsForViewModels(typeof(App).Assembly);
             Locator.CurrentMutable.RegisterLazySingleton(() => new BinaryFormatter());
             Locator.CurrentMutable.RegisterLazySingleton(() =>
-                new LocalStorageService(new Uri(
-                    Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "ModSink_Data"))));
+                new LocalStorageService(PathProvider.Downloads));
 
             //TODO: Load plugins, waiting on https://stackoverflow.com/questions/46351411
         }
@@ -78,8 +77,7 @@ namespace ModSink.WPF
             InitializeDependencyInjection();
 
             Log.Information("Starting UI");
-            var cs = new ClientService(new DownloadService(new HttpClientDownloader()), new LocalStorageService(new Uri(
-                    Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "ModSink_Data"))),
+            var cs = new ClientService(new DownloadService(new HttpClientDownloader()), new LocalStorageService(PathProvider.Downloads),
                 new HttpClientDownloader(), new BinaryFormatter());
             MainWindow = new MainWindow(new MainWindowViewModel(new DownloadsViewModel(cs), new LibraryViewModel(cs),
                 new SettingsViewModel(new SettingsModel(cs))));
@@ -122,8 +120,10 @@ namespace ModSink.WPF
                 Log.ForContext(typeof(PresentationTraceSources)).Warning(m);
             }));
             PresentationTraceSources.DataBindingSource.Switch.Level = SourceLevels.Warning | SourceLevels.Error;
-            Countly.StartSession("https://countly.j2ghz.com", "54c6bf3a77021fadb7bd5b2a66490b465d4382ac", FullVersion);
             Countly.UserDetails.Username = Environment.UserName;
+            Countly.UserDetails.Organization = Environment.MachineName;
+            Countly.StartSession("https://countly.j2ghz.com", "54c6bf3a77021fadb7bd5b2a66490b465d4382ac", FullVersion);
+            
         }
     }
 }

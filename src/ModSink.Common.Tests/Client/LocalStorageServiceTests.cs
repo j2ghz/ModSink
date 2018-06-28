@@ -13,8 +13,7 @@ namespace Modsink.Common.Tests.Client
         [Fact]
         public async Task CheckLocationTest()
         {
-            var uri = new Uri(Path.Combine(Path.GetFullPath("."), "temp\\"));
-            var lss = new LocalStorageService(uri);
+            var lss = new LocalStorageService(new DirectoryInfo(Path.Combine(Path.GetFullPath("."), "temp\\")));
             var fileSignature =
                 new FileSignature(new HashValue(new byte[] {0x99, 0xE9, 0xD8, 0x51, 0x37, 0xDB, 0x46, 0xEF}), 1UL);
 

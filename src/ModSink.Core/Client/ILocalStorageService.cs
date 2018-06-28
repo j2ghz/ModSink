@@ -13,7 +13,7 @@ namespace ModSink.Core.Client
 
         string GetFileName(FileSignature fileSignature);
 
-        Uri GetFileUri(FileSignature fileSignature);
+        FileInfo GetFileUri(FileSignature fileSignature);
 
         Task<bool> IsFileAvailable(FileSignature fileSignature);
 
