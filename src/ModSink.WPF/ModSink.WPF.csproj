@@ -2,13 +2,14 @@
   <PropertyGroup>
     <LanguageTargets>$(MSBuildExtensionsPath)\$(VisualStudioVersion)\Bin\Microsoft.CSharp.targets</LanguageTargets>
     <TargetFramework>net462</TargetFramework>
-    <OutputType>Exe</OutputType>
-    <StartupObject />
+    <OutputType>WinExe</OutputType>
+    <StartupObject>ModSink.WPF.App</StartupObject>
     <Authors>J2ghz</Authors>
     <Product>ModSink</Product>
     <LangVersion>latest</LangVersion>
-    <DebugType>embedded</DebugType>
+    <DebugType>full</DebugType>
     <DebugSymbols>true</DebugSymbols>
+    <ApplicationIcon />
   </PropertyGroup>
   <ItemGroup>
     <!-- App.xaml -->
