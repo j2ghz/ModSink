@@ -1,27 +1,29 @@
 using System;
 using System.Diagnostics;
-using System.IO;
 using System.Net;
 using System.Reflection;
-using System.Runtime.Serialization.Formatters.Binary;
 using System.Windows;
-using Anotar.Serilog;
 using CountlySDK;
-using ModSink.Common;
-using ModSink.Common.Client;
 using ModSink.WPF.Helpers;
-using ModSink.WPF.Model;
 using ModSink.WPF.ViewModel;
 using ReactiveUI;
 using Serilog;
 using Serilog.Debugging;
 using Splat;
 using Splat.Serilog;
+using ILogger = Splat.ILogger;
 
 namespace ModSink.WPF
 {
     public partial class App : Application
     {
+        public App()
+        {
+            if (!Debugger.IsAttached)
+                ConsoleManager.Show();
+            SelfLog.Enable(Console.Error);
+            SetupLogging();
+        }
 
         private static string FullVersion => typeof(App).GetTypeInfo().Assembly
             .GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion;
@@ -32,7 +34,7 @@ namespace ModSink.WPF
             ServicePointManager.DefaultConnectionLimit = 10;
 
             Locator.CurrentMutable.InitializeSplat();
-            Registration.Register(Log.ForContext<Splat.ILogger>());
+            Registration.Register(Log.ForContext<ILogger>());
             Locator.CurrentMutable.InitializeReactiveUI();
             Locator.CurrentMutable.RegisterViewsForViewModels(typeof(App).Assembly);
 
@@ -57,14 +59,6 @@ namespace ModSink.WPF
             base.OnExit(e);
         }
 
-        public App() : base()
-        {
-            if (!Debugger.IsAttached)
-                ConsoleManager.Show();
-            SelfLog.Enable(Console.Error);
-            SetupLogging();
-        }
-
         protected override void OnStartup(StartupEventArgs e)
         {
             Log.Information("Starting ModSink ({version})", FullVersion);
@@ -72,8 +66,8 @@ namespace ModSink.WPF
             InitializeDependencyInjection();
 
             Log.Information("Starting UI");
-            
-            MainWindow = new MainWindow(){ViewModel = new MainWindowViewModel()};
+
+            MainWindow = new MainWindow {ViewModel = new MainWindowViewModel()};
             ShutdownMode = ShutdownMode.OnMainWindowClose;
             base.OnStartup(e);
             MainWindow.Show();
@@ -113,16 +107,12 @@ namespace ModSink.WPF
             PresentationTraceSources.DataBindingSource.Listeners.Add(new RelayTraceListener(m =>
             {
                 Log.ForContext(typeof(PresentationTraceSources)).Warning(m);
-                if (Debugger.IsAttached)
-                {
-                    Debugger.Break();
-                }
+                if (Debugger.IsAttached) Debugger.Break();
             }));
             PresentationTraceSources.DataBindingSource.Switch.Level = SourceLevels.Warning | SourceLevels.Error;
             Countly.UserDetails.Username = Environment.UserName;
             Countly.UserDetails.Organization = Environment.MachineName;
             Countly.StartSession("https://countly.j2ghz.com", "54c6bf3a77021fadb7bd5b2a66490b465d4382ac", FullVersion);
-            
         }
     }
 }

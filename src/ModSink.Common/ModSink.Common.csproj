@@ -14,6 +14,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Anotar.Serilog.Fody" Version="4.6.2" />
     <PackageReference Include="fusillade" Version="1.0.0" />
     <PackageReference Include="Humanizer" Version="2.3.3" />
     <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />

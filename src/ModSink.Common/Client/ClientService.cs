@@ -5,7 +5,9 @@ using System.Linq;
 using System.Reactive.Linq;
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
+using Anotar.Serilog;
 using DynamicData;
+using Humanizer;
 using ModSink.Core.Client;
 using ModSink.Core.Models;
 using ModSink.Core.Models.Group;
@@ -39,7 +41,6 @@ namespace ModSink.Common.Client
 
         public IDownloader Downloader { get; }
         public IFormatter SerializationFormatter { get; }
-        private ILogger log => Log.ForContext<ClientService>();
         public IObservableList<Group> Groups { get; }
         public ISourceList<string> GroupUrls { get; } = new SourceList<string>();
         public IDownloadService DownloadService { get; }
@@ -49,7 +50,7 @@ namespace ModSink.Common.Client
 
         public async Task DownloadMissingFiles(Modpack modpack)
         {
-            Log.Information("Gathering files to download for {modpack}", modpack.Name);
+            LogTo.Information("Gathering files to download for {modpack}", modpack.Name);
             foreach (var mod in modpack.Mods)
             foreach (var fh in mod.Mod.Files)
             {
@@ -72,11 +73,11 @@ namespace ModSink.Common.Client
 
         private async Task<T> Load<T>(Uri uri) where T : IBaseUri
         {
-            log.Information("Loading {T} from {url}", typeof(T), uri);
+            LogTo.Information("Loading {T} from {url}", typeof(T), uri);
             using (var mem = new MemoryStream()) 
             {
                 await Downloader.Download(uri, mem);
-                log.Debug("Deserializing");
+                LogTo.Debug("Deserializing, size: {size}", mem.Length.Bytes().Humanize("G03"));
                 mem.Position = 0;
                 var t = (T) SerializationFormatter.Deserialize(mem);
                 t.BaseUri = new Uri(uri, ".");

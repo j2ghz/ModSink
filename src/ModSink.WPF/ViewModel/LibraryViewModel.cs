@@ -7,13 +7,12 @@ using DynamicData.Binding;
 using ModSink.Core.Client;
 using ModSink.Core.Models.Repo;
 using ReactiveUI;
+using ReactiveUI.Fody.Helpers;
 
 namespace ModSink.WPF.ViewModel
 {
     public class LibraryViewModel : ReactiveObject
     {
-        private Modpack _selectedModpack;
-
         public LibraryViewModel(IClientService clientService)
         {
             ClientService = clientService;
@@ -35,18 +34,15 @@ namespace ModSink.WPF.ViewModel
             LogTo.Verbose("Library initialized");
         }
 
-        public ReactiveCommand<Unit, Unit> Install { get; set; }
+        [Reactive] public ReactiveCommand<Unit, Unit> Install { get; set; }
 
-        public ObservableCollectionExtended<Modpack> Modpacks { get; } =
+        [Reactive]
+        public ObservableCollectionExtended<Modpack> Modpacks { get; set; } =
             new ObservableCollectionExtended<Modpack>();
 
 
-        public IClientService ClientService { get; }
+        [Reactive] public IClientService ClientService { get; set; }
 
-        public Modpack SelectedModpack
-        {
-            get => _selectedModpack;
-            set => this.RaiseAndSetIfChanged(ref _selectedModpack, value);
-        }
+        [Reactive] public Modpack SelectedModpack { get; set; }
     }
 }

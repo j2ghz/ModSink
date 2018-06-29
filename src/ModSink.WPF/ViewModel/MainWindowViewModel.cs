@@ -1,9 +1,9 @@
 ﻿using System.Runtime.Serialization.Formatters.Binary;
 using ModSink.Common;
-using ModSink.Common.Client;
 using ModSink.WPF.Helpers;
 using ModSink.WPF.Model;
 using ReactiveUI;
+using ReactiveUI.Fody.Helpers;
 
 namespace ModSink.WPF.ViewModel
 {
@@ -22,8 +22,8 @@ namespace ModSink.WPF.ViewModel
             SettingsVM = new SettingsViewModel(new SettingsModel(cs));
         }
 
-        public SettingsViewModel SettingsVM { get; set; }
-        public DownloadsViewModel DownloadsVM { get; }
-        public LibraryViewModel LibraryVM { get; }
+        [Reactive] public SettingsViewModel SettingsVM { get; set; }
+        [Reactive] public DownloadsViewModel DownloadsVM { get; set; }
+        [Reactive] public LibraryViewModel LibraryVM { get; set; }
     }
 }
