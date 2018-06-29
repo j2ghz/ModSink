@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Net;
 using System.Reflection;
 using System.Windows;
+using Anotar.Serilog;
 using CountlySDK;
 using ModSink.WPF.Helpers;
 using ModSink.WPF.ViewModel;
@@ -38,6 +39,8 @@ namespace ModSink.WPF
             Locator.CurrentMutable.InitializeReactiveUI();
             Locator.CurrentMutable.RegisterViewsForViewModels(typeof(App).Assembly);
 
+            Locator.CurrentMutable.RegisterConstant(new AppBootstrapper(),typeof(AppBootstrapper));
+
             //TODO: Load plugins, waiting on https://stackoverflow.com/questions/46351411
         }
 
@@ -55,7 +58,7 @@ namespace ModSink.WPF
 
         protected override void OnExit(ExitEventArgs e)
         {
-            Countly.EndSession().GetAwaiter().GetResult();
+            Countly.EndSession().ContinueWith(_=>LogTo.Information("Shutdown finished."));
             base.OnExit(e);
         }
 
@@ -67,10 +70,7 @@ namespace ModSink.WPF
 
             Log.Information("Starting UI");
 
-            MainWindow = new MainWindow {ViewModel = new MainWindowViewModel()};
-            ShutdownMode = ShutdownMode.OnMainWindowClose;
             base.OnStartup(e);
-            MainWindow.Show();
         }
 
         private void SetupLogging()

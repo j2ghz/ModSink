@@ -7,9 +7,9 @@ using ReactiveUI.Fody.Helpers;
 
 namespace ModSink.WPF.ViewModel
 {
-    public class MainWindowViewModel : ReactiveObject
+    public class AppBootstrapper : ReactiveObject
     {
-        public MainWindowViewModel()
+        public AppBootstrapper()
         {
             var modsink = new ModSinkBuilder()
                 .WithDownloader(new HttpClientDownloader())
