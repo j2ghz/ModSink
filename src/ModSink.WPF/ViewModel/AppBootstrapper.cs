@@ -3,7 +3,7 @@ using ModSink.Common;
 using ModSink.WPF.Helpers;
 using ModSink.WPF.Model;
 using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
+using Splat;
 
 namespace ModSink.WPF.ViewModel
 {
@@ -16,14 +16,15 @@ namespace ModSink.WPF.ViewModel
                 .WithFormatter(new BinaryFormatter())
                 .InDirectory(PathProvider.Downloads)
                 .Build();
+            Locator.CurrentMutable.RegisterConstant(modsink);
             var cs = modsink.Client;
             DownloadsVM = new DownloadsViewModel(cs);
             LibraryVM = new LibraryViewModel(cs);
             SettingsVM = new SettingsViewModel(new SettingsModel(cs));
         }
 
-        [Reactive] public SettingsViewModel SettingsVM { get; set; }
-        [Reactive] public DownloadsViewModel DownloadsVM { get; set; }
-        [Reactive] public LibraryViewModel LibraryVM { get; set; }
+        public SettingsViewModel SettingsVM { get; }
+        public DownloadsViewModel DownloadsVM { get; }
+        public LibraryViewModel LibraryVM { get; }
     }
 }

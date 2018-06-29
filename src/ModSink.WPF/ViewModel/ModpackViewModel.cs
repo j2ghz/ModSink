@@ -1,7 +1,7 @@
 ﻿using System.Linq;
 using Humanizer;
 using Humanizer.Bytes;
-using ModSink.Core.Client;
+using ModSink.Core;
 using ModSink.Core.Models.Repo;
 using ReactiveUI;
 using Splat;
@@ -20,7 +20,7 @@ namespace ModSink.WPF.ViewModel
                     .Aggregate((sum, a) => sum + a)).Humanize("G03");
             Download = ReactiveCommand.CreateFromTask(async () =>
             {
-                var cs = Locator.Current.GetService<IClientService>();
+                var cs = Locator.Current.GetService<IModSink>().Client;
                 await cs.ScheduleMissingFilesDownload(Modpack);
             }, null, RxApp.TaskpoolScheduler);
         }
