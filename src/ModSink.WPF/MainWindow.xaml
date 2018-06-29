@@ -10,17 +10,16 @@
                       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                       mc:Ignorable="d"
                       Title="MainWindow" Height="600" Width="1000"
-                      WindowStartupLocation="CenterScreen"
-                      d:DataContext="{d:DesignInstance vm:MainWindowViewModel}">
+                      WindowStartupLocation="CenterScreen">
     <Controls:MetroTabControl Controls:TabControlHelper.Underlined="TabPanel">
         <TabItem Header="Library">
-            <rx:ViewModelViewHost x:Name="VmvhLibrary" />
+            <v:LibraryView x:Name="LibraryView"></v:LibraryView>
         </TabItem>
-        <TabItem Header="Downloads">
+        <!--<TabItem Header="Downloads">
             <v:DownloadsView DataContext="{Binding DownloadsVM}" />
         </TabItem>
         <TabItem Header="Settings">
             <v:SettingsView DataContext="{Binding SettingsVM}" />
-        </TabItem>
+        </TabItem>-->
     </Controls:MetroTabControl>
 </Controls:MetroWindow>

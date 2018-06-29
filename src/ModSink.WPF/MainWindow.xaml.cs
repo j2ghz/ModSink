@@ -28,7 +28,7 @@ namespace ModSink.WPF
 
             this.WhenActivated(d =>
                 {
-                    this.OneWayBind(ViewModel, vm => vm.LibraryVM, v => v.VmvhLibrary.ViewModel).DisposeWith(d);
+                    this.OneWayBind(ViewModel, vm => vm.LibraryVM, v => v.LibraryView.ViewModel).DisposeWith(d);
                 });
         }
 
