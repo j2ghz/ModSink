@@ -28,7 +28,7 @@ namespace ModSink.WPF.ViewModel
                 async () =>
                 {
                     LogTo.Information("Installing modpack {modpack_name}", SelectedModpack.Name);
-                    await clientService.DownloadMissingFiles(SelectedModpack);
+                    await clientService.ScheduleMissingFilesDownload(SelectedModpack);
                 },
                 canInstall);
             LogTo.Verbose("Library initialized");

@@ -48,7 +48,7 @@ namespace ModSink.Common.Client
         public IObservableList<Repo> Repos { get; }
 
 
-        public async Task DownloadMissingFiles(Modpack modpack)
+        public async Task ScheduleMissingFilesDownload(Modpack modpack)
         {
             LogTo.Information("Gathering files to download for {modpack}", modpack.Name);
             foreach (var mod in modpack.Mods)
