@@ -11,10 +11,10 @@
     <DockPanel LastChildFill="True" Margin="5">
         <TextBlock x:Name="TbName" FontSize="32" DockPanel.Dock="Top" Padding="5" />
         <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" Margin="2">
-            <TextBlock Text="{Binding SelectedModpack.Size, StringFormat=~{0}}" />
-            <Button Content="Install" Command="{Binding Install}" Margin="15,5" />
+            <TextBlock x:Name="TbSize" />
+            <Button Content="Install" x:Name="BtnInstall" Margin="15,5" />
         </StackPanel>
-        <TreeView Margin="5" ItemsSource="{Binding SelectedModpack.Modpack.Mods}">
+        <TreeView Margin="5" x:Name="TrvMods">
             <TreeView.ItemTemplate>
                 <HierarchicalDataTemplate ItemsSource="{Binding Mod.Files}">
                     <TextBlock Text="{Binding Mod.Name}" />

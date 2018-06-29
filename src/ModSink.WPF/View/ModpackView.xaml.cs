@@ -15,7 +15,9 @@ namespace ModSink.WPF.View
 
             this.WhenActivated(d =>
             {
-                this.Bind(ViewModel, vm => vm.Modpack.Name, v => v.TbName.Text).DisposeWith(d);
+                this.OneWayBind(ViewModel, vm => vm.Modpack.Name, v => v.TbName.Text).DisposeWith(d);
+                this.OneWayBind(ViewModel, vm => vm.Size, v => v.TbSize).DisposeWith(d);
+                this.OneWayBind(ViewModel, vm => vm.Modpack.Mods, v => v.TrvMods.ItemsSource).DisposeWith(d);
             });
         }
     }

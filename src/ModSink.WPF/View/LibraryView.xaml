@@ -4,7 +4,7 @@
                           xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                           xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                           xmlns:Controls="http://metro.mahapps.com/winfx/xaml/controls"
-                          xmlns:local="clr-namespace:ModSink.WPF.View"
+                          xmlns:v="clr-namespace:ModSink.WPF.View"
                           xmlns:repoModels="clr-namespace:ModSink.Core.Models.Repo;assembly=ModSink.Core"
                           xmlns:vm="clr-namespace:ModSink.WPF.ViewModel"
                           xmlns:rxui="http://reactiveui.net"
@@ -13,8 +13,8 @@
     <DockPanel LastChildFill="True">
         <DockPanel LastChildFill="True" DockPanel.Dock="Left">
             <TextBox Controls:TextBoxHelper.Watermark="Search" DockPanel.Dock="Top" />
-            <ListBox x:Name="LbModpacks" MinWidth="120" DisplayMemberPath="Name"/>
+            <ListBox x:Name="LbModpacks" MinWidth="120" DisplayMemberPath="Name" />
         </DockPanel>
-        <rxui:ViewModelViewHost x:Name="VmvhModpack" />
+        <v:ModpackView x:Name="VModpack" />
     </DockPanel>
 </rxui:ReactiveUserControl>
