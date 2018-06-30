@@ -284,14 +284,17 @@ namespace ModSink.CLI
             return modpack;
         }
 
-        private static async Task<Repo> CreateRepo(DirectoryInfo directory)
+        private static async Task<Repo> CreateRepo(DirectoryInfo directoryInfo)
         {
             var repo = new Repo {Modpacks = new List<Modpack>(), Files = new Dictionary<FileSignature, Uri>()};
 
-            foreach (var modPackFolder in directory.EnumerateDirectories())
+            foreach (var modPackFolder in directoryInfo.EnumerateDirectories())
             {
                 var modpack = await CreateModpack(modPackFolder,
-                    (file, uri) => { repo.Files.Add(file, new Uri(directory.FullName).MakeRelativeUri(uri)); });
+                    (file, uri) =>
+                    {
+                        repo.Files.Add(file, new Uri(Path.Combine(directoryInfo.FullName, ".")).MakeRelativeUri(uri));
+                    });
                 repo.Modpacks.Add(modpack);
             }
 
