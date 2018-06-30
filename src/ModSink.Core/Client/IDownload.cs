@@ -15,6 +15,7 @@ namespace ModSink.Core.Client
 
     public interface IDownload : IReactiveObject
     {
+        Guid Id { get; }
         Lazy<Task<Stream>> Destination { get; }
         string Name { get; }
         IObservable<DownloadProgress> Progress { get; }

@@ -1,10 +1,11 @@
-﻿using DynamicData;
+﻿using System;
+using DynamicData;
 
 namespace ModSink.Core.Client
 {
     public interface IDownloadService
     {
-        IObservableList<IDownload> Downloads { get; }
+        IObservableCache<IDownload, Guid> Downloads { get; }
 
         void Add(IDownload download);
     }

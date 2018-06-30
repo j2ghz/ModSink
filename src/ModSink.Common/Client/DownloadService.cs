@@ -10,7 +10,7 @@ namespace ModSink.Common.Client
     public class DownloadService : IDownloadService
     {
         private readonly IDownloader downloader;
-        private readonly SourceList<IDownload> downloads = new SourceList<IDownload>();
+        private readonly SourceCache<IDownload, Guid> downloads = new SourceCache<IDownload, Guid>(d => d.Id);
         private byte simultaneousDownloads;
 
         public DownloadService(IDownloader downloader)
@@ -29,12 +29,12 @@ namespace ModSink.Common.Client
             }
         }
 
-        public IObservableList<IDownload> Downloads => downloads.AsObservableList();
+        public IObservableCache<IDownload, Guid> Downloads => downloads.AsObservableCache();
 
         public void Add(IDownload download)
         {
             LogTo.Debug("Scheduling {download}", download);
-            downloads.Add(download);
+            downloads.AddOrUpdate(download);
             CheckDownloadsToStart();
         }
 

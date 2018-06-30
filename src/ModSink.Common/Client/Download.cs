@@ -41,6 +41,7 @@ namespace ModSink.Common.Client
                 .OnDeactivate(() => progressSubscription.Dispose());
         }
 
+        public Guid Id { get; } = Guid.NewGuid();
         public Lazy<Task<Stream>> Destination { get; }
         public string Name { get; }
         public IObservable<DownloadProgress> Progress => progress;
