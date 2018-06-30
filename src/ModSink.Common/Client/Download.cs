@@ -3,11 +3,11 @@ using System.IO;
 using System.Reactive.Disposables;
 using System.Reactive.Subjects;
 using System.Threading.Tasks;
+using Anotar.Serilog;
 using Humanizer;
 using Humanizer.Bytes;
 using ModSink.Core.Client;
 using ReactiveUI;
-using Serilog;
 using Stateless;
 
 namespace ModSink.Common.Client
@@ -32,7 +32,7 @@ namespace ModSink.Common.Client
             state = new StateMachine<DownloadState, Trigger>(DownloadState.Queued);
             state.OnTransitioned(_ => this.RaisePropertyChanged(nameof(State)));
             state.OnTransitioned(t =>
-                log.Verbose("Switched to state {state}", t.Destination.Humanize()));
+                LogTo.Verbose("Switched to state {state}", t.Destination.Humanize()));
             state.Configure(DownloadState.Queued)
                 .Permit(Trigger.Start, DownloadState.Downloading);
             state.Configure(DownloadState.Downloading)
@@ -40,8 +40,6 @@ namespace ModSink.Common.Client
                 .Permit(Trigger.Error, DownloadState.Errored)
                 .OnDeactivate(() => progressSubscription.Dispose());
         }
-
-        private ILogger log => Log.ForContext<Download>().ForContext("ID", Name);
 
         public Lazy<Task<Stream>> Destination { get; }
         public string Name { get; }

@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Linq;
 using System.Net;
+using Anotar.Serilog;
 using DynamicData;
 using ModSink.Core.Client;
-using Serilog;
 
 namespace ModSink.Common.Client
 {
@@ -12,7 +12,6 @@ namespace ModSink.Common.Client
         private readonly IDownloader downloader;
         private readonly SourceList<IDownload> downloads = new SourceList<IDownload>();
         private byte simultaneousDownloads;
-        private ILogger Log => Serilog.Log.ForContext<DownloadService>();
 
         public DownloadService(IDownloader downloader)
         {
@@ -34,7 +33,7 @@ namespace ModSink.Common.Client
 
         public void Add(IDownload download)
         {
-            Log.Debug("Scheduling {download}", download);
+            LogTo.Debug("Scheduling {download}", download);
             downloads.Add(download);
             CheckDownloadsToStart();
         }

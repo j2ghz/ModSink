@@ -1,9 +1,11 @@
 ﻿using System;
 using System.IO;
+using System.Net;
 using System.Net.Http;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
+using Anotar.Serilog;
 using Fusillade;
 using Humanizer;
 using Humanizer.Bytes;
@@ -32,7 +34,19 @@ namespace ModSink.Common
 
                     //Read response
                     report(ByteSize.FromBytes(0), ByteSize.FromBytes(0), TransferState.ReadingResponse);
-                    response.EnsureSuccessStatusCode();
+
+                    try
+                    {
+                        response.EnsureSuccessStatusCode();
+                    }
+                    catch (HttpRequestException)
+                    {
+                        if (response.StatusCode == HttpStatusCode.NotFound)
+                            LogTo.Warning("Downloading '{url}' failed, server responded with 404 (NotFound)'",
+                                source);
+                        throw;
+                    }
+
                     if (expectedLength != 0)
                         if (response.Content.Headers.ContentLength > 0)
                             if (Convert.ToUInt64(response.Content.Headers.ContentLength) != expectedLength)

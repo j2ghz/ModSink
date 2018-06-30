@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Linq;
 using System.Reactive.Linq;
+using Anotar.Serilog;
 using Humanizer;
 using ModSink.Core.Client;
 using ReactiveUI;
-using Serilog;
 
 namespace ModSink.WPF.ViewModel
 {
@@ -46,7 +46,6 @@ namespace ModSink.WPF.ViewModel
             LogErrors(state);
         }
 
-        private ILogger log => Log.ForContext<DownloadViewModel>().ForContext("downloadName", Name);
         public string State => state.Value;
         public string Downloaded => downloaded.Value;
         public string Name { get; }
@@ -54,10 +53,10 @@ namespace ModSink.WPF.ViewModel
         public string Size => size.Value;
         public string Speed => speed.Value;
 
-        private void LogErrors(IHandleObservableErrors oaph)
+        private static void LogErrors(IHandleObservableErrors oaph)
         {
             oaph.ThrownExceptions.Subscribe(e =>
-                log.Error(e, "{downloadName} An exception from Observable of underlying download was caught"));
+                LogTo.Error(e, "{downloadName} An exception from Observable of underlying download was caught"));
         }
     }
 }

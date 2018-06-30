@@ -13,7 +13,6 @@ using ModSink.Core.Models;
 using ModSink.Core.Models.Group;
 using ModSink.Core.Models.Repo;
 using ReactiveUI;
-using Serilog;
 
 namespace ModSink.Common.Client
 {
@@ -56,7 +55,7 @@ namespace ModSink.Common.Client
             {
                 var fileSignature = fh.Value;
                 var (available, stream) = await LocalStorageService.WriteIfMissingOrInvalid(fileSignature);
-                Log.Debug("Check {fh}, Exists: {exists}", fileSignature.Hash, available);
+                LogTo.Debug("Check {fh}, Exists: {exists}", fileSignature.Hash, available);
                 if (!available)
                     DownloadService.Add(new Download(GetDownloadUri(fileSignature), stream,
                         fileSignature.ToString()));
@@ -74,7 +73,7 @@ namespace ModSink.Common.Client
         private async Task<T> Load<T>(Uri uri) where T : IBaseUri
         {
             LogTo.Information("Loading {T} from {url}", typeof(T), uri);
-            using (var mem = new MemoryStream()) 
+            using (var mem = new MemoryStream())
             {
                 await Downloader.Download(uri, mem);
                 LogTo.Debug("Deserializing, size: {size}", mem.Length.Bytes().Humanize("G03"));

@@ -9,7 +9,7 @@
     <PackageProjectUrl>https://github.com/j2ghz/ModSink.Common</PackageProjectUrl>
     <Copyright>Copyright (C) 2017 Jozef Hollý</Copyright>
     <LangVersion>latest</LangVersion>
-    <DebugType>embedded</DebugType>
+    <DebugType>portable</DebugType>
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
 
