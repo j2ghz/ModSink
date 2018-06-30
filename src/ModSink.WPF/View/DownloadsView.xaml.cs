@@ -1,28 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+﻿using System.Reactive.Disposables;
+using ModSink.WPF.ViewModel;
+using ReactiveUI;
 
 namespace ModSink.WPF.View
 {
-    /// <summary>
-    /// Interaction logic for DownloadsView.xaml
-    /// </summary>
-    public partial class DownloadsView : UserControl
+    public partial class DownloadsView : ReactiveUserControl<DownloadsViewModel>
     {
         public DownloadsView()
         {
             InitializeComponent();
+
+            this.WhenActivated(d =>
+            {
+                this.OneWayBind(ViewModel, vm => vm.QueueCount, v => v.TbQueueCount.Text).DisposeWith(d);
+                this.OneWayBind(ViewModel, vm => vm.Downloads, v => v.LvDownloads.ItemsSource).DisposeWith(d);
+            });
         }
     }
 }

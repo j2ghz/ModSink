@@ -15,11 +15,11 @@
         <TabItem Header="Library">
             <v:LibraryView x:Name="LibraryView" />
         </TabItem>
-        <!--<TabItem Header="Downloads">
-            <v:DownloadsView DataContext="{Binding DownloadsVM}" />
+        <TabItem Header="Downloads">
+            <v:DownloadsView x:Name="DownloadsView" />
         </TabItem>
-        <TabItem Header="Settings">
+        <!-- TabItem Header="Settings">
             <v:SettingsView DataContext="{Binding SettingsVM}" />
-        </TabItem>-->
+        </>-->
     </controls:MetroTabControl>
 </controls:MetroWindow>
