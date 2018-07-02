@@ -1,14 +1,14 @@
 ﻿using System;
 using System.IO;
 using System.Threading.Tasks;
-using ModSink.Core;
-using ModSink.Core.Client;
-using ModSink.Core.Models.Repo;
+using DynamicData;
+using ModSink.Common.Models.Repo;
 
 namespace ModSink.Common.Client
 {
     public class LocalStorageService : ILocalStorageService
     {
+        private readonly SourceList<FileSignature> filesAvailable = new SourceList<FileSignature>();
         private readonly DirectoryInfo localDir;
 
         public LocalStorageService(DirectoryInfo localDir)
@@ -16,6 +16,10 @@ namespace ModSink.Common.Client
             this.localDir = localDir;
             if (!localDir.Exists)
                 localDir.Create();
+            filesAvailable.Edit(l =>
+            {
+                //localDir.EnumerateFiles().Select(fi=>new FileSignature(new HashValue(), ))
+            });
         }
 
         public async Task Delete(FileSignature fileSignature)
