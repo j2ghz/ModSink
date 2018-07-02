@@ -1,4 +1,5 @@
-﻿using System.Reactive.Disposables;
+﻿using System;
+using System.Reactive.Disposables;
 using ModSink.Core.Models.Repo;
 using ReactiveUI;
 
@@ -7,7 +8,7 @@ namespace ModSink.WPF.View
     /// <summary>
     ///     Interaction logic for ModView.xaml
     /// </summary>
-    public partial class ModView : ReactiveUserControl<ModEntry>
+    public class ModView : ReactiveUserControl<ModEntry>
     {
         public ModView()
         {

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using ModSink.Common.Client;
 using ModSink.Core;
 
 namespace ModSink.WPF.Helpers
@@ -12,7 +11,5 @@ namespace ModSink.WPF.Helpers
                 Environment.SpecialFolderOption.Create), nameof(ModSink)));
 
         public static DirectoryInfo Downloads => AppData.ChildDir("Downloads");
-
-
     }
 }

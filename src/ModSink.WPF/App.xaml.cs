@@ -39,7 +39,7 @@ namespace ModSink.WPF
             Locator.CurrentMutable.InitializeReactiveUI();
             Locator.CurrentMutable.RegisterViewsForViewModels(typeof(App).Assembly);
 
-            Locator.CurrentMutable.RegisterConstant(new AppBootstrapper(),typeof(AppBootstrapper));
+            Locator.CurrentMutable.RegisterConstant(new AppBootstrapper(), typeof(AppBootstrapper));
 
             //TODO: Load plugins, waiting on https://stackoverflow.com/questions/46351411
         }
@@ -58,7 +58,7 @@ namespace ModSink.WPF
 
         protected override void OnExit(ExitEventArgs e)
         {
-            Countly.EndSession().ContinueWith(_=>LogTo.Information("Shutdown finished."));
+            Countly.EndSession().ContinueWith(_ => LogTo.Information("Shutdown finished."));
             base.OnExit(e);
         }
 

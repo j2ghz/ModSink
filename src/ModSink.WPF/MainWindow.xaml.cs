@@ -1,8 +1,5 @@
-﻿using System;
-using System.Reactive.Disposables;
+﻿using System.Reactive.Disposables;
 using System.Reflection;
-using System.Windows;
-using System.Windows.Controls;
 using MahApps.Metro.Controls;
 using ModSink.WPF.ViewModel;
 using ReactiveUI;
@@ -14,7 +11,7 @@ namespace ModSink.WPF
     {
         public MainWindow()
         {
-            this.ViewModel = Locator.Current.GetService<AppBootstrapper>();
+            ViewModel = Locator.Current.GetService<AppBootstrapper>();
 
             InitializeComponent();
 
@@ -25,7 +22,6 @@ namespace ModSink.WPF
             {
                 this.OneWayBind(ViewModel, vm => vm.LibraryVM, v => v.LibraryView.ViewModel).DisposeWith(d);
                 this.OneWayBind(ViewModel, vm => vm.DownloadsVM, v => v.DownloadsView.ViewModel).DisposeWith(d);
-                //this.Events().Closed.Log(this,"Closing main window").Subscribe(e => Application.Current.Shutdown());
             });
         }
 

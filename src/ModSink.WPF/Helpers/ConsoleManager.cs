@@ -1,16 +1,18 @@
-﻿namespace ModSink.WPF.Helpers
-{
-    using System;
-    using System.Diagnostics;
-    using System.IO;
-    using System.Reflection;
-    using System.Runtime.InteropServices;
-    using System.Security;
+﻿using System;
+using System.Diagnostics;
+using System.IO;
+using System.Reflection;
+using System.Runtime.InteropServices;
+using System.Security;
 
+namespace ModSink.WPF.Helpers
+{
     [SuppressUnmanagedCodeSecurity]
     public static class ConsoleManager
     {
         private const string Kernel32_DllName = "kernel32.dll";
+
+        public static bool HasConsole => GetConsoleWindow() != IntPtr.Zero;
 
         [DllImport(Kernel32_DllName)]
         private static extern bool AllocConsole();
@@ -24,13 +26,8 @@
         [DllImport(Kernel32_DllName)]
         private static extern int GetConsoleOutputCP();
 
-        public static bool HasConsole
-        {
-            get { return GetConsoleWindow() != IntPtr.Zero; }
-        }
-
         /// <summary>
-        /// Creates a new console instance if the process is not attached to a console already.
+        ///     Creates a new console instance if the process is not attached to a console already.
         /// </summary>
         public static void Show()
         {
@@ -40,11 +37,13 @@
                 AllocConsole();
                 InvalidateOutAndError();
             }
+
             //#endif
         }
 
         /// <summary>
-        /// If the process has a console attached to it, it will be detached and no longer visible. Writing to the System.Console is still possible, but no output will be shown.
+        ///     If the process has a console attached to it, it will be detached and no longer visible. Writing to the
+        ///     System.Console is still possible, but no output will be shown.
         /// </summary>
         public static void Hide()
         {
@@ -54,33 +53,30 @@
                 SetOutAndErrorNull();
                 FreeConsole();
             }
+
             //#endif
         }
 
         public static void Toggle()
         {
             if (HasConsole)
-            {
                 Hide();
-            }
             else
-            {
                 Show();
-            }
         }
 
-        static void InvalidateOutAndError()
+        private static void InvalidateOutAndError()
         {
-            Type type = typeof(System.Console);
+            var type = typeof(Console);
 
-            System.Reflection.FieldInfo _out = type.GetField("_out",
-                System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.NonPublic);
+            var _out = type.GetField("_out",
+                BindingFlags.Static | BindingFlags.NonPublic);
 
-            System.Reflection.FieldInfo _error = type.GetField("_error",
-                System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.NonPublic);
+            var _error = type.GetField("_error",
+                BindingFlags.Static | BindingFlags.NonPublic);
 
-            System.Reflection.MethodInfo _InitializeStdOutError = type.GetMethod("InitializeStdOutError",
-                System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.NonPublic);
+            var _InitializeStdOutError = type.GetMethod("InitializeStdOutError",
+                BindingFlags.Static | BindingFlags.NonPublic);
 
             Debug.Assert(_out != null);
             Debug.Assert(_error != null);
@@ -90,10 +86,10 @@
             _out.SetValue(null, null);
             _error.SetValue(null, null);
 
-            _InitializeStdOutError.Invoke(null, new object[] { true });
+            _InitializeStdOutError.Invoke(null, new object[] {true});
         }
 
-        static void SetOutAndErrorNull()
+        private static void SetOutAndErrorNull()
         {
             Console.SetOut(TextWriter.Null);
             Console.SetError(TextWriter.Null);
