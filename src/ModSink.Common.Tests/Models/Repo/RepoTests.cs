@@ -2,12 +2,11 @@
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 using FluentAssertions;
-using ModSink.Common.Models.Repo;
 using Xunit;
 
-namespace Modsink.Common.Tests
+namespace Modsink.Common.Tests.Models.Repo
 {
-    public class ModelsSerializationTests
+    public class RepoTests
     {
         private readonly IFormatter formatter = new BinaryFormatter();
 
@@ -20,7 +19,13 @@ namespace Modsink.Common.Tests
             stream.Length.Should().BeGreaterThan(0);
             stream.Position = 0;
             var obj = formatter.Deserialize(stream);
-            Assert.IsAssignableFrom<Repo>(obj);
+            Assert.IsAssignableFrom<ModSink.Common.Models.Repo.Repo>(obj);
+        }
+
+        [Fact]
+        public void RepoIsSerializable()
+        {
+            TestDataBuilder.Repo().Should().BeBinarySerializable();
         }
     }
 }
