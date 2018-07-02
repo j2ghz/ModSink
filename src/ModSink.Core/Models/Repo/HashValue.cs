@@ -17,6 +17,15 @@ namespace ModSink.Core.Models.Repo
             Value = value.ToArray();
         }
 
+        /// <summary>
+        ///     Reverses <see cref="HashValue" />.<see cref="ToString" />
+        /// </summary>
+        /// <param name="str">Result of <see cref="HashValue" />.<see cref="ToString" /></param>
+        public HashValue(string str)
+        {
+            Value = Array.ConvertAll(str.Split('-'), s => Convert.ToByte(s, 16));
+        }
+
         public byte[] Value { get; }
 
         public bool Equals(HashValue other)

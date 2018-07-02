@@ -18,11 +18,11 @@ namespace ModSink.Core.Models.Repo
             Length = Convert.ToUInt64(length);
         }
 
-        public HashValue Hash { get; set; }
+        public HashValue Hash { get; }
         /// <summary>
         /// The length of the file taken from <see cref="FileInfo"/>, in bytes.
         /// </summary>
-        public ulong Length { get; set; }
+        public ulong Length { get; }
 
 
         public bool Equals(FileSignature other)
@@ -32,7 +32,7 @@ namespace ModSink.Core.Models.Repo
 
         public override bool Equals(object obj)
         {
-            if (ReferenceEquals(null, obj)) return false;
+            if (obj is null) return false;
             return obj is FileSignature signature && Equals(signature);
         }
 
