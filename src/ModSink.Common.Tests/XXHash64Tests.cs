@@ -1,8 +1,8 @@
 ﻿using ModSink.Common;
-using ModSink.Core.Models.Repo;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using ModSink.Common.Models.Repo;
 using Xunit;
 
 namespace Modsink.Common.Tests

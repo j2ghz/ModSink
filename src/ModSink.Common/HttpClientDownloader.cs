@@ -9,8 +9,8 @@ using Anotar.Serilog;
 using Fusillade;
 using Humanizer;
 using Humanizer.Bytes;
-using ModSink.Core.Client;
-using static ModSink.Core.Client.DownloadProgress;
+using ModSink.Common.Client;
+using static ModSink.Common.Client.DownloadProgress;
 
 namespace ModSink.Common
 {

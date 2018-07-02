@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace ModSink.Core.Models.Repo
+namespace ModSink.Common.Models.Repo
 {
     [Serializable]
     public class Modpack

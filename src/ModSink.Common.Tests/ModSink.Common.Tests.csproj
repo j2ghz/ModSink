@@ -16,7 +16,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ModSink.Common\ModSink.Common.csproj" />
-    <ProjectReference Include="..\ModSink.Core\ModSink.Core.csproj" />
   </ItemGroup>
 
   <ItemGroup>

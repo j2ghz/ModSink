@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace ModSink.Core.Models.Repo
+namespace ModSink.Common.Models.Repo
 {
     [Serializable]
     public class ModEntry

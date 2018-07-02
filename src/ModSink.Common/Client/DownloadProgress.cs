@@ -1,7 +1,7 @@
-﻿using Humanizer.Bytes;
-using System;
+﻿using System;
+using Humanizer.Bytes;
 
-namespace ModSink.Core.Client
+namespace ModSink.Common.Client
 {
     public struct DownloadProgress
     {
@@ -12,10 +12,10 @@ namespace ModSink.Core.Client
 
         public DownloadProgress(ByteSize size, ByteSize downloaded, TransferState state)
         {
-            this.Size = size;
-            this.Downloaded = downloaded;
-            this.State = state;
-            this.Timestamp = DateTime.Now;
+            Size = size;
+            Downloaded = downloaded;
+            State = state;
+            Timestamp = DateTime.Now;
         }
 
         public enum TransferState
@@ -27,6 +27,6 @@ namespace ModSink.Core.Client
             Finished
         }
 
-        public ByteSize Remaining => this.Size.Subtract(this.Downloaded);
+        public ByteSize Remaining => Size.Subtract(Downloaded);
     }
 }

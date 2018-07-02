@@ -1,17 +1,14 @@
-﻿using System;
-using ModSink.Core;
-using ModSink.Core.Server;
-using ModSink.Core.Client;
+﻿using ModSink.Common.Client;
 
 namespace ModSink.Common
 {
-    public class ModSink : IModSink
+    public class ModSink
     {
-        public ModSink( IClientService client)
+        public ModSink(ClientService client)
         {
-            this.Client = client;
+            Client = client;
         }
 
-        public IClientService Client { get; }
+        public ClientService Client { get; }
     }
 }

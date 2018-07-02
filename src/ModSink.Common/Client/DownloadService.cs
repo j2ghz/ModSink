@@ -3,14 +3,13 @@ using System.Linq;
 using System.Net;
 using Anotar.Serilog;
 using DynamicData;
-using ModSink.Core.Client;
 
 namespace ModSink.Common.Client
 {
-    public class DownloadService : IDownloadService
+    public class DownloadService
     {
         private readonly IDownloader downloader;
-        private readonly SourceCache<IDownload, Guid> downloads = new SourceCache<IDownload, Guid>(d => d.Id);
+        private readonly SourceCache<Download, Guid> downloads = new SourceCache<Download, Guid>(d => d.Id);
         private byte simultaneousDownloads;
 
         public DownloadService(IDownloader downloader)
@@ -29,9 +28,9 @@ namespace ModSink.Common.Client
             }
         }
 
-        public IObservableCache<IDownload, Guid> Downloads => downloads.AsObservableCache();
+        public IObservableCache<Download, Guid> Downloads => downloads.AsObservableCache();
 
-        public void Add(IDownload download)
+        public void Add(Download download)
         {
             LogTo.Debug("Scheduling {download}", download);
             downloads.AddOrUpdate(download);
@@ -40,7 +39,8 @@ namespace ModSink.Common.Client
 
         private void CheckDownloadsToStart()
         {
-            var toStart = SimultaneousDownloads - downloads.Items.Count(d => d.State == DownloadState.Downloading);
+            var toStart = SimultaneousDownloads -
+                          downloads.Items.Count(d => d.State == Download.DownloadState.Downloading);
             for (var i = 0; i < toStart; i++)
             {
                 var d = NextDownload();
@@ -50,9 +50,9 @@ namespace ModSink.Common.Client
             }
         }
 
-        private IDownload NextDownload()
+        private Download NextDownload()
         {
-            return Downloads.Items.FirstOrDefault(d => d.State == DownloadState.Queued);
+            return Downloads.Items.FirstOrDefault(d => d.State == Download.DownloadState.Queued);
         }
     }
 }

@@ -1,18 +1,14 @@
-﻿using ModSink.Core;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Text;
-using ModSink.Core.Models.Repo;
 using System.IO;
-using System.Threading;
-using System.Reactive.Linq;
-using System.Threading.Tasks;
 using System.Linq;
-using System.Reactive.Disposables;
+using System.Threading;
+using System.Threading.Tasks;
+using ModSink.Common.Models.Repo;
 
 namespace ModSink.Common
 {
-    public class HashingService : IHashingService
+    public class HashingService
     {
         private readonly IHashFunction hashFunction;
 
@@ -24,21 +20,17 @@ namespace ModSink.Common
         public async Task<HashValue> GetFileHash(FileInfo file, CancellationToken cancel)
         {
             if (file.Length > 0)
-            {
                 using (var stream = file.OpenRead())
                 {
-                    return await this.hashFunction.ComputeHashAsync(stream, cancel);
+                    return await hashFunction.ComputeHashAsync(stream, cancel);
                 }
-            }
-            else
-            {
-                return this.hashFunction.HashOfEmpty;
-            }
+
+            return hashFunction.HashOfEmpty;
         }
 
         public async Task<HashValue> GetFileHash(Stream stream, CancellationToken cancel)
         {
-            return await this.hashFunction.ComputeHashAsync(stream, cancel);
+            return await hashFunction.ComputeHashAsync(stream, cancel);
         }
 
         public IEnumerable<Lazy<Task<FileWithHash>>> GetFileHashes(DirectoryInfo directory, CancellationToken token)
@@ -63,10 +55,7 @@ namespace ModSink.Common
             {
                 var dir = directoryStack.Pop();
                 dir.EnumerateDirectories().ForEach(directoryStack.Push);
-                foreach (var file in dir.EnumerateFiles())
-                {
-                    yield return file;
-                }
+                foreach (var file in dir.EnumerateFiles()) yield return file;
             }
         }
     }

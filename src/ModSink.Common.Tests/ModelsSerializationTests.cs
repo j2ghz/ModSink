@@ -2,7 +2,7 @@
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 using FluentAssertions;
-using ModSink.Core.Models.Repo;
+using ModSink.Common.Models.Repo;
 using Xunit;
 
 namespace Modsink.Common.Tests

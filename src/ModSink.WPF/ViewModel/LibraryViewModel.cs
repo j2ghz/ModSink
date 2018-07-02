@@ -4,8 +4,8 @@ using System.Reactive.Linq;
 using Anotar.Serilog;
 using DynamicData;
 using DynamicData.Binding;
-using ModSink.Core.Client;
-using ModSink.Core.Models.Repo;
+using ModSink.Common.Client;
+using ModSink.Common.Models.Repo;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
@@ -13,7 +13,7 @@ namespace ModSink.WPF.ViewModel
 {
     public class LibraryViewModel : ReactiveObject
     {
-        public LibraryViewModel(IClientService clientService)
+        public LibraryViewModel(ClientService clientService)
         {
             ClientService = clientService;
             ClientService.Repos
@@ -41,7 +41,7 @@ namespace ModSink.WPF.ViewModel
             new ObservableCollectionExtended<Modpack>();
 
 
-        [Reactive] public IClientService ClientService { get; set; }
+        [Reactive] public ClientService ClientService { get; set; }
 
         [Reactive] public Modpack SelectedModpack { get; set; }
     }

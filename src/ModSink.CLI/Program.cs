@@ -11,10 +11,8 @@ using Humanizer;
 using Microsoft.Extensions.CommandLineUtils;
 using ModSink.Common;
 using ModSink.Common.Client;
-using ModSink.Core;
-using ModSink.Core.Client;
-using ModSink.Core.Models.Group;
-using ModSink.Core.Models.Repo;
+using ModSink.Common.Models.Group;
+using ModSink.Common.Models.Repo;
 using Serilog;
 
 namespace ModSink.CLI

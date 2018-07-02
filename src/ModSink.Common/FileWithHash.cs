@@ -1,17 +1,14 @@
-﻿using ModSink.Core.Models.Repo;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Text;
+﻿using System.IO;
+using ModSink.Common.Models.Repo;
 
-namespace ModSink.Core
+namespace ModSink.Common
 {
     public class FileWithHash
     {
         public FileWithHash(FileInfo file, HashValue hash)
         {
-            this.File = file;
-            this.Hash = hash;
+            File = file;
+            Hash = hash;
         }
 
         public FileInfo File { get; set; }

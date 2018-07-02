@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Text;
+﻿using System.IO;
 
-namespace ModSink.Core
+namespace ModSink.Common
 {
     public static class FileSystemInfoExtensions
     {
@@ -20,6 +17,5 @@ namespace ModSink.Core
             var childPath = Path.Combine(parentPath, child);
             return new FileInfo(childPath);
         }
-
     }
 }

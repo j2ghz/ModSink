@@ -1,9 +1,9 @@
 ﻿using System;
 using System.IO;
 using System.Threading.Tasks;
-using ModSink.Core.Models.Repo;
+using ModSink.Common.Models.Repo;
 
-namespace ModSink.Core.Client
+namespace ModSink.Common.Client
 {
     public interface ILocalStorageService
     {

@@ -3,7 +3,7 @@ using System.IO;
 using System.Threading.Tasks;
 using FluentAssertions;
 using ModSink.Common.Client;
-using ModSink.Core.Models.Repo;
+using ModSink.Common.Models.Repo;
 using Xunit;
 
 namespace Modsink.Common.Tests.Client

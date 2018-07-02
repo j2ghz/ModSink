@@ -2,14 +2,14 @@
 using System.Reactive.Linq;
 using DynamicData;
 using DynamicData.Binding;
-using ModSink.Core.Client;
+using ModSink.Common.Client;
 using ReactiveUI;
 
 namespace ModSink.WPF.Model
 {
     public class SettingsModel : ReactiveObject
     {
-        public SettingsModel(IClientService client)
+        public SettingsModel(ClientService client)
         {
             Client = client;
             client.GroupUrls.Connect().ObserveOnDispatcher()
@@ -20,7 +20,7 @@ namespace ModSink.WPF.Model
             client.GroupUrls.Add(@"https://modsink.j2ghz.com/group.bin");
         }
 
-        public IClientService Client { get; }
+        public ClientService Client { get; }
 
         public ObservableCollectionExtended<string> GroupUrls { get; } = new ObservableCollectionExtended<string>();
     }

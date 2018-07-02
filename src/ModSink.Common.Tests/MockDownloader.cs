@@ -7,7 +7,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Humanizer.Bytes;
 using ModSink.Common.Client;
-using ModSink.Core.Client;
 using System.Reactive.Subjects;
 
 namespace Modsink.Common.Tests

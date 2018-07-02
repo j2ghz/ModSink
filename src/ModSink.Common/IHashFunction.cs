@@ -1,11 +1,9 @@
-﻿using ModSink.Core.Models.Repo;
-using System;
-using System.Collections.Generic;
-using System.IO;
+﻿using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using ModSink.Common.Models.Repo;
 
-namespace ModSink.Core
+namespace ModSink.Common
 {
     public interface IHashFunction
     {

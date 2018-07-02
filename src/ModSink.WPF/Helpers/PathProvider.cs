@@ -1,6 +1,6 @@
 ﻿using System;
 using System.IO;
-using ModSink.Core;
+using ModSink.Common;
 
 namespace ModSink.WPF.Helpers
 {

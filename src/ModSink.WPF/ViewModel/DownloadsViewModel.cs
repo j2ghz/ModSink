@@ -5,7 +5,7 @@ using DynamicData;
 using DynamicData.Aggregation;
 using DynamicData.Binding;
 using Humanizer;
-using ModSink.Core.Client;
+using ModSink.Common.Client;
 using ReactiveUI;
 
 namespace ModSink.WPF.ViewModel
@@ -14,19 +14,19 @@ namespace ModSink.WPF.ViewModel
     {
         private readonly ObservableAsPropertyHelper<string> queueCount;
 
-        public DownloadsViewModel(IClientService clientService)
+        public DownloadsViewModel(ClientService clientService)
         {
             var ds = clientService.DownloadService.Downloads.Connect();
             ds
                 .AutoRefresh(d => d.State)
-                .Filter(d => d.State == DownloadState.Downloading)
+                .Filter(d => d.State == Download.DownloadState.Downloading)
                 .Transform(d => new DownloadViewModel(d))
                 .DisposeMany()
                 .Bind(Downloads)
                 .Subscribe();
             queueCount = ds
                 .AutoRefresh(d => d.State)
-                .Filter(d => d.State == DownloadState.Queued)
+                .Filter(d => d.State == Download.DownloadState.Queued)
                 .Count()
                 .Select(i => "file".ToQuantity(i))
                 .ToProperty(this, t => t.QueueCount);

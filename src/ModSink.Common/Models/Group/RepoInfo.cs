@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ModSink.Core.Models.Group
+namespace ModSink.Common.Models.Group
 {
     [Serializable]
     public class RepoInfo

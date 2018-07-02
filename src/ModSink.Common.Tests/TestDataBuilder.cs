@@ -1,10 +1,10 @@
-﻿using ModSink.Core.Models.Repo;
-using System.Linq;
+﻿using System.Linq;
 using System.Collections.Generic;
 using System.Text;
 using Bogus;
 using System;
 using System.IO;
+using ModSink.Common.Models.Repo;
 
 namespace Modsink.Common.Tests
 {

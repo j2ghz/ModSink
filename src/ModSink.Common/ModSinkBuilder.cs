@@ -1,8 +1,6 @@
 ﻿using System.IO;
 using System.Runtime.Serialization;
 using ModSink.Common.Client;
-using ModSink.Core;
-using ModSink.Core.Client;
 
 namespace ModSink.Common
 {
@@ -30,7 +28,7 @@ namespace ModSink.Common
             return this;
         }
 
-        public IModSink Build()
+        public ModSink Build()
         {
             return new ModSink(new ClientService(new DownloadService(downloader),
                 new LocalStorageService(localStorageDirectory), downloader, formatter));

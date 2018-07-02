@@ -6,14 +6,14 @@ using System.Threading.Tasks;
 using Anotar.Serilog;
 using Humanizer;
 using Humanizer.Bytes;
-using ModSink.Core.Client;
 using ReactiveUI;
 using Stateless;
 
 namespace ModSink.Common.Client
 {
-    public class Download : ReactiveObject, IDownload
+    public partial class Download : ReactiveObject
     {
+
         private readonly BehaviorSubject<DownloadProgress> progress =
             new BehaviorSubject<DownloadProgress>(new DownloadProgress(ByteSize.FromBytes(0), ByteSize.FromBytes(0),
                 DownloadProgress.TransferState.NotStarted));

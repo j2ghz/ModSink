@@ -3,7 +3,7 @@ using System.Linq;
 using System.Reactive.Linq;
 using Anotar.Serilog;
 using Humanizer;
-using ModSink.Core.Client;
+using ModSink.Common.Client;
 using ReactiveUI;
 
 namespace ModSink.WPF.ViewModel
@@ -16,7 +16,7 @@ namespace ModSink.WPF.ViewModel
         private readonly ObservableAsPropertyHelper<string> speed;
         private readonly ObservableAsPropertyHelper<string> state;
 
-        public DownloadViewModel(IDownload download)
+        public DownloadViewModel(Download download)
         {
             Name = download.Name;
             var dp = download.Progress

@@ -8,17 +8,16 @@ using System.Threading.Tasks;
 using Anotar.Serilog;
 using DynamicData;
 using Humanizer;
-using ModSink.Core.Client;
-using ModSink.Core.Models;
-using ModSink.Core.Models.Group;
-using ModSink.Core.Models.Repo;
+using ModSink.Common.Models;
+using ModSink.Common.Models.Group;
+using ModSink.Common.Models.Repo;
 using ReactiveUI;
 
 namespace ModSink.Common.Client
 {
-    public class ClientService : ReactiveObject, IClientService
+    public class ClientService : ReactiveObject
     {
-        public ClientService(IDownloadService downloadService, ILocalStorageService localStorageService,
+        public ClientService(DownloadService downloadService, ILocalStorageService localStorageService,
             IDownloader downloader, IFormatter serializationFormatter)
         {
             DownloadService = downloadService;
@@ -42,7 +41,7 @@ namespace ModSink.Common.Client
         public IFormatter SerializationFormatter { get; }
         public IObservableList<Group> Groups { get; }
         public ISourceList<string> GroupUrls { get; } = new SourceList<string>();
-        public IDownloadService DownloadService { get; }
+        public DownloadService DownloadService { get; }
         public ILocalStorageService LocalStorageService { get; }
         public IObservableList<Repo> Repos { get; }
 

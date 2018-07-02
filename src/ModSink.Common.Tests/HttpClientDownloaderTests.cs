@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using Humanizer.Bytes;
 using ModSink.Common;
-using ModSink.Core.Client;
+using ModSink.Common.Client;
 using Xunit;
 
 namespace Modsink.Common.Tests

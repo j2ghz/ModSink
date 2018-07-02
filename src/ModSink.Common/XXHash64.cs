@@ -2,8 +2,7 @@
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using ModSink.Core;
-using ModSink.Core.Models.Repo;
+using ModSink.Common.Models.Repo;
 
 namespace ModSink.Common
 {
