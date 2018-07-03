@@ -22,7 +22,7 @@ namespace Modsink.Common.Tests.Models.Repo
         [Fact]
         public void IsSerializeable()
         {
-            for (var i = 0; i < 5; i++) HashValue.Should().BeBinarySerializable();
+            for (var i = 0; i < 10; i++) HashValue.Should().BeBinarySerializable();
         }
     }
 }

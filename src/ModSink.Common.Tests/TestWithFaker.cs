@@ -1,5 +1,7 @@
-﻿using Bogus;
+﻿using System;
+using Bogus;
 using FluentAssertions;
+using FluentAssertions.Equivalency;
 using Xunit;
 
 namespace ModSink.Common.Tests
@@ -18,7 +20,7 @@ namespace ModSink.Common.Tests
 
         [Fact]
         [Trait("Category", "Serialization")]
-        public void IsSerializeable()
+        public virtual void IsSerializeable()
         {
             for (var i = 0; i < 10; i++) Faker.Generate().Should().BeBinarySerializable();
         }

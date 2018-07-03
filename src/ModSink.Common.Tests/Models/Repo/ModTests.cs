@@ -14,7 +14,7 @@ namespace Modsink.Common.Tests.Models.Repo
                 .RuleFor(m => m.Version, f => f.System.Semver())
                 .RuleFor(m => m.Name, f => f.System.FileName())
                 .RuleFor(m => m.Files,
-                    f => f.Make(10,
+                    f => f.Make(3,
                         () => new Tuple<Uri, FileSignature>(new Uri(Path.GetFullPath(f.System.FilePath())),
                             FileSignatureTests.FileSignature)).ToDictionary(t => t.Item1, t => t.Item2));
 
