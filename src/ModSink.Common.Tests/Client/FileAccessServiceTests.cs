@@ -8,12 +8,12 @@ using Xunit;
 
 namespace Modsink.Common.Tests.Client
 {
-    public class LocalStorageServiceTests
+    public class FileAccessServiceTests
     {
         [Fact]
         public async Task CheckLocationTest()
         {
-            var lss = new LocalStorageService(new DirectoryInfo(Path.Combine(Path.GetFullPath("."), "temp\\")));
+            var lss = new FileAccessService(new DirectoryInfo(Path.Combine(Path.GetFullPath("."), "temp\\")));
             var fileSignature =
                 new FileSignature(new HashValue(new byte[] {0x99, 0xE9, 0xD8, 0x51, 0x37, 0xDB, 0x46, 0xEF}), 1UL);
 

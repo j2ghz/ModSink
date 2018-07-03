@@ -5,7 +5,7 @@ using ModSink.Common.Models.Repo;
 
 namespace ModSink.Common.Client
 {
-    public interface ILocalStorageService
+    public interface IFileAccessService
     {
         Task Delete(FileSignature fileSignature);
 

@@ -17,11 +17,11 @@ namespace ModSink.Common.Client
 {
     public class ClientService : ReactiveObject
     {
-        public ClientService(DownloadService downloadService, ILocalStorageService localStorageService,
+        public ClientService(DownloadService downloadService, IFileAccessService fileAccessService,
             IDownloader downloader, IFormatter serializationFormatter)
         {
             DownloadService = downloadService;
-            LocalStorageService = localStorageService;
+            FileAccessService = fileAccessService;
             Downloader = downloader;
             SerializationFormatter = serializationFormatter;
 
@@ -42,7 +42,7 @@ namespace ModSink.Common.Client
         public IObservableList<Group> Groups { get; }
         public ISourceList<string> GroupUrls { get; } = new SourceList<string>();
         public DownloadService DownloadService { get; }
-        public ILocalStorageService LocalStorageService { get; }
+        public IFileAccessService FileAccessService { get; }
         public IObservableList<Repo> Repos { get; }
 
 
@@ -53,7 +53,7 @@ namespace ModSink.Common.Client
             foreach (var fh in mod.Mod.Files)
             {
                 var fileSignature = fh.Value;
-                var (available, stream) = await LocalStorageService.WriteIfMissingOrInvalid(fileSignature);
+                var (available, stream) = await FileAccessService.WriteIfMissingOrInvalid(fileSignature);
                 LogTo.Debug("Check {fh}, Exists: {exists}", fileSignature.Hash, available);
                 if (!available)
                     DownloadService.Add(new Download(GetDownloadUri(fileSignature), stream,
