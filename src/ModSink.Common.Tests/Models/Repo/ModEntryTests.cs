@@ -6,9 +6,11 @@ namespace Modsink.Common.Tests.Models.Repo
 {
     public class ModEntryTests : TestWithFaker<ModEntry>
     {
-        public override Faker<ModEntry> Faker { get; } =
+        public static readonly Faker<ModEntry> ModEntryFaker =
             new Faker<ModEntry>().StrictMode(true)
                 .RuleFor(m => m.Mod, ModTests.ModFaker.Generate())
                 .RuleForType(typeof(bool), f => f.Random.Bool());
+
+        public override Faker<ModEntry> Faker { get; } = ModEntryFaker;
     }
 }

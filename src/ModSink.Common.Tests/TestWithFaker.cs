@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Bogus;
+﻿using Bogus;
 using FluentAssertions;
 using Xunit;
 
@@ -12,6 +9,7 @@ namespace ModSink.Common.Tests
         public abstract Faker<T> Faker { get; }
 
         [Fact]
+        [Trait("Category", "Serialization")]
         public void HasValidFaker()
         {
             Faker.AssertConfigurationIsValid();
@@ -19,9 +17,10 @@ namespace ModSink.Common.Tests
 
 
         [Fact]
+        [Trait("Category", "Serialization")]
         public void IsSerializeable()
         {
-            Assert.All(Faker.Generate(10), f => { f.Should().BeBinarySerializable(); });
+            for (var i = 0; i < 10; i++) Faker.Generate().Should().BeBinarySerializable();
         }
     }
 }
