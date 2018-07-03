@@ -44,10 +44,5 @@ namespace ModSink.Common.Models.Repo
                 return (Hash.GetHashCode() * 397) ^ Length.GetHashCode();
             }
         }
-
-        public override string ToString()
-        {
-            return Hash.ToString();
-        }
     }
 }
