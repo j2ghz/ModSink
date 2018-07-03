@@ -1,28 +1,14 @@
 ﻿using Bogus;
-using FluentAssertions;
 using ModSink.Common.Models.Repo;
-using Xunit;
+using ModSink.Common.Tests;
 
 namespace Modsink.Common.Tests.Models.Repo
 {
-    public class ModEntryTests
+    public class ModEntryTests : TestWithFaker<ModEntry>
     {
-        public static readonly Faker<ModEntry> ModEntryFaker =
+        public override Faker<ModEntry> Faker { get; } =
             new Faker<ModEntry>().StrictMode(true)
                 .RuleFor(m => m.Mod, ModTests.ModFaker.Generate())
                 .RuleForType(typeof(bool), f => f.Random.Bool());
-
-        [Fact]
-        public void HasValidFaker()
-        {
-            ModEntryFaker.AssertConfigurationIsValid();
-        }
-
-
-        [Fact]
-        public void IsSerializeable()
-        {
-            Assert.All(ModEntryFaker.Generate(5), modEntry => { modEntry.Should().BeBinarySerializable(); });
-        }
     }
 }
