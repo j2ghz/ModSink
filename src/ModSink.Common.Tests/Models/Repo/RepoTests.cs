@@ -1,6 +1,5 @@
-﻿using System.IO;
-using System.Runtime.Serialization;
-using System.Runtime.Serialization.Formatters.Binary;
+﻿using System;
+using Bogus;
 using FluentAssertions;
 using Xunit;
 
@@ -8,24 +7,14 @@ namespace Modsink.Common.Tests.Models.Repo
 {
     public class RepoTests
     {
-        private readonly IFormatter formatter = new BinaryFormatter();
-
         [Fact]
-        public void SerializeDeserializeRepo()
+        public void IsSerializable()
         {
-            var repo = TestDataBuilder.Repo();
-            var stream = new MemoryStream();
-            formatter.Serialize(stream, repo);
-            stream.Length.Should().BeGreaterThan(0);
-            stream.Position = 0;
-            var obj = formatter.Deserialize(stream);
-            Assert.IsAssignableFrom<ModSink.Common.Models.Repo.Repo>(obj);
-        }
-
-        [Fact]
-        public void RepoIsSerializable()
-        {
-            TestDataBuilder.Repo().Should().BeBinarySerializable();
+            var repoFaker = new Faker<ModSink.Common.Models.Repo.Repo>()
+                .StrictMode(true)
+                .RuleFor(r => r.BaseUri, f => new Uri(f.Internet.UrlWithPath()));
+            repoFaker.AssertConfigurationIsValid();
+            Assert.All(repoFaker.Generate(5), r => { r.Should().BeBinarySerializable(); });
         }
     }
 }
