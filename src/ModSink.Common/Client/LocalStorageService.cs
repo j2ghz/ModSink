@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using DynamicData;
 using ModSink.Common.Models.Repo;
@@ -18,13 +19,17 @@ namespace ModSink.Common.Client
                 localDir.Create();
             filesAvailable.Edit(l =>
             {
-                //localDir.EnumerateFiles().Select(fi=>new FileSignature(new HashValue(), ))
+                l.AddRange(localDir.EnumerateFiles()
+                    .Select(fi => new FileSignature(new HashValue(fi.Name), fi.Length)));
             });
         }
+
+        public IObservableList<FileSignature> FilesAvailable => filesAvailable.AsObservableList();
 
         public async Task Delete(FileSignature fileSignature)
         {
             var fi = await GetFileInfo(fileSignature);
+            filesAvailable.Remove(fileSignature);
             await Task.Run(() => fi.Delete());
         }
 
@@ -42,7 +47,7 @@ namespace ModSink.Common.Client
         {
             return localDir.ChildFile(GetFileName(fileSignature));
         }
-
+        [Obsolete]
         public async Task<bool> IsFileAvailable(FileSignature fileSignature)
         {
             var fi = await GetFileInfo(fileSignature);
@@ -52,13 +57,13 @@ namespace ModSink.Common.Client
         public async Task<Stream> Read(FileSignature fileSignature)
         {
             var file = await GetFileInfo(fileSignature);
-            return await Task.Run(() => file.Open(FileMode.Open, FileAccess.Read));
+            return await Task.Run(() => file.Open(FileMode.Open, FileAccess.Read,FileShare.Read));
         }
 
         public async Task<Stream> Write(FileSignature fileSignature)
         {
             var file = await GetFileInfo(fileSignature);
-            return await Task.Run(() => file.Open(FileMode.Create, FileAccess.Write));
+            return await Task.Run(() => file.Open(FileMode.Create, FileAccess.Write,FileShare.None));
         }
 
         public async Task<(bool available, Lazy<Task<Stream>> stream)> WriteIfMissingOrInvalid(
