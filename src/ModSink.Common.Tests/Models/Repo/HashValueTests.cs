@@ -1,4 +1,5 @@
-﻿using FluentAssertions;
+﻿using Bogus;
+using FluentAssertions;
 using ModSink.Common.Models.Repo;
 using Xunit;
 
@@ -6,6 +7,9 @@ namespace Modsink.Common.Tests.Models.Repo
 {
     public class HashValueTests
     {
+        private static readonly Faker Faker = new Faker();
+        public static HashValue HashValue => new HashValue(Faker.Random.Bytes(8));
+
         [Fact]
         public void CreateFromToStringResult()
         {
@@ -13,6 +17,12 @@ namespace Modsink.Common.Tests.Models.Repo
             var str = hash.ToString();
             var result = new HashValue(str);
             result.Should().BeEquivalentTo(hash);
+        }
+
+        [Fact]
+        public void IsSerializeable()
+        {
+            for (var i = 0; i < 10; i++) HashValue.Should().BeBinarySerializable();
         }
     }
 }
