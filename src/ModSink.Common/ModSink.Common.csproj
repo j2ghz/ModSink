@@ -16,6 +16,7 @@
   <ItemGroup>
     <PackageReference Include="Anotar.Serilog.Fody" Version="4.6.2" />
     <PackageReference Include="DynamicData" Version="6.4.0.2419" />
+    <PackageReference Include="Fody" Version="3.1.3" />
     <PackageReference Include="fusillade" Version="1.0.0" />
     <PackageReference Include="Humanizer" Version="2.4.2" />
     <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />

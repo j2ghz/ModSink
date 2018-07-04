@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 using System.Net;
 using System.Net.Http;
@@ -29,12 +30,13 @@ namespace ModSink.Common
                         observer.OnNext(new DownloadProgress(size, downloaded, state)));
                     //Get response
                     report(ByteSize.FromBytes(0), ByteSize.FromBytes(0), TransferState.AwaitingResponse);
+                    LogTo.Verbose("Sent request to {url}", source);
                     var response = await client.GetAsync(source, HttpCompletionOption.ResponseHeadersRead,
                         cancel);
 
                     //Read response
                     report(ByteSize.FromBytes(0), ByteSize.FromBytes(0), TransferState.ReadingResponse);
-
+                    LogTo.Verbose("Reading response");
                     try
                     {
                         response.EnsureSuccessStatusCode();
@@ -55,7 +57,7 @@ namespace ModSink.Common
                     var length = ByteSize.FromBytes(response.Content.Headers.ContentLength ?? 0);
 
                     report(length, ByteSize.FromBytes(0), TransferState.ReadingResponse);
-
+                    LogTo.Verbose("Transfer in progress");
                     var totalRead = 0;
                     using (var input = await response.Content.ReadAsStreamAsync())
                     {
@@ -74,10 +76,12 @@ namespace ModSink.Common
 
                     //Finish
                     report(length, totalRead.Bytes(), TransferState.Finished);
+                    LogTo.Verbose("Transfer finished");
                     observer.OnCompleted();
                 }
                 catch (Exception e)
                 {
+                    if (Debugger.IsAttached) throw;
                     observer.OnError(e);
                 }
 

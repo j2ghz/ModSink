@@ -79,7 +79,7 @@ namespace ModSink.WPF
                 .WriteTo.LiterateConsole(
                     outputTemplate:
                     "{Timestamp:HH:mm:ss} {Level:u3} [{SourceContext}@{ThreadId}] {Message:lj} {Properties}{NewLine}{Exception}")
-                .WriteTo.Debug()
+                .WriteTo.Debug(outputTemplate: "{Level:u3} [{SourceContext}-{ThreadId}] {Message:lj}{NewLine}{Exception}")
                 .WriteTo.RollingFile(
                     "./Logs/{Date}.log",
                     outputTemplate:

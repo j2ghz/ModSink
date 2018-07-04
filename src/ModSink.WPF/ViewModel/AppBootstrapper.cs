@@ -11,6 +11,7 @@ namespace ModSink.WPF.ViewModel
     {
         public AppBootstrapper()
         {
+            PathProvider.EnsureFoldersExist();
             var modsink = new ModSinkBuilder()
                 .WithDownloader(new HttpClientDownloader())
                 .WithFormatter(new BinaryFormatter())

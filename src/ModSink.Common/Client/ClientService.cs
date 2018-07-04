@@ -25,29 +25,25 @@ namespace ModSink.Common.Client
         {
             this.downloader = downloader;
             this.serializationFormatter = serializationFormatter;
-
-            var groups = GroupUrls
+            LogTo.Warning("Creating pipeline");
+            var repos = GroupUrls
                 .Connect()
                 .Transform(g => new Uri(g))
-                .TransformAsync(Load<Group>);
-            var repos = groups
+                .TransformAsync(Load<Group>)
                 .TransformMany(g => g.RepoInfos.Select(r => new Uri(g.BaseUri, r.Uri)))
                 .TransformAsync(Load<Repo>);
-            this.Repos = repos.AsObservableList();
-            var allFiles = repos
-                .TransformMany(r => r.Files)
-                .AsObservableList();
-            var modpacks = repos
-                .TransformMany(r => r.Modpacks);
-            var selectedModpacks = modpacks
-                .Filter(m => m.Selected);
-            var requiredFiles = selectedModpacks
+            Repos = repos.AsObservableList();
+            var allFiles = Repos.Connect().TransformMany(r => r.Files).AsObservableList();
+            var downloadQueue = Repos.Connect()
+                .TransformMany(r => r.Modpacks)
+                .AutoRefresh(m => m.Selected)
+                .Filter(m => m.Selected)
                 .TransformMany(m => m.Mods)
-                .TransformMany(m => m.Mod.Files.Values);
-            var downloadQueue = requiredFiles
-                .Transform(fs => allFiles.Items.Single(kvp => kvp.Key.Equals(fs)))
-                .Transform(kvp => new QueuedDownload(kvp.Key, kvp.Value));
-            DownloadService = new DownloadService(downloader, downloadQueue, tempDownloadsDirectory);
+                .TransformMany(m => m.Mod.Files.Values)
+                .Transform(fs => allFiles.Items.First(kvp => kvp.Key.Equals(fs)))
+                .Transform(kvp => new QueuedDownload(kvp.Key, kvp.Value))
+                .AsObservableList();
+            DownloadService = new DownloadService(downloader, downloadQueue.Connect(), tempDownloadsDirectory);
 
 
             //localFilesManager = new LocalFilesManager(requiredFiles);
