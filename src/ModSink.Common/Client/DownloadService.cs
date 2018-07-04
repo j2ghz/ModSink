@@ -1,58 +1,40 @@
 ﻿using System;
-using System.Linq;
+using System.IO;
 using System.Net;
-using Anotar.Serilog;
 using DynamicData;
+using ReactiveUI;
 
 namespace ModSink.Common.Client
 {
-    public class DownloadService
+    public class DownloadService : ReactiveObject
     {
         private readonly IDownloader downloader;
-        private readonly SourceCache<Download, Guid> downloads = new SourceCache<Download, Guid>(d => d.Id);
-        private byte simultaneousDownloads;
+        private readonly IObservable<IChangeSet<QueuedDownload>> downloadQueue;
+        private int simultaneousDownloads;
 
-        public DownloadService(IDownloader downloader)
+        public DownloadService(IDownloader downloader, IObservable<IChangeSet<QueuedDownload>> downloadQueue,
+            DirectoryInfo tempDownloadsDirectory)
         {
             this.downloader = downloader;
             SimultaneousDownloads = 5;
+            this.downloadQueue = downloadQueue;
+            ActiveDownloads = this.downloadQueue
+                .Top(SimultaneousDownloads)
+                .Transform(qd => new Download(qd, tempDownloadsDirectory, downloader))
+                .AsObservableList();
         }
 
-        public byte SimultaneousDownloads
+        public IObservableList<Download> ActiveDownloads { get; }
+
+        public int SimultaneousDownloads
         {
             get => simultaneousDownloads;
             set
             {
-                simultaneousDownloads = value;
-                ServicePointManager.DefaultConnectionLimit = value;
+                this.RaiseAndSetIfChanged(ref simultaneousDownloads, value);
+                if (ServicePointManager.DefaultConnectionLimit < value)
+                    ServicePointManager.DefaultConnectionLimit = value;
             }
-        }
-
-        public IObservableCache<Download, Guid> Downloads => downloads.AsObservableCache();
-
-        public void Add(Download download)
-        {
-            LogTo.Debug("Scheduling {download}", download);
-            downloads.AddOrUpdate(download);
-            CheckDownloadsToStart();
-        }
-
-        private void CheckDownloadsToStart()
-        {
-            var toStart = SimultaneousDownloads -
-                          downloads.Items.Count(d => d.State == Download.DownloadState.Downloading);
-            for (var i = 0; i < toStart; i++)
-            {
-                var d = NextDownload();
-                if (d == null) break;
-                d.Start(downloader);
-                d.Progress.Subscribe(_ => { }, _ => CheckDownloadsToStart(), CheckDownloadsToStart);
-            }
-        }
-
-        private Download NextDownload()
-        {
-            return Downloads.Items.FirstOrDefault(d => d.State == Download.DownloadState.Queued);
         }
     }
 }

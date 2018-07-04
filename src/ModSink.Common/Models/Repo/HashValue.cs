@@ -43,7 +43,10 @@ namespace ModSink.Common.Models.Repo
         {
             return Value.GetHashCode();
         }
-
+        /// <summary>
+        /// Converts to filename or display string
+        /// </summary>
+        /// <returns>XX-XX-XX-XX-XX-XX-XX-XX format</returns>
         public override string ToString()
         {
             return BitConverter.ToString(Value);

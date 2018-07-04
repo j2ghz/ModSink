@@ -8,6 +8,8 @@ namespace ModSink.Common.Models.Repo
     {
         public ICollection<ModEntry> Mods { get; set; }
         public string Name { get; set; }
+
+        public bool Selected { get; set; } = false;
         //public ICollection<IServer> Servers { get; set; }
     }
 }
