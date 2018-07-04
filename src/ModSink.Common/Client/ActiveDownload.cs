@@ -7,7 +7,7 @@ using ReactiveUI;
 
 namespace ModSink.Common.Client
 {
-    public partial class Download : ReactiveObject, IDisposable
+    public class ActiveDownload : ReactiveObject, IDisposable
     {
         private readonly BehaviorSubject<DownloadProgress> progress =
             new BehaviorSubject<DownloadProgress>(new DownloadProgress(ByteSize.FromBytes(0), ByteSize.FromBytes(0),
@@ -15,7 +15,7 @@ namespace ModSink.Common.Client
 
         private readonly CompositeDisposable disposable = new CompositeDisposable();
 
-        public Download(in QueuedDownload source, DirectoryInfo tempDownloadsDirectory, IDownloader downloader)
+        public ActiveDownload(in QueuedDownload source, DirectoryInfo tempDownloadsDirectory, IDownloader downloader)
         {
             Source = source.Source;
             Destination = tempDownloadsDirectory.ChildFile(source.FileSignature.Hash.ToString()).Create();

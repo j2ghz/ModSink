@@ -17,11 +17,10 @@
     <PackageReference Include="Anotar.Serilog.Fody" Version="4.6.2" />
     <PackageReference Include="DynamicData" Version="6.4.0.2419" />
     <PackageReference Include="fusillade" Version="1.0.0" />
-    <PackageReference Include="Humanizer" Version="2.3.3" />
+    <PackageReference Include="Humanizer" Version="2.4.2" />
     <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
     <PackageReference Include="ReactiveUI" Version="8.3.1" />
     <PackageReference Include="Serilog" Version="2.7.1" />
-    <PackageReference Include="Stateless" Version="4.2.1" />
     <PackageReference Include="System.Data.HashFunction.xxHash" Version="2.0.0" />
     <PackageReference Include="System.Interactive.Async.Providers" Version="3.1.1" />
     <PackageReference Include="System.Interactive.Providers" Version="3.1.1" />

@@ -16,21 +16,21 @@ namespace ModSink.WPF.ViewModel
         private readonly ObservableAsPropertyHelper<string> speed;
         private readonly ObservableAsPropertyHelper<string> state;
 
-        public DownloadViewModel(Download download)
+        public DownloadViewModel(ActiveDownload activeDownload)
         {
-            Name = download.Name;
-            var dp = download.Progress
+            Name = activeDownload.Name;
+            var dp = activeDownload.Progress
                 .Sample(TimeSpan.FromMilliseconds(100))
                 .Buffer(2, 1)
                 .Select(progList => new DownloadProgressCombined(progList.Last(), progList.First()));
 
             speed = dp.Select(p => p.Speed.Humanize("G03")).ToProperty(this, x => x.Speed);
 
-            downloaded = download.Progress
+            downloaded = activeDownload.Progress
                 .Sample(TimeSpan.FromMilliseconds(250)).Select(p => p.Downloaded.Humanize("G03"))
                 .ToProperty(this, x => x.Downloaded);
 
-            var dpRealtime = download.Progress
+            var dpRealtime = activeDownload.Progress
                 .Sample(TimeSpan.FromSeconds(1.0 / 60));
 
 
@@ -53,10 +53,10 @@ namespace ModSink.WPF.ViewModel
         public string Size => size.Value;
         public string Speed => speed.Value;
 
-        private static void LogErrors(IHandleObservableErrors oaph)
+        private void LogErrors(IHandleObservableErrors oaph)
         {
             oaph.ThrownExceptions.Subscribe(e =>
-                LogTo.Error(e, "{downloadName} An exception from Observable of underlying download was caught"));
+                LogTo.Error(e, "[{download}] failed", this.Name));
         }
     }
 }

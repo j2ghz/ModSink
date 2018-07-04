@@ -33,6 +33,7 @@ namespace ModSink.Common.Client
             var repos = groups
                 .TransformMany(g => g.RepoInfos.Select(r => new Uri(g.BaseUri, r.Uri)))
                 .TransformAsync(Load<Repo>);
+            this.Repos = repos.AsObservableList();
             var allFiles = repos
                 .TransformMany(r => r.Files)
                 .AsObservableList();
@@ -43,14 +44,16 @@ namespace ModSink.Common.Client
             var requiredFiles = selectedModpacks
                 .TransformMany(m => m.Mods)
                 .TransformMany(m => m.Mod.Files.Values);
-            var downloads = requiredFiles
+            var downloadQueue = requiredFiles
                 .Transform(fs => allFiles.Items.Single(kvp => kvp.Key.Equals(fs)))
                 .Transform(kvp => new QueuedDownload(kvp.Key, kvp.Value));
-            DownloadService = new DownloadService(downloader, downloads, tempDownloadsDirectory);
+            DownloadService = new DownloadService(downloader, downloadQueue, tempDownloadsDirectory);
 
 
             //localFilesManager = new LocalFilesManager(requiredFiles);
         }
+
+        public IObservableList<Repo> Repos { get; }
 
 
         public ISourceList<string> GroupUrls { get; } = new SourceList<string>();

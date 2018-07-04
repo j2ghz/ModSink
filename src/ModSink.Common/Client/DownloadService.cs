@@ -18,11 +18,14 @@ namespace ModSink.Common.Client
             this.downloader = downloader;
             SimultaneousDownloads = 5;
             this.downloadQueue = downloadQueue;
+            QueuedDownloads = downloadQueue.AsObservableList();
             ActiveDownloads = this.downloadQueue
                 .Top(SimultaneousDownloads)
                 .Transform(qd => new Download(qd, tempDownloadsDirectory, downloader))
                 .AsObservableList();
         }
+
+        public IObservableList<QueuedDownload> QueuedDownloads { get; }
 
         public IObservableList<Download> ActiveDownloads { get; }
 

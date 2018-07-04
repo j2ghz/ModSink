@@ -14,7 +14,7 @@ namespace ModSink.WPF.ViewModel
             var modsink = new ModSinkBuilder()
                 .WithDownloader(new HttpClientDownloader())
                 .WithFormatter(new BinaryFormatter())
-                .InDirectory(PathProvider.Downloads)
+                .InDirectory(PathProvider.Downloads,PathProvider.Temp)
                 .Build();
             Locator.CurrentMutable.RegisterConstant(modsink);
             var cs = modsink.Client;

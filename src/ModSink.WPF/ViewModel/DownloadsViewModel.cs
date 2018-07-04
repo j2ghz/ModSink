@@ -1,8 +1,7 @@
 ﻿using System;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
-using Anotar.Serilog;
 using DynamicData;
-using DynamicData.Aggregation;
 using DynamicData.Binding;
 using Humanizer;
 using ModSink.Common.Client;
@@ -10,27 +9,23 @@ using ReactiveUI;
 
 namespace ModSink.WPF.ViewModel
 {
-    public class DownloadsViewModel : ReactiveObject
+    public class DownloadsViewModel : ReactiveObject, IDisposable
     {
+        private readonly CompositeDisposable disposable = new CompositeDisposable();
         private readonly ObservableAsPropertyHelper<string> queueCount;
 
         public DownloadsViewModel(ClientService clientService)
         {
-            var ds = clientService.DownloadService.Downloads.Connect();
-            ds
-                .AutoRefresh(d => d.State)
-                .Filter(d => d.State == Download.DownloadState.Downloading)
+            var ds = clientService.DownloadService;
+            ds.ActiveDownloads.Connect()
                 .Transform(d => new DownloadViewModel(d))
                 .DisposeMany()
                 .Bind(Downloads)
-                .Subscribe();
-            queueCount = ds
-                .AutoRefresh(d => d.State)
-                .Filter(d => d.State == Download.DownloadState.Queued)
-                .Count()
+                .Subscribe()
+                .DisposeWith(disposable);
+            queueCount = ds.QueuedDownloads.CountChanged
                 .Select(i => "file".ToQuantity(i))
                 .ToProperty(this, t => t.QueueCount);
-            queueCount.ThrownExceptions.Subscribe(e => LogTo.Warning(e, "Download failed"));
         }
 
 
@@ -38,5 +33,10 @@ namespace ModSink.WPF.ViewModel
             new ObservableCollectionExtended<DownloadViewModel>();
 
         public string QueueCount => queueCount.Value;
+
+        public void Dispose()
+        {
+            disposable?.Dispose();
+        }
     }
 }
