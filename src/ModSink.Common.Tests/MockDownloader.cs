@@ -1,75 +1,56 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
-using System.Reactive.Disposables;
 using System.Reactive.Linq;
-using System.Threading;
-using System.Threading.Tasks;
+using System.Reactive.Subjects;
+using Humanizer;
 using Humanizer.Bytes;
 using ModSink.Common.Client;
-using System.Reactive.Subjects;
 
 namespace Modsink.Common.Tests
 {
     public class MockDownloader : IDownloader
     {
-        private readonly bool shouldFail;
-        private readonly bool slow;
+        private readonly IDictionary<Uri, Stream> paths;
 
-        public MockDownloader(bool shouldFail, bool slow)
+
+        public MockDownloader(IDictionary<Uri, Stream> paths)
         {
-            this.shouldFail = shouldFail;
-            this.slow = slow;
+            this.paths = paths;
         }
 
-        public IConnectableObservable<DownloadProgress> Download(Uri source, Stream destination, ulong expectedLength = 0)
+        public IConnectableObservable<DownloadProgress> Download(Uri source, Stream destination,
+            ulong expectedLength = 0)
         {
-            return Observable.Create<DownloadProgress>(async (observer,cancel) =>
+            return Observable.Create<DownloadProgress>(async (observer, cancel) =>
             {
-                //Get response
-                observer.OnNext(new DownloadProgress(
-                    ByteSize.FromBytes(0),
-                    ByteSize.FromBytes(0),
+                observer.OnNext(new DownloadProgress(0.Bits(), 0.Bits(), DownloadProgress.TransferState.NotStarted));
+                observer.OnNext(new DownloadProgress(0.Bits(), 0.Bits(),
                     DownloadProgress.TransferState.AwaitingResponse));
-
-                //Read response
-                observer.OnNext(new DownloadProgress(
-                    ByteSize.FromBytes(0),
-                    ByteSize.FromBytes(0),
+                if (!paths.TryGetValue(source, out var stream)) throw new HttpRequestException("404");
+                observer.OnNext(new DownloadProgress(stream.Length.Bytes(), 0.Bits(),
                     DownloadProgress.TransferState.ReadingResponse));
-
-                observer.OnNext(new DownloadProgress(
-                    ByteSize.FromBytes(1),
-                    ByteSize.FromBytes(0),
-                    DownloadProgress.TransferState.ReadingResponse));
-
-                //Download
-                observer.OnNext(new DownloadProgress(
-                    ByteSize.FromBytes(1),
-                    ByteSize.FromBytes(0),
+                observer.OnNext(new DownloadProgress(stream.Length.Bytes(), 0.Bits(),
                     DownloadProgress.TransferState.Downloading));
+                await stream.CopyToAsync(destination);
 
-                if (slow)
+                var totalRead = 0;
+                var buffer = new byte[16 * 1024];
+                int read;
+                
+                observer.OnNext(new DownloadProgress(stream.Length.Bytes(), ByteSize.FromBytes(0),
+                    DownloadProgress.TransferState.Downloading));
+                while ((read = await stream.ReadAsync(buffer, 0, buffer.Length, cancel)) > 0)
                 {
-                    for (var i = 0; i < 100; i++)
-                    {
-                        observer.OnNext(new DownloadProgress(
-                            ByteSize.FromBytes(100),
-                            ByteSize.FromBytes(i),
-                            DownloadProgress.TransferState.Downloading));
-                        await Task.Delay(10,cancel);
-                    }
+                    destination.Write(buffer, 0, read);
+                    totalRead += read;
+                    observer.OnNext(new DownloadProgress(stream.Length.Bytes(), totalRead.Bytes(),
+                        DownloadProgress.TransferState.Downloading));
                 }
 
-                if (shouldFail) throw new HttpRequestException();
-                //Finish
-                observer.OnNext(new DownloadProgress(
-                    ByteSize.FromBytes(1),
-                    ByteSize.FromBytes(1),
+                observer.OnNext(new DownloadProgress(stream.Length.Bytes(), totalRead.Bytes(),
                     DownloadProgress.TransferState.Finished));
-
-                observer.OnCompleted();
-                return Disposable.Empty;
             }).Publish();
         }
     }
