@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
@@ -45,6 +46,7 @@ namespace ModSink.Common.Tests
             var formatter = new BinaryFormatter();
             var groupStream = new MemoryStream();
             formatter.Serialize(groupStream, group);
+            groupStream.Position = 0;
             var fileUri = new Uri("http://localhost/file.bin");
             var fileSignature = new FileSignature(
                 new HashValue(new byte[] {0x99, 0xE9, 0xD8, 0x51, 0x37, 0xDB, 0x46, 0xEF}),
@@ -83,12 +85,14 @@ namespace ModSink.Common.Tests
             };
             var repoStream = new MemoryStream();
             formatter.Serialize(repoStream, repo);
+            repo.BaseUri = new Uri("http://localhost/");
+            repoStream.Position = 0;
             var fileStream = new MemoryStream(new byte[] {0xFA});
 
             var groupUri = new Uri("http://localhost/group.bin");
             var downloader = new MockDownloader(new Dictionary<Uri, Stream>
             {
-                {new Uri(groupUri, "./test"), groupStream},
+                {groupUri, groupStream},
                 {repoUri, repoStream},
                 {fileUri, fileStream}
             });
@@ -97,14 +101,15 @@ namespace ModSink.Common.Tests
                 .WithDownloader(downloader)
                 .WithFormatter(formatter)
                 .InDirectory(tempRoot.ChildDir("downloads"), tempRoot.ChildDir("temp")).Build();
+            m.Client.DownloadService.QueuedDownloads.Connect().Subscribe();
             //Act
             m.Client.GroupUrls.Edit(a => a.Add(groupUri.ToString()));
             //Assert
 
-            //m.Client.GroupUrls.Items.Should().HaveCount(1);
-            //m.Client.Repos.Items.Should().HaveCount(1);
-            //m.Client.Repos.Items.Should().AllBeEquivalentTo(repo);
-            //m.Client.DownloadService.QueuedDownloads.Items.Should().HaveCount(1);
+            m.Client.GroupUrls.Items.Should().HaveCount(1);
+            m.Client.Repos.Items.Should().HaveCount(1);
+            //m.Client.Repos.Items.Single().Should().BeEquivalentTo(repo);
+            m.Client.DownloadService.QueuedDownloads.Items.Should().HaveCount(1);
             //Clean up
             schedDisposable.Dispose();
         }

@@ -33,10 +33,10 @@ namespace ModSink.Common.Client
                 .TransformAsync(Load<Group>)
                 .TransformMany(g => g.RepoInfos.Select(r => new Uri(g.BaseUri, r.Uri)))
                 .TransformAsync(Load<Repo>)
-                
                 .AsObservableList();
-            
+            Repos.Connect().Subscribe();
             var allFiles = Repos.Connect().TransformMany(r => r.Files).AsObservableList();
+            allFiles.Connect().Subscribe();
             var downloadQueue = Repos.Connect()
                 .TransformMany(r => r.Modpacks)
                 .AutoRefresh(m => m.Selected)
@@ -46,6 +46,7 @@ namespace ModSink.Common.Client
                 .Transform(fs => allFiles.Items.First(kvp => kvp.Key.Equals(fs)))
                 .Transform(kvp => new QueuedDownload(kvp.Key, kvp.Value))
                 .AsObservableList();
+            downloadQueue.Connect().Subscribe();
             DownloadService = new DownloadService(downloader, downloadQueue.Connect(), tempDownloadsDirectory);
 
 

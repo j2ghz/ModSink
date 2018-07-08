@@ -7,6 +7,7 @@ using System.Reactive.Subjects;
 using Humanizer;
 using Humanizer.Bytes;
 using ModSink.Common.Client;
+using Xunit;
 
 namespace Modsink.Common.Tests
 {
@@ -28,7 +29,7 @@ namespace Modsink.Common.Tests
                 observer.OnNext(new DownloadProgress(0.Bits(), 0.Bits(), DownloadProgress.TransferState.NotStarted));
                 observer.OnNext(new DownloadProgress(0.Bits(), 0.Bits(),
                     DownloadProgress.TransferState.AwaitingResponse));
-                if (!paths.TryGetValue(source, out var stream)) throw new HttpRequestException("404");
+                var stream = paths[source];
                 observer.OnNext(new DownloadProgress(stream.Length.Bytes(), 0.Bits(),
                     DownloadProgress.TransferState.ReadingResponse));
                 observer.OnNext(new DownloadProgress(stream.Length.Bytes(), 0.Bits(),
