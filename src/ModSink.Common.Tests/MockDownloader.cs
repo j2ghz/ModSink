@@ -1,15 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Net.Http;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using Humanizer;
 using Humanizer.Bytes;
 using ModSink.Common.Client;
-using Xunit;
 
-namespace Modsink.Common.Tests
+namespace ModSink.Common.Tests
 {
     public class MockDownloader : IDownloader
     {
@@ -39,7 +37,7 @@ namespace Modsink.Common.Tests
                 var totalRead = 0;
                 var buffer = new byte[16 * 1024];
                 int read;
-                
+
                 observer.OnNext(new DownloadProgress(stream.Length.Bytes(), ByteSize.FromBytes(0),
                     DownloadProgress.TransferState.Downloading));
                 while ((read = await stream.ReadAsync(buffer, 0, buffer.Length, cancel)) > 0)

@@ -1,12 +1,11 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.Threading.Tasks;
 using FluentAssertions;
 using ModSink.Common.Client;
 using ModSink.Common.Models.Repo;
 using Xunit;
 
-namespace Modsink.Common.Tests.Client
+namespace ModSink.Common.Tests.Client
 {
     public class FileAccessServiceTests
     {
@@ -24,12 +23,14 @@ namespace Modsink.Common.Tests.Client
             {
                 stream.WriteByte(0xff);
             }
+
             (await lss.IsFileAvailable(fileSignature)).Should().BeTrue();
             using (var stream = await lss.Read(fileSignature))
             {
                 stream.ReadByte().Should().Be(0xff);
                 stream.ReadByte().Should().Be(-1);
             }
+
             var filename = (await lss.GetFileInfo(fileSignature)).FullName;
             filename.Should().StartWith(Path.Combine(Path.GetFullPath("."), "temp\\"));
             filename.Should().ContainEquivalentOf(fileSignature.Hash.ToString());

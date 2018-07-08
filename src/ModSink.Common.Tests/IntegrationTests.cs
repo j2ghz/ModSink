@@ -1,16 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Reactive.Concurrency;
-using System.Reactive.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
-using DynamicData;
 using FluentAssertions;
-using Modsink.Common.Tests;
 using ModSink.Common.Models.Group;
 using ModSink.Common.Models.Repo;
-using ReactiveUI;
 using ReactiveUI.Testing;
 using Serilog;
 using Xunit;

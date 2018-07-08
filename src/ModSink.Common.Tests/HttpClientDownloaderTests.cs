@@ -3,12 +3,10 @@ using System.IO;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
-using Humanizer.Bytes;
-using ModSink.Common;
 using ModSink.Common.Client;
 using Xunit;
 
-namespace Modsink.Common.Tests
+namespace ModSink.Common.Tests
 {
     public class HttpClientDownloaderTests
     {
@@ -27,6 +25,7 @@ namespace Modsink.Common.Tests
                         progress.Downloaded.Bits.Should().Be(progress.Size.Bits);
                         progress.Remaining.Bits.Should().Be(0);
                     }
+
                     progress.State.Should().Be(DownloadProgress.TransferState.Finished);
                 }
             }

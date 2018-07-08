@@ -3,12 +3,18 @@ using FluentAssertions;
 using ModSink.Common.Models.Repo;
 using Xunit;
 
-namespace Modsink.Common.Tests.Models.Repo
+namespace ModSink.Common.Tests.Models.Repo
 {
     public class FileSignatureTests
     {
         private static readonly Faker Faker = new Faker();
         public static FileSignature FileSignature => new FileSignature(HashValueTests.HashValue, Faker.Random.ULong());
+
+        [Fact]
+        public void IsSerializeable()
+        {
+            for (var i = 0; i < 10; i++) FileSignature.Should().BeBinarySerializable();
+        }
 
         [Fact]
         public void SameEqual()
@@ -17,12 +23,6 @@ namespace Modsink.Common.Tests.Models.Repo
             var b = new FileSignature(new HashValue(new byte[] {0x99, 0xE9, 0xD8, 0x51, 0x37, 0xDB, 0x46, 0xEF}), 355);
             a.Equals(b).Should().BeTrue("FileSignature with same properties should be equal")
                 ;
-        }
-
-        [Fact]
-        public void IsSerializeable()
-        {
-            for (var i = 0; i < 10; i++) FileSignature.Should().BeBinarySerializable();
         }
     }
 }

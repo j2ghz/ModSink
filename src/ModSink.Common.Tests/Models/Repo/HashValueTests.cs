@@ -3,7 +3,7 @@ using FluentAssertions;
 using ModSink.Common.Models.Repo;
 using Xunit;
 
-namespace Modsink.Common.Tests.Models.Repo
+namespace ModSink.Common.Tests.Models.Repo
 {
     public class HashValueTests
     {
