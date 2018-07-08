@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Net;
+using System.Reactive.Linq;
 using DynamicData;
 using ReactiveUI;
 
@@ -9,7 +10,6 @@ namespace ModSink.Common.Client
     public class DownloadService : ReactiveObject
     {
         private readonly IDownloader downloader;
-        private readonly IObservable<IChangeSet<QueuedDownload>> downloadQueue;
         private int simultaneousDownloads;
 
         public DownloadService(IDownloader downloader, IObservable<IChangeSet<QueuedDownload>> downloadQueue,
@@ -17,12 +17,15 @@ namespace ModSink.Common.Client
         {
             this.downloader = downloader;
             SimultaneousDownloads = 5;
-            this.downloadQueue = downloadQueue;
             QueuedDownloads = downloadQueue.AsObservableList();
-            ActiveDownloads = this.downloadQueue
+            QueuedDownloads.Connect().Subscribe();
+            ActiveDownloads = downloadQueue
+                .ObserveOn(RxApp.TaskpoolScheduler)
                 .Top(SimultaneousDownloads)
                 .Transform(qd => new ActiveDownload(qd, tempDownloadsDirectory, downloader))
+                .DisposeMany()
                 .AsObservableList();
+            ActiveDownloads.Connect().Subscribe();
         }
 
         public IObservableList<QueuedDownload> QueuedDownloads { get; }

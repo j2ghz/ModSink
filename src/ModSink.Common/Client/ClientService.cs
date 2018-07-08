@@ -26,8 +26,7 @@ namespace ModSink.Common.Client
             this.downloader = downloader;
             this.serializationFormatter = serializationFormatter;
             LogTo.Warning("Creating pipeline");
-            Repos = GroupUrls
-                .Connect()
+            Repos = GroupUrls.Connect()
                 .ObserveOn(RxApp.TaskpoolScheduler)
                 .Transform(g => new Uri(g))
                 .TransformAsync(Load<Group>)
@@ -35,9 +34,13 @@ namespace ModSink.Common.Client
                 .TransformAsync(Load<Repo>)
                 .AsObservableList();
             Repos.Connect().Subscribe();
-            var allFiles = Repos.Connect().TransformMany(r => r.Files).AsObservableList();
+            var allFiles = Repos.Connect()
+                .ObserveOn(RxApp.TaskpoolScheduler)
+                .TransformMany(r => r.Files)
+                .AsObservableList();
             allFiles.Connect().Subscribe();
             var downloadQueue = Repos.Connect()
+                .ObserveOn(RxApp.TaskpoolScheduler)
                 .TransformMany(r => r.Modpacks)
                 .AutoRefresh(m => m.Selected)
                 .Filter(m => m.Selected)

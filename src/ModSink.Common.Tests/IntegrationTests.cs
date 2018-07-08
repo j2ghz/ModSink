@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reactive.Concurrency;
 using System.Runtime.Serialization.Formatters.Binary;
+using DynamicData;
 using FluentAssertions;
 using ModSink.Common.Models.Group;
 using ModSink.Common.Models.Repo;
@@ -92,10 +93,15 @@ namespace ModSink.Common.Tests
                 {fileUri, fileStream}
             });
 
+            var downloadsDir = tempRoot.ChildDir("downloads");
+            if (!downloadsDir.Exists) downloadsDir.Create();
+            var tempDir = tempRoot.ChildDir("temp");
+            if (!tempDir.Exists) tempDir.Create();
             var m = new ModSinkBuilder()
                 .WithDownloader(downloader)
                 .WithFormatter(formatter)
-                .InDirectory(tempRoot.ChildDir("downloads"), tempRoot.ChildDir("temp")).Build();
+                .InDirectory(downloadsDir, tempDir)
+                .Build();
             m.Client.DownloadService.QueuedDownloads.Connect().Subscribe();
             //Act
             m.Client.GroupUrls.Edit(a => a.Add(groupUri.ToString()));
@@ -103,9 +109,15 @@ namespace ModSink.Common.Tests
 
             m.Client.GroupUrls.Items.Should().HaveCount(1);
             m.Client.Repos.Items.Should().HaveCount(1);
-            //m.Client.Repos.Items.Single().Should().BeEquivalentTo(repo);
+            m.Client.DownloadService.QueuedDownloads.Items.Should().HaveCount(0);
+            foreach (var r in m.Client.Repos.Items)
+            foreach (var modpack in r.Modpacks)
+                modpack.Selected = true;
+
             m.Client.DownloadService.QueuedDownloads.Items.Should().HaveCount(1);
+            m.Client.DownloadService.ActiveDownloads.Items.Should().HaveCount(1);
             //Clean up
+            m.Client.GroupUrls.Clear();
             schedDisposable.Dispose();
         }
     }
