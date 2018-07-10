@@ -1,31 +1,32 @@
 ﻿using System;
 using System.IO;
 using System.Net;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using DynamicData;
 using ReactiveUI;
 
 namespace ModSink.Common.Client
 {
-    public class DownloadService : ReactiveObject
+    public class DownloadService : ReactiveObject, IDisposable
     {
-        private readonly IDownloader downloader;
+        private readonly CompositeDisposable disposable = new CompositeDisposable();
         private int simultaneousDownloads;
 
         public DownloadService(IDownloader downloader, IObservable<IChangeSet<QueuedDownload>> downloadQueue,
             DirectoryInfo tempDownloadsDirectory)
         {
-            this.downloader = downloader;
             SimultaneousDownloads = 5;
-            QueuedDownloads = downloadQueue.AsObservableList();
-            QueuedDownloads.Connect().Subscribe();
+            QueuedDownloads = downloadQueue.AsObservableList().DisposeWith(disposable);
+            QueuedDownloads.Connect().Subscribe().DisposeWith(disposable);
             ActiveDownloads = downloadQueue
                 .ObserveOn(RxApp.TaskpoolScheduler)
                 .Top(SimultaneousDownloads)
                 .Transform(qd => new ActiveDownload(qd, tempDownloadsDirectory, downloader))
                 .DisposeMany()
-                .AsObservableList();
-            ActiveDownloads.Connect().Subscribe();
+                .AsObservableList()
+                .DisposeWith(disposable);
+            ActiveDownloads.Connect().Subscribe().DisposeWith(disposable);
         }
 
         public IObservableList<QueuedDownload> QueuedDownloads { get; }
@@ -41,6 +42,11 @@ namespace ModSink.Common.Client
                 if (ServicePointManager.DefaultConnectionLimit < value)
                     ServicePointManager.DefaultConnectionLimit = value;
             }
+        }
+
+        public void Dispose()
+        {
+            disposable.Dispose();
         }
     }
 }

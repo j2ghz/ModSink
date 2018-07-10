@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reactive.Concurrency;
+using System.Reactive.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
+using System.Threading.Tasks;
 using DynamicData;
 using FluentAssertions;
 using ModSink.Common.Models.Group;
@@ -22,14 +25,21 @@ namespace ModSink.Common.Tests
 
         public void Dispose()
         {
-            tempRoot.Parent?.Delete(true);
+            try
+            {
+                tempRoot.Parent?.Delete(true);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+            }
         }
 
         private readonly DirectoryInfo tempRoot = new DirectoryInfo(Path.GetTempPath()).ChildDir("ModSink")
             .ChildDir(Guid.NewGuid().ToString());
 
         [Fact]
-        public void DownloadRepo()
+        public async Task DownloadRepo()
         {
             Log.Logger = new LoggerConfiguration().WriteTo.Debug().CreateLogger();
             //Arrange
@@ -83,7 +93,8 @@ namespace ModSink.Common.Tests
             formatter.Serialize(repoStream, repo);
             repo.BaseUri = new Uri("http://localhost/");
             repoStream.Position = 0;
-            var fileStream = new MemoryStream(new byte[] {0xFA});
+            var fileSource = new byte[] {0xFA};
+            var fileStream = new MemoryStream(fileSource);
 
             var groupUri = new Uri("http://localhost/group.bin");
             var downloader = new MockDownloader(new Dictionary<Uri, Stream>
@@ -116,8 +127,13 @@ namespace ModSink.Common.Tests
 
             m.Client.DownloadService.QueuedDownloads.Items.Should().HaveCount(1);
             m.Client.DownloadService.ActiveDownloads.Items.Should().HaveCount(1);
+            var item = m.Client.DownloadService.ActiveDownloads.Items.Single();
+            item.Progress.Subscribe();
+            var file = tempDir.ChildFile(fileSignature.Hash.ToString());
+            file.Exists.Should().BeTrue();
+            File.ReadAllBytes(file.FullName).Should().BeEquivalentTo(fileSource);
             //Clean up
-            m.Client.GroupUrls.Clear();
+            m.Client.Dispose();
             schedDisposable.Dispose();
         }
     }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
@@ -14,11 +15,13 @@ using ReactiveUI;
 
 namespace ModSink.Common.Client
 {
-    public class ClientService : ReactiveObject
+    public class ClientService : ReactiveObject, IDisposable
     {
         private readonly IDownloader downloader;
         private readonly IFormatter serializationFormatter;
         private LocalFilesManager localFilesManager;
+
+        private readonly CompositeDisposable disposable = new CompositeDisposable();
 
         public ClientService(IDownloader downloader, IFormatter serializationFormatter,
             DirectoryInfo localFilesDirectory, DirectoryInfo tempDownloadsDirectory)
@@ -32,13 +35,15 @@ namespace ModSink.Common.Client
                 .TransformAsync(Load<Group>)
                 .TransformMany(g => g.RepoInfos.Select(r => new Uri(g.BaseUri, r.Uri)))
                 .TransformAsync(Load<Repo>)
-                .AsObservableList();
-            Repos.Connect().Subscribe();
+                .AsObservableList()
+                .DisposeWith(disposable);
+            Repos.Connect().Subscribe().DisposeWith(disposable);
             var allFiles = Repos.Connect()
                 .ObserveOn(RxApp.TaskpoolScheduler)
                 .TransformMany(r => r.Files)
-                .AsObservableList();
-            allFiles.Connect().Subscribe();
+                .AsObservableList()
+                .DisposeWith(disposable);
+            allFiles.Connect().Subscribe().DisposeWith(disposable);
             var downloadQueue = Repos.Connect()
                 .ObserveOn(RxApp.TaskpoolScheduler)
                 .TransformMany(r => r.Modpacks)
@@ -48,10 +53,10 @@ namespace ModSink.Common.Client
                 .TransformMany(m => m.Mod.Files.Values)
                 .Transform(fs => allFiles.Items.First(kvp => kvp.Key.Equals(fs)))
                 .Transform(kvp => new QueuedDownload(kvp.Key, kvp.Value))
-                .AsObservableList();
-            downloadQueue.Connect().Subscribe();
-            DownloadService = new DownloadService(downloader, downloadQueue.Connect(), tempDownloadsDirectory);
-
+                .AsObservableList()
+                .DisposeWith(disposable);
+            downloadQueue.Connect().Subscribe().DisposeWith(disposable);
+            DownloadService = new DownloadService(downloader, downloadQueue.Connect(), tempDownloadsDirectory).DisposeWith(disposable);
 
             //localFilesManager = new LocalFilesManager(requiredFiles);
         }
@@ -74,6 +79,11 @@ namespace ModSink.Common.Client
                 t.BaseUri = new Uri(uri, ".");
                 return t;
             }
+        }
+
+        public void Dispose()
+        {
+            disposable.Dispose();
         }
     }
 }

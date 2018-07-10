@@ -2,6 +2,7 @@
 using System.IO;
 using System.Reactive.Disposables;
 using System.Reactive.Subjects;
+using Anotar.Serilog;
 using Humanizer.Bytes;
 using ReactiveUI;
 
@@ -19,7 +20,9 @@ namespace ModSink.Common.Client
         {
             Source = source.Source;
             Name = source.FileSignature.Hash.ToString();
-            Destination = tempDownloadsDirectory.ChildFile(source.FileSignature.Hash.ToString()).Create();
+            var tempFile = tempDownloadsDirectory.ChildFile(source.FileSignature.Hash.ToString());
+            Destination = tempFile.Create();
+            LogTo.Debug("Created ActiveDownload for {signature} into {destination}", source.FileSignature,tempFile);
             var dProg = downloader.Download(Source, Destination, source.FileSignature.Length);
             dProg.Subscribe(progress).DisposeWith(disposable);
             dProg.Connect().DisposeWith(disposable);
