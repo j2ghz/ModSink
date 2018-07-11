@@ -131,6 +131,7 @@ namespace ModSink.Common.Tests
             item.Progress.Subscribe();
             var file = tempDir.ChildFile(fileSignature.Hash.ToString());
             file.Exists.Should().BeTrue();
+            m.Client.GroupUrls.Clear();
             File.ReadAllBytes(file.FullName).Should().BeEquivalentTo(fileSource);
             //Clean up
             m.Client.Dispose();
