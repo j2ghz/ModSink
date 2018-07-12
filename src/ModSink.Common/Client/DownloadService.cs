@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 using System.Net;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
@@ -14,7 +13,7 @@ namespace ModSink.Common.Client
         private int simultaneousDownloads;
 
         public DownloadService(IDownloader downloader, IObservable<IChangeSet<QueuedDownload>> downloadQueue,
-            DirectoryInfo tempDownloadsDirectory)
+            LocalFilesManager localFilesManager)
         {
             SimultaneousDownloads = 5;
             QueuedDownloads = downloadQueue.AsObservableList().DisposeWith(disposable);
@@ -22,7 +21,8 @@ namespace ModSink.Common.Client
             ActiveDownloads = downloadQueue
                 .ObserveOn(RxApp.TaskpoolScheduler)
                 .Top(SimultaneousDownloads)
-                .Transform(qd => new ActiveDownload(qd, tempDownloadsDirectory, downloader))
+                .Transform(qd => new ActiveDownload(qd, localFilesManager.GetTemporaryFileStream(qd.FileSignature),
+                    () => localFilesManager.AddNewFile(qd.FileSignature), downloader))
                 .DisposeMany()
                 .AsObservableList()
                 .DisposeWith(disposable);

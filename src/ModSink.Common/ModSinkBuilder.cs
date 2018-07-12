@@ -9,7 +9,6 @@ namespace ModSink.Common
         private IDownloader downloader;
         private IFormatter formatter;
         private DirectoryInfo localStorageDirectory;
-        private DirectoryInfo tempDirectory;
 
         public ModSinkBuilder WithDownloader(IDownloader downloader)
         {
@@ -23,16 +22,15 @@ namespace ModSink.Common
             return this;
         }
 
-        public ModSinkBuilder InDirectory(DirectoryInfo directory, DirectoryInfo temp)
+        public ModSinkBuilder InDirectory(DirectoryInfo directory)
         {
             localStorageDirectory = directory;
-            tempDirectory = temp;
             return this;
         }
 
         public ModSink Build()
         {
-            return new ModSink(new ClientService(downloader, formatter, localStorageDirectory, tempDirectory));
+            return new ModSink(new ClientService(downloader, formatter, localStorageDirectory));
         }
     }
 }

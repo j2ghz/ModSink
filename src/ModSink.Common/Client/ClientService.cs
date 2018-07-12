@@ -17,14 +17,12 @@ namespace ModSink.Common.Client
 {
     public class ClientService : ReactiveObject, IDisposable
     {
+        private readonly CompositeDisposable disposable = new CompositeDisposable();
         private readonly IDownloader downloader;
         private readonly IFormatter serializationFormatter;
-        private LocalFilesManager localFilesManager;
+        private readonly LocalFilesManager localFilesManager;
 
-        private readonly CompositeDisposable disposable = new CompositeDisposable();
-
-        public ClientService(IDownloader downloader, IFormatter serializationFormatter,
-            DirectoryInfo localFilesDirectory, DirectoryInfo tempDownloadsDirectory)
+        public ClientService(IDownloader downloader, IFormatter serializationFormatter, DirectoryInfo localStorage)
         {
             this.downloader = downloader;
             this.serializationFormatter = serializationFormatter;
@@ -44,21 +42,17 @@ namespace ModSink.Common.Client
                 .AsObservableList()
                 .DisposeWith(disposable);
             allFiles.Connect().Subscribe().DisposeWith(disposable);
-            var downloadQueue = Repos.Connect()
+            var filesRequired = Repos.Connect()
                 .ObserveOn(RxApp.TaskpoolScheduler)
                 .TransformMany(r => r.Modpacks)
                 .AutoRefresh(m => m.Selected)
                 .Filter(m => m.Selected)
                 .TransformMany(m => m.Mods)
                 .TransformMany(m => m.Mod.Files.Values)
-                .Transform(fs => allFiles.Items.First(kvp => kvp.Key.Equals(fs)))
-                .Transform(kvp => new QueuedDownload(kvp.Key, kvp.Value))
                 .AsObservableList()
                 .DisposeWith(disposable);
-            downloadQueue.Connect().Subscribe().DisposeWith(disposable);
-            DownloadService = new DownloadService(downloader, downloadQueue.Connect(), tempDownloadsDirectory).DisposeWith(disposable);
-
-            //localFilesManager = new LocalFilesManager(requiredFiles);
+            localFilesManager = new LocalFilesManager(new FileAccessService(localStorage),filesRequired, downloader).DisposeWith(disposable);
+            
         }
 
         public IObservableList<Repo> Repos { get; }
@@ -66,6 +60,11 @@ namespace ModSink.Common.Client
 
         public ISourceList<string> GroupUrls { get; } = new SourceList<string>();
         public DownloadService DownloadService { get; }
+
+        public void Dispose()
+        {
+            disposable.Dispose();
+        }
 
         private async Task<T> Load<T>(Uri uri) where T : IBaseUri
         {
@@ -79,11 +78,6 @@ namespace ModSink.Common.Client
                 t.BaseUri = new Uri(uri, ".");
                 return t;
             }
-        }
-
-        public void Dispose()
-        {
-            disposable.Dispose();
         }
     }
 }
