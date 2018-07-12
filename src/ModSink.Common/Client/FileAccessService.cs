@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using ModSink.Common.Models.Repo;
@@ -56,14 +57,9 @@ namespace ModSink.Common.Client
             return await Task.Run(() => file.Open(FileMode.Create, FileAccess.Write, FileShare.None));
         }
 
-        public async Task<(bool available, Lazy<Task<Stream>> stream)> WriteIfMissingOrInvalid(
-            FileSignature fileSignature)
+        public IEnumerable<FileInfo> GetFiles()
         {
-            var fi = await GetFileInfo(fileSignature);
-            var exists = await IsFileAvailable(fileSignature);
-            if (exists == false || fileSignature.Length != Convert.ToUInt64(fi.Length))
-                return (false, new Lazy<Task<Stream>>(() => Write(fileSignature)));
-            return (true, null);
+            return localDir.EnumerateFiles();
         }
     }
 }

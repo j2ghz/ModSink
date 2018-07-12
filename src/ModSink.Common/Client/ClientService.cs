@@ -9,6 +9,7 @@ using Anotar.Serilog;
 using DynamicData;
 using Humanizer;
 using ModSink.Common.Models;
+using ModSink.Common.Models.Client;
 using ModSink.Common.Models.Group;
 using ModSink.Common.Models.Repo;
 using ReactiveUI;
@@ -19,8 +20,8 @@ namespace ModSink.Common.Client
     {
         private readonly CompositeDisposable disposable = new CompositeDisposable();
         private readonly IDownloader downloader;
-        private readonly IFormatter serializationFormatter;
         private readonly LocalFilesManager localFilesManager;
+        private readonly IFormatter serializationFormatter;
 
         public ClientService(IDownloader downloader, IFormatter serializationFormatter, DirectoryInfo localStorage)
         {
@@ -36,12 +37,13 @@ namespace ModSink.Common.Client
                 .AsObservableList()
                 .DisposeWith(disposable);
             Repos.Connect().Subscribe().DisposeWith(disposable);
-            var allFiles = Repos.Connect()
+            var onlineFiles = Repos.Connect()
                 .ObserveOn(RxApp.TaskpoolScheduler)
                 .TransformMany(r => r.Files)
+                .Transform(kvp => new OnlineFile(kvp.Key, kvp.Value))
                 .AsObservableList()
                 .DisposeWith(disposable);
-            allFiles.Connect().Subscribe().DisposeWith(disposable);
+            onlineFiles.Connect().Subscribe().DisposeWith(disposable);
             var filesRequired = Repos.Connect()
                 .ObserveOn(RxApp.TaskpoolScheduler)
                 .TransformMany(r => r.Modpacks)
@@ -51,8 +53,9 @@ namespace ModSink.Common.Client
                 .TransformMany(m => m.Mod.Files.Values)
                 .AsObservableList()
                 .DisposeWith(disposable);
-            localFilesManager = new LocalFilesManager(new FileAccessService(localStorage),filesRequired, downloader).DisposeWith(disposable);
-            
+            localFilesManager =
+                new LocalFilesManager(new FileAccessService(localStorage), filesRequired, onlineFiles, downloader)
+                    .DisposeWith(disposable);
         }
 
         public IObservableList<Repo> Repos { get; }

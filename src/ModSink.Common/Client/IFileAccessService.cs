@@ -20,7 +20,6 @@ namespace ModSink.Common.Client
         Task<Stream> Read(FileSignature fileSignature);
 
         Task<Stream> Write(FileSignature fileSignature);
-
-        Task<(bool available, Lazy<Task<Stream>> stream)> WriteIfMissingOrInvalid(FileSignature fileSignature);
+        
     }
 }

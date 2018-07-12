@@ -106,12 +106,10 @@ namespace ModSink.Common.Tests
 
             var downloadsDir = tempRoot.ChildDir("downloads");
             if (!downloadsDir.Exists) downloadsDir.Create();
-            var tempDir = tempRoot.ChildDir("temp");
-            if (!tempDir.Exists) tempDir.Create();
             var m = new ModSinkBuilder()
                 .WithDownloader(downloader)
                 .WithFormatter(formatter)
-                .InDirectory(downloadsDir, tempDir)
+                .InDirectory(downloadsDir)
                 .Build();
             m.Client.DownloadService.QueuedDownloads.Connect().Subscribe();
             //Act
@@ -129,7 +127,7 @@ namespace ModSink.Common.Tests
             m.Client.DownloadService.ActiveDownloads.Items.Should().HaveCount(1);
             var item = m.Client.DownloadService.ActiveDownloads.Items.Single();
             item.Progress.Subscribe();
-            var file = tempDir.ChildFile(fileSignature.Hash.ToString());
+            var file = downloadsDir.ChildFile(fileSignature.Hash.ToString());
             file.Exists.Should().BeTrue();
             m.Client.GroupUrls.Clear();
             File.ReadAllBytes(file.FullName).Should().BeEquivalentTo(fileSource);
