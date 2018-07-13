@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Subjects;
 using Anotar.Serilog;
@@ -25,6 +26,7 @@ namespace ModSink.Common.Client
             var dProg = downloader.Download(Source, Destination, source.FileSignature.Length);
             dProg.Subscribe(progress).DisposeWith(disposable);
             dProg.Connect().DisposeWith(disposable);
+            dProg.Subscribe(_ => { }, completed);
         }
 
         public string Name { get; }

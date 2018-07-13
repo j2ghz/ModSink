@@ -3,22 +3,24 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reactive.Concurrency;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
-using System.Threading.Tasks;
+using Anotar.Serilog;
 using DynamicData;
 using FluentAssertions;
+using ModSink.Common.Client;
 using ModSink.Common.Models.Group;
 using ModSink.Common.Models.Repo;
 using ReactiveUI.Testing;
 using Serilog;
 using Xunit;
 
-namespace ModSink.Common.Tests
+namespace ModSink.Common.Tests.Client
 {
-    public class IntegrationTests : IDisposable
+    public class ClientServiceTests : IDisposable
     {
-        public IntegrationTests()
+        public ClientServiceTests()
         {
             tempRoot.Create();
         }
@@ -31,7 +33,7 @@ namespace ModSink.Common.Tests
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
+                throw new Exception("Cleanup of temporary files failed", e);
             }
         }
 
@@ -39,7 +41,7 @@ namespace ModSink.Common.Tests
             .ChildDir(Guid.NewGuid().ToString());
 
         [Fact]
-        public async Task DownloadRepo()
+        public void DownloadRepo()
         {
             Log.Logger = new LoggerConfiguration().WriteTo.Debug().CreateLogger();
             //Arrange
@@ -106,33 +108,29 @@ namespace ModSink.Common.Tests
 
             var downloadsDir = tempRoot.ChildDir("downloads");
             if (!downloadsDir.Exists) downloadsDir.Create();
-            var m = new ModSinkBuilder()
-                .WithDownloader(downloader)
-                .WithFormatter(formatter)
-                .InDirectory(downloadsDir)
-                .Build();
-            m.Client.QueuedDownloads.Connect().Subscribe();
+
+            var client = new ClientService(downloader, formatter, downloadsDir);
             //Act
-            m.Client.GroupUrls.Edit(a => a.Add(groupUri.ToString()));
+            client.GroupUrls.Edit(a => a.Add(groupUri.ToString()));
             //Assert
 
-            m.Client.GroupUrls.Items.Should().HaveCount(1);
-            m.Client.Repos.Items.Should().HaveCount(1);
-            m.Client.QueuedDownloads.Items.Should().HaveCount(0);
-            foreach (var r in m.Client.Repos.Items)
+            client.GroupUrls.Items.Should().HaveCount(1);
+            client.Repos.Items.Should().HaveCount(1);
+            client.QueuedDownloads.Items.Should().HaveCount(0);
+            foreach (var r in client.Repos.Items)
             foreach (var modpack in r.Modpacks)
                 modpack.Selected = true;
 
-            m.Client.QueuedDownloads.Items.Should().HaveCount(1);
-            m.Client.ActiveDownloads.Items.Should().HaveCount(1);
-            var item = m.Client.ActiveDownloads.Items.Single();
+            client.QueuedDownloads.Items.Should().HaveCount(1);
+            client.ActiveDownloads.Items.Should().HaveCount(1);
+            var item = client.ActiveDownloads.Items.Single();
             item.Progress.Subscribe();
             var file = downloadsDir.ChildFile(fileSignature.Hash.ToString());
             file.Exists.Should().BeTrue();
-            m.Client.GroupUrls.Clear();
+            client.GroupUrls.Clear();
             File.ReadAllBytes(file.FullName).Should().BeEquivalentTo(fileSource);
             //Clean up
-            m.Client.Dispose();
+            client.Dispose();
             schedDisposable.Dispose();
         }
     }

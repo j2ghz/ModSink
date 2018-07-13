@@ -1,7 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
-using System.Threading.Tasks;
+using System.Linq;
 using ModSink.Common.Models.Repo;
 
 namespace ModSink.Common.Client
@@ -17,49 +16,42 @@ namespace ModSink.Common.Client
                 localDir.Create();
         }
 
-
-        public async Task Delete(FileSignature fileSignature)
+        IEnumerable<FileSignature> IFileAccessService.FilesAvailable()
         {
-            var fi = await GetFileInfo(fileSignature);
-            await Task.Run(() => fi.Delete());
+            return localDir.EnumerateFiles().Where(f => f.Name.EndsWith(".tmp"))
+                .Select(f => new FileSignature(new HashValue(f.Name), f.Length));
         }
 
-        public async Task<FileInfo> GetFileInfo(FileSignature fileSignature)
+        Stream IFileAccessService.Read(FileSignature fileSignature, bool temporary)
         {
-            return await Task.Run(() => new FileInfo(GetFileUri(fileSignature).FullName));
+            var file = GetFileInfo(fileSignature, temporary);
+            return file.Open(FileMode.Create, FileAccess.Read, FileShare.Read);
         }
 
-        public string GetFileName(FileSignature fileSignature)
+        Stream IFileAccessService.Write(FileSignature fileSignature, bool temporary)
         {
-            return fileSignature.Hash.ToString();
+            var file = GetFileInfo(fileSignature, temporary);
+            return file.Open(FileMode.Create, FileAccess.Write, FileShare.None);
         }
 
-        public FileInfo GetFileUri(FileSignature fileSignature)
+        public void TemporaryFinished(FileSignature fileSignature)
         {
-            return localDir.ChildFile(GetFileName(fileSignature));
+            GetFileInfo(fileSignature, true).MoveTo(GetFileInfo(fileSignature, false).FullName);
         }
 
-        public async Task<bool> IsFileAvailable(FileSignature fileSignature)
+        private FileInfo GetFileInfo(FileSignature fileSignature, bool temporary)
         {
-            var fi = await GetFileInfo(fileSignature);
-            return await Task.Run(() => fi.Exists);
+            return new FileInfo(GetFileUri(fileSignature, temporary).FullName);
         }
 
-        public async Task<Stream> Read(FileSignature fileSignature)
+        private string GetFileName(FileSignature fileSignature, bool temporary)
         {
-            var file = await GetFileInfo(fileSignature);
-            return await Task.Run(() => file.Open(FileMode.Open, FileAccess.Read, FileShare.Read));
+            return fileSignature.Hash + (temporary ? ".tmp" : string.Empty);
         }
 
-        public async Task<Stream> Write(FileSignature fileSignature)
+        private FileInfo GetFileUri(FileSignature fileSignature, bool temporary)
         {
-            var file = await GetFileInfo(fileSignature);
-            return await Task.Run(() => file.Open(FileMode.Create, FileAccess.Write, FileShare.None));
-        }
-
-        public IEnumerable<FileInfo> GetFiles()
-        {
-            return localDir.EnumerateFiles();
+            return localDir.ChildFile(GetFileName(fileSignature, temporary));
         }
     }
 }

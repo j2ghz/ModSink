@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reactive.Disposables;
@@ -12,16 +13,15 @@ using ModSink.Common.Models;
 using ModSink.Common.Models.Client;
 using ModSink.Common.Models.Group;
 using ModSink.Common.Models.Repo;
-using ReactiveUI;
 
 namespace ModSink.Common.Client
 {
-    public class ClientService : ReactiveObject, IDisposable
+    public class ClientService : IDisposable
     {
         private readonly CompositeDisposable disposable = new CompositeDisposable();
         private readonly IDownloader downloader;
 
-        private readonly FileAccessService fileAccessService;
+        private readonly IFileAccessService fileAccessService;
 
         private readonly SourceCache<FileSignature, HashValue> filesAvailable =
             new SourceCache<FileSignature, HashValue>(fs => fs.Hash);
@@ -35,63 +35,60 @@ namespace ModSink.Common.Client
             this.serializationFormatter = serializationFormatter;
             LogTo.Warning("Creating pipeline");
             Repos = GroupUrls.Connect()
-                .ObserveOn(RxApp.TaskpoolScheduler)
                 .Transform(g => new Uri(g))
                 .TransformAsync(Load<Group>)
                 .TransformMany(g => g.RepoInfos.Select(r => new Uri(g.BaseUri, r.Uri)))
+                .AddKey(u => u)
                 .TransformAsync(Load<Repo>)
-                .AsObservableList()
+                .AsObservableCache()
                 .DisposeWith(disposable);
             Repos.Connect().Subscribe().DisposeWith(disposable);
-            var onlineFiles = Repos.Connect()
-                .ObserveOn(RxApp.TaskpoolScheduler)
-                .TransformMany(r => r.Files)
+            OnlineFiles = Repos.Connect()
+                .TransformMany(r => r.Files, f => f.Key)
                 .Transform(kvp => new OnlineFile(kvp.Key, kvp.Value))
-                .AsObservableList()
+                .AsObservableCache()
                 .DisposeWith(disposable);
-            onlineFiles.Connect().Subscribe().DisposeWith(disposable);
-            var filesRequired = Repos.Connect()
-                .ObserveOn(RxApp.TaskpoolScheduler)
+            OnlineFiles.Connect().Subscribe().DisposeWith(disposable);
+
+            filesAvailable.Edit(l =>
+            {
+                l.AddOrUpdate(fileAccessService.FilesAvailable());
+            });
+
+            QueuedDownloads = Repos.Connect()
+                .RemoveKey()
                 .TransformMany(r => r.Modpacks)
                 .AutoRefresh(m => m.Selected)
                 .Filter(m => m.Selected)
                 .TransformMany(m => m.Mods)
                 .TransformMany(m => m.Mod.Files.Values)
-                .AsObservableList()
-                .DisposeWith(disposable);
-
-            filesAvailable.Edit(l =>
-            {
-                l.AddOrUpdate(fileAccessService.GetFiles()
-                    .Select(fi => new FileSignature(new HashValue(fi.Name), fi.Length)));
-            });
-
-            QueuedDownloads = filesRequired.Connect()
-                .Filter(fs => filesAvailable.Items.Contains(fs))
-                .Transform(fs => onlineFiles.Items.Single(onlineFile => onlineFile.FileSignature.Equals(fs)))
-                .Transform(of => new QueuedDownload(of.FileSignature, of.Uri))
-                .AsObservableList()
+                .AddKey(fs => fs)
+                .Filter(fs => !filesAvailable.Items.Contains(fs))
+                .LeftJoin(OnlineFiles.Connect(), of => of.FileSignature,
+                    (fs, of) => new QueuedDownload(fs, of.Value.Uri))
+                .AsObservableCache()
                 .DisposeWith(disposable);
             QueuedDownloads.Connect().Subscribe().DisposeWith(disposable);
 
             ActiveDownloads = QueuedDownloads.Connect()
-                .ObserveOn(RxApp.TaskpoolScheduler)
-                .Top(2)
+                .Top(Comparer<QueuedDownload>.Default, 2)
                 .Transform(qd => new ActiveDownload(qd, GetTemporaryFileStream(qd.FileSignature),
                     () => AddNewFile(qd.FileSignature), downloader))
                 .DisposeMany()
-                .AsObservableList()
+                .AsObservableCache()
                 .DisposeWith(disposable);
             ActiveDownloads.Connect().Subscribe().DisposeWith(disposable);
         }
 
-        public IObservableList<QueuedDownload> QueuedDownloads { get; }
+        public IObservableCache<OnlineFile, FileSignature> OnlineFiles { get; }
+
+        public IObservableCache<QueuedDownload, FileSignature> QueuedDownloads { get; }
 
 
-        public IObservableList<Repo> Repos { get; }
+        public IObservableCache<Repo, Uri> Repos { get; }
 
 
-        public IObservableList<ActiveDownload> ActiveDownloads { get; }
+        public IObservableCache<ActiveDownload, FileSignature> ActiveDownloads { get; }
         public ISourceList<string> GroupUrls { get; } = new SourceList<string>();
 
         public void Dispose()
@@ -99,14 +96,15 @@ namespace ModSink.Common.Client
             disposable.Dispose();
         }
 
-        private void AddNewFile(FileSignature argFileSignature)
+        private void AddNewFile(FileSignature fileSignature)
         {
-            throw new NotImplementedException();
+            fileAccessService.TemporaryFinished(fileSignature);
+            filesAvailable.AddOrUpdate(fileSignature);
         }
 
         private Stream GetTemporaryFileStream(FileSignature argFileSignature)
         {
-            throw new NotImplementedException();
+            return fileAccessService.Write(argFileSignature, true);
         }
 
         private async Task<T> Load<T>(Uri uri) where T : IBaseUri
