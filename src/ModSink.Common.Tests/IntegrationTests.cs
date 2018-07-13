@@ -111,21 +111,21 @@ namespace ModSink.Common.Tests
                 .WithFormatter(formatter)
                 .InDirectory(downloadsDir)
                 .Build();
-            m.Client.DownloadService.QueuedDownloads.Connect().Subscribe();
+            m.Client.QueuedDownloads.Connect().Subscribe();
             //Act
             m.Client.GroupUrls.Edit(a => a.Add(groupUri.ToString()));
             //Assert
 
             m.Client.GroupUrls.Items.Should().HaveCount(1);
             m.Client.Repos.Items.Should().HaveCount(1);
-            m.Client.DownloadService.QueuedDownloads.Items.Should().HaveCount(0);
+            m.Client.QueuedDownloads.Items.Should().HaveCount(0);
             foreach (var r in m.Client.Repos.Items)
             foreach (var modpack in r.Modpacks)
                 modpack.Selected = true;
 
-            m.Client.DownloadService.QueuedDownloads.Items.Should().HaveCount(1);
-            m.Client.DownloadService.ActiveDownloads.Items.Should().HaveCount(1);
-            var item = m.Client.DownloadService.ActiveDownloads.Items.Single();
+            m.Client.QueuedDownloads.Items.Should().HaveCount(1);
+            m.Client.ActiveDownloads.Items.Should().HaveCount(1);
+            var item = m.Client.ActiveDownloads.Items.Single();
             item.Progress.Subscribe();
             var file = downloadsDir.ChildFile(fileSignature.Hash.ToString());
             file.Exists.Should().BeTrue();

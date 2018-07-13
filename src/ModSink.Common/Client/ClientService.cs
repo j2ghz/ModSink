@@ -20,11 +20,17 @@ namespace ModSink.Common.Client
     {
         private readonly CompositeDisposable disposable = new CompositeDisposable();
         private readonly IDownloader downloader;
-        private readonly LocalFilesManager localFilesManager;
+
+        private readonly FileAccessService fileAccessService;
+
+        private readonly SourceCache<FileSignature, HashValue> filesAvailable =
+            new SourceCache<FileSignature, HashValue>(fs => fs.Hash);
+
         private readonly IFormatter serializationFormatter;
 
         public ClientService(IDownloader downloader, IFormatter serializationFormatter, DirectoryInfo localStorage)
         {
+            fileAccessService = new FileAccessService(localStorage);
             this.downloader = downloader;
             this.serializationFormatter = serializationFormatter;
             LogTo.Warning("Creating pipeline");
@@ -53,20 +59,54 @@ namespace ModSink.Common.Client
                 .TransformMany(m => m.Mod.Files.Values)
                 .AsObservableList()
                 .DisposeWith(disposable);
-            localFilesManager =
-                new LocalFilesManager(new FileAccessService(localStorage), filesRequired, onlineFiles, downloader)
-                    .DisposeWith(disposable);
+
+            filesAvailable.Edit(l =>
+            {
+                l.AddOrUpdate(fileAccessService.GetFiles()
+                    .Select(fi => new FileSignature(new HashValue(fi.Name), fi.Length)));
+            });
+
+            QueuedDownloads = filesRequired.Connect()
+                .Filter(fs => filesAvailable.Items.Contains(fs))
+                .Transform(fs => onlineFiles.Items.Single(onlineFile => onlineFile.FileSignature.Equals(fs)))
+                .Transform(of => new QueuedDownload(of.FileSignature, of.Uri))
+                .AsObservableList()
+                .DisposeWith(disposable);
+            QueuedDownloads.Connect().Subscribe().DisposeWith(disposable);
+
+            ActiveDownloads = QueuedDownloads.Connect()
+                .ObserveOn(RxApp.TaskpoolScheduler)
+                .Top(2)
+                .Transform(qd => new ActiveDownload(qd, GetTemporaryFileStream(qd.FileSignature),
+                    () => AddNewFile(qd.FileSignature), downloader))
+                .DisposeMany()
+                .AsObservableList()
+                .DisposeWith(disposable);
+            ActiveDownloads.Connect().Subscribe().DisposeWith(disposable);
         }
+
+        public IObservableList<QueuedDownload> QueuedDownloads { get; }
+
 
         public IObservableList<Repo> Repos { get; }
 
 
+        public IObservableList<ActiveDownload> ActiveDownloads { get; }
         public ISourceList<string> GroupUrls { get; } = new SourceList<string>();
-        public DownloadService DownloadService { get; }
 
         public void Dispose()
         {
             disposable.Dispose();
+        }
+
+        private void AddNewFile(FileSignature argFileSignature)
+        {
+            throw new NotImplementedException();
+        }
+
+        private Stream GetTemporaryFileStream(FileSignature argFileSignature)
+        {
+            throw new NotImplementedException();
         }
 
         private async Task<T> Load<T>(Uri uri) where T : IBaseUri
