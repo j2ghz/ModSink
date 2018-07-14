@@ -14,19 +14,14 @@ namespace ModSink.WPF.ViewModel
     {
         public LibraryViewModel(ClientService clientService)
         {
-            clientService.Repos
-                .Connect()
-                .RemoveKey()
-                .TransformMany(r => r.Modpacks)
-                .ObserveOnDispatcher()
+            clientService.Modpacks.Connect()
+                .ObserveOn(RxApp.MainThreadScheduler)
                 .Bind(Modpacks)
                 .Subscribe();
             LogTo.Verbose("Library initialized");
         }
 
-
-        [Reactive]
-        public ObservableCollectionExtended<Modpack> Modpacks { get; set; } =
+        public ObservableCollectionExtended<Modpack> Modpacks { get; } =
             new ObservableCollectionExtended<Modpack>();
 
         [Reactive] public Modpack SelectedModpack { get; set; }

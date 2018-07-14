@@ -43,8 +43,9 @@ namespace ModSink.Common.Client
                 .AsObservableCache()
                 .DisposeWithThrowExceptions(disposable);
             OnlineFiles = Repos.Connect()
-                .TransformMany(r => r.Files, f => f.Key)
-                .Transform(kvp => new OnlineFile(kvp.Key, kvp.Value))
+                .TransformMany(
+                    repo => repo.Files.Select(kvp => new OnlineFile(kvp.Key, new Uri(repo.BaseUri, kvp.Value))),
+                    of => of.FileSignature)
                 .AsObservableCache()
                 .DisposeWithThrowExceptions(disposable);
             Modpacks = Repos.Connect()

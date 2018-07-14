@@ -27,7 +27,6 @@ namespace ModSink.WPF.ViewModel
                 .ToProperty(this, t => t.QueueCount);
         }
 
-
         public ObservableCollectionExtended<DownloadViewModel> Downloads { get; } =
             new ObservableCollectionExtended<DownloadViewModel>();
 

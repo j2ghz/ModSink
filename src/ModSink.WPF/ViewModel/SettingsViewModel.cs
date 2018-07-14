@@ -10,29 +10,29 @@ namespace ModSink.WPF.ViewModel
 {
     public class SettingsViewModel : ReactiveObject
     {
-        private string repoSelected;
+        private string groupSelected;
 
         public SettingsViewModel(SettingsModel settings)
         {
             Settings = settings;
-            AddRepoUrl = ReactiveCommand.CreateFromTask(async () =>
+            AddGroup = ReactiveCommand.CreateFromTask(async () =>
             {
-                var repoUrl = await DialogCoordinator.ShowInputAsync(this, "Add new Repo",
-                    "Enter the url for the new Repo you want to add.\nIt usually looks like https://example.com/someFolder/repo.bin");
+                var repoUrl = await DialogCoordinator.ShowInputAsync(this, "Add new Group",
+                    "Enter the url for the new Repo you want to add.\nIt usually looks like https://example.com/someFolder/group.bin");
                 if (string.IsNullOrWhiteSpace(repoUrl)) return;
                 settings.Client.GroupUrls.Edit(l => l.Add(repoUrl));
             });
             var isRepoSelected =
-                this.WhenAnyValue(x => x.RepoSelected,
+                this.WhenAnyValue<SettingsViewModel, bool, string>(x => x.GroupSelected,
                     r => !string.IsNullOrWhiteSpace(r));
-            RemoveRepoUrl = ReactiveCommand.Create(() => settings.Client.GroupUrls.Edit(l => l.Remove(RepoSelected)),
+            RemoveGroup = ReactiveCommand.Create(() => settings.Client.GroupUrls.Edit(l => l.Remove(GroupSelected)),
                 isRepoSelected);
         }
 
-        public string RepoSelected
+        public string GroupSelected
         {
-            get => repoSelected;
-            set => this.RaiseAndSetIfChanged(ref repoSelected, value);
+            get => groupSelected;
+            set => this.RaiseAndSetIfChanged(ref groupSelected, value);
         }
 
 
@@ -67,8 +67,8 @@ namespace ModSink.WPF.ViewModel
             }
         }
 
-        public ReactiveCommand AddRepoUrl { get; }
-        public ReactiveCommand RemoveRepoUrl { get; }
+        public ReactiveCommand AddGroup { get; }
+        public ReactiveCommand RemoveGroup { get; }
 
 
         public SettingsModel Settings { get; }
