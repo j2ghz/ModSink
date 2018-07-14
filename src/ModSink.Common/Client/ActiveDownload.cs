@@ -26,7 +26,11 @@ namespace ModSink.Common.Client
             var dProg = downloader.Download(Source, Destination, source.FileSignature.Length);
             dProg.Subscribe(progress).DisposeWith(disposable);
             dProg.Connect().DisposeWith(disposable);
-            dProg.Subscribe(_ => { }, completed);
+            dProg.Subscribe(_ => { }, () =>
+            {
+                Destination.Dispose();
+                completed();
+            });
         }
 
         public string Name { get; }

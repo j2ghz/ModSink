@@ -64,8 +64,8 @@ namespace ModSink.Common.Client
                 .TransformMany(m => m.Mod.Files.Values)
                 .AddKey(fs => fs)
                 .Filter(fs => !filesAvailable.Items.Contains(fs))
-                .LeftJoin(OnlineFiles.Connect(), of => of.FileSignature,
-                    (fs, of) => new QueuedDownload(fs, of.Value.Uri))
+                .InnerJoin(OnlineFiles.Connect(), of => of.FileSignature,
+                    (fs, of) => new QueuedDownload(fs,of.Uri ))
                 .AsObservableCache()
                 .DisposeWith(disposable);
             QueuedDownloads.Connect().Subscribe().DisposeWith(disposable);
