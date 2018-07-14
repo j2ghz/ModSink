@@ -16,6 +16,7 @@ namespace ModSink.WPF.ViewModel
         {
             clientService.Repos
                 .Connect()
+                .RemoveKey()
                 .TransformMany(r => r.Modpacks)
                 .ObserveOnDispatcher()
                 .Bind(Modpacks)

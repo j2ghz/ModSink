@@ -16,14 +16,13 @@ namespace ModSink.WPF.ViewModel
 
         public DownloadsViewModel(ClientService clientService)
         {
-            var ds = clientService.DownloadService;
-            ds.ActiveDownloads.Connect()
+            clientService.ActiveDownloads.Connect()
                 .Transform(d => new DownloadViewModel(d))
                 .DisposeMany()
                 .Bind(Downloads)
                 .Subscribe()
                 .DisposeWith(disposable);
-            queueCount = ds.QueuedDownloads.CountChanged
+            queueCount = clientService.QueuedDownloads.CountChanged
                 .Select(i => "file".ToQuantity(i))
                 .ToProperty(this, t => t.QueueCount);
         }
