@@ -2,7 +2,9 @@ using System;
 using System.Diagnostics;
 using System.Net;
 using System.Reflection;
+using System.Threading;
 using System.Windows;
+using System.Windows.Media;
 using Anotar.Serilog;
 using CountlySDK;
 using ModSink.WPF.Helpers;
@@ -65,22 +67,27 @@ namespace ModSink.WPF
         protected override void OnStartup(StartupEventArgs e)
         {
             Log.Information("Starting ModSink ({version})", FullVersion);
-
-            InitializeDependencyInjection();
-
+            Log.Information("Dispatcher managed thread identifier = {0}", Thread.CurrentThread.ManagedThreadId);
+            Log.Information("WPF rendering capability (tier) = {0}", RenderCapability.Tier / 0x10000);
+            RenderCapability.TierChanged += (s, a) =>
+                Log.Information("WPF rendering capability (tier) = {0}", RenderCapability.Tier / 0x10000);
             Log.Information("Starting UI");
-
             base.OnStartup(e);
+            InitializeDependencyInjection();
         }
+
 
         private void SetupLogging()
         {
-            Log.Logger = new LoggerConfiguration()
-                .WriteTo.LiterateConsole(
+            var config = new LoggerConfiguration();
+            if (Debugger.IsAttached)
+                config = config.WriteTo.Debug(
+                    outputTemplate: "{Level:u3} [{SourceContext}-{ThreadId}] {Message:lj}{NewLine}{Exception}");
+            else
+                config = config.WriteTo.LiterateConsole(
                     outputTemplate:
-                    "{Timestamp:HH:mm:ss} {Level:u3} [{SourceContext}@{ThreadId}] {Message:lj} {Properties}{NewLine}{Exception}")
-                .WriteTo.Debug(outputTemplate: "{Level:u3} [{SourceContext}-{ThreadId}] {Message:lj}{NewLine}{Exception}")
-                .WriteTo.RollingFile(
+                    "{Timestamp:HH:mm:ss} {Level:u3} [{SourceContext}-{ThreadId}] {Message:lj}{NewLine}{Exception}");
+            Log.Logger = config.WriteTo.RollingFile(
                     "./Logs/{Date}.log",
                     outputTemplate:
                     "{Timestamp:o} [{Level:u3}] ({SourceContext}) {Properties} {Message}{NewLine}{Exception}")

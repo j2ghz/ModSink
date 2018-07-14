@@ -36,7 +36,6 @@ namespace ModSink.Common
 
                     //Read response
                     report(ByteSize.FromBytes(0), ByteSize.FromBytes(0), TransferState.ReadingResponse);
-                    LogTo.Verbose("Reading response");
                     try
                     {
                         response.EnsureSuccessStatusCode();
@@ -57,7 +56,6 @@ namespace ModSink.Common
                     var length = ByteSize.FromBytes(response.Content.Headers.ContentLength ?? 0);
 
                     report(length, ByteSize.FromBytes(0), TransferState.ReadingResponse);
-                    LogTo.Verbose("Transfer in progress");
                     var totalRead = 0;
                     using (var input = await response.Content.ReadAsStreamAsync())
                     {
@@ -76,7 +74,6 @@ namespace ModSink.Common
 
                     //Finish
                     report(length, totalRead.Bytes(), TransferState.Finished);
-                    LogTo.Verbose("Transfer finished");
                     observer.OnCompleted();
                 }
                 catch (Exception e)
