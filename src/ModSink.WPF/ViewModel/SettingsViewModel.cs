@@ -20,7 +20,7 @@ namespace ModSink.WPF.ViewModel
                 var repoUrl = await DialogCoordinator.ShowInputAsync(this, "Add new Group",
                     "Enter the url for the new Repo you want to add.\nIt usually looks like https://example.com/someFolder/group.bin");
                 if (string.IsNullOrWhiteSpace(repoUrl)) return;
-                settings.Client.GroupUrls.Edit(l => l.Add(repoUrl));
+                settings.Client.GroupUrls.Edit(l => l.AddOrUpdate(repoUrl));
             });
             var isRepoSelected =
                 this.WhenAnyValue<SettingsViewModel, bool, string>(x => x.GroupSelected,

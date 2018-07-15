@@ -37,9 +37,9 @@ namespace ModSink.Common.Client
             Repos = GroupUrls.Connect()
                 .Transform(g => new Uri(g))
                 .TransformAsync(Load<Group>)
-                .TransformMany(g => g.RepoInfos.Select(r => new Uri(g.BaseUri, r.Uri)))
-                .AddKey(u => u)
+                .TransformMany(g => g.RepoInfos.Select(r => new Uri(g.BaseUri, r.Uri)),repoUri=> repoUri)
                 .TransformAsync(Load<Repo>)
+                .OnItemUpdated((repo,_)=>LogTo.Information("Repo from {url} has been loaded",repo.BaseUri))
                 .AsObservableCache()
                 .DisposeWithThrowExceptions(disposable);
             OnlineFiles = Repos.Connect()
@@ -62,6 +62,7 @@ namespace ModSink.Common.Client
                 .Filter(fs => !filesAvailable.Items.Contains(fs))
                 .InnerJoin(OnlineFiles.Connect(), of => of.FileSignature,
                     (fs, of) => new QueuedDownload(fs, of.Uri))
+                .OnItemUpdated((qd, _) => LogTo.Information("Download added to queue ({file} from {url})", qd.FileSignature,qd.Source))
                 .AsObservableCache()
                 .DisposeWithThrowExceptions(disposable);
             ActiveDownloads = QueuedDownloads.Connect()
@@ -78,7 +79,7 @@ namespace ModSink.Common.Client
         public IObservableCache<QueuedDownload, FileSignature> QueuedDownloads { get; }
         public IObservableCache<Repo, Uri> Repos { get; }
         public IObservableCache<ActiveDownload, FileSignature> ActiveDownloads { get; }
-        public ISourceList<string> GroupUrls { get; } = new SourceList<string>();
+        public ISourceCache<string, string> GroupUrls { get; } = new SourceCache<string,string>(u=>u);
 
         public void Dispose()
         {

@@ -80,10 +80,10 @@ namespace ModSink.WPF
         private void SetupLogging()
         {
             var config = new LoggerConfiguration();
-            if (Debugger.IsAttached)
-                config = config.WriteTo.Debug(
-                    outputTemplate: "{Level:u3} [{SourceContext}-{ThreadId}] {Message:lj}{NewLine}{Exception}");
-            else
+            //if (Debugger.IsAttached)
+            //    config = config.WriteTo.Debug(
+            //        outputTemplate: "{Level:u3} [{SourceContext}-{ThreadId}] {Message:lj}{NewLine}{Exception}");
+            //else
                 config = config.WriteTo.LiterateConsole(
                     outputTemplate:
                     "{Timestamp:HH:mm:ss} {Level:u3} [{SourceContext}-{ThreadId}] {Message:lj}{NewLine}{Exception}");

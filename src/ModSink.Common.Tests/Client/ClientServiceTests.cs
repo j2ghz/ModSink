@@ -111,7 +111,7 @@ namespace ModSink.Common.Tests.Client
 
             var client = new ClientService(downloader, formatter, downloadsDir);
             //Act
-            client.GroupUrls.Edit(a => a.Add(groupUri.ToString()));
+            client.GroupUrls.Edit(a => a.AddOrUpdate(groupUri.ToString()));
             //Assert
 
             client.GroupUrls.Items.Should().HaveCount(1);
