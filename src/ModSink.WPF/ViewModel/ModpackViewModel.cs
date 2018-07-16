@@ -16,8 +16,6 @@ namespace ModSink.WPF.ViewModel
                     .SelectMany(m => m.Mod.Files)
                     .Select(f => f.Value.Length)
                     .Aggregate((sum, a) => sum + a)).Humanize("G03");
-            Download = ReactiveCommand.Create(() => { modpack.Selected = true; }, null,
-                RxApp.TaskpoolScheduler);
         }
 
         public Modpack Modpack { get; }
