@@ -12,7 +12,7 @@ namespace ModSink.WPF.ViewModel
     public class DownloadsViewModel : ReactiveObject, IDisposable
     {
         private readonly CompositeDisposable disposable = new CompositeDisposable();
-        private readonly ObservableAsPropertyHelper<string> queueCount;
+        private readonly ObservableAsPropertyHelper<string> status;
 
         public DownloadsViewModel(ClientService clientService)
         {
@@ -22,15 +22,16 @@ namespace ModSink.WPF.ViewModel
                 .Bind(Downloads)
                 .Subscribe()
                 .DisposeWith(disposable);
-            queueCount = clientService.QueuedDownloads.CountChanged
-                .Select(i => "file".ToQuantity(i))
-                .ToProperty(this, t => t.QueueCount);
+            status = clientService.QueuedDownloads.CountChanged
+                .CombineLatest(clientService.ActiveDownloads.CountChanged, (queue, active) =>
+                    $"Downloading {"file".ToQuantity(active)}, {"file".ToQuantity(queue)} in queue")
+                .ToProperty(this, t => t.Status);
         }
 
         public ObservableCollectionExtended<DownloadViewModel> Downloads { get; } =
             new ObservableCollectionExtended<DownloadViewModel>();
 
-        public string QueueCount => queueCount.Value;
+        public string Status => status.Value;
 
         public void Dispose()
         {

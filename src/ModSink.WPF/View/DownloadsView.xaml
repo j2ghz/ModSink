@@ -11,29 +11,8 @@
                           d:DesignHeight="800" d:DesignWidth="1500">
     <DockPanel LastChildFill="True">
         <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
-            <TextBlock x:Name="TbQueueCount" />
+            <TextBlock x:Name="TbStatus" />
         </StackPanel>
-        <ListView x:Name="LvDownloads">
-            <ListView.View>
-                <GridView>
-                    <GridViewColumn Width="300" Header="Name" DisplayMemberBinding="{Binding Name}" />
-                    <GridViewColumn Width="150" Header="State" DisplayMemberBinding="{Binding State}" />
-                    <GridViewColumn Width="100" Header="Downloaded" DisplayMemberBinding="{Binding Downloaded}" />
-                    <GridViewColumn Width="100" Header="Size" DisplayMemberBinding="{Binding Size}" />
-                    <GridViewColumn Width="100" Header="Speed" DisplayMemberBinding="{Binding Speed}" />
-                    <GridViewColumn Width="500" Header="Progress">
-                        <GridViewColumn.CellTemplate>
-                            <DataTemplate>
-                                <Grid>
-                                    <ProgressBar Value="{Binding Progress, Mode=OneWay}" />
-                                    <TextBlock Text="{Binding Progress, Mode=OneWay, StringFormat={}{0:0}%}"
-                                               HorizontalAlignment="Center" VerticalAlignment="Center" />
-                                </Grid>
-                            </DataTemplate>
-                        </GridViewColumn.CellTemplate>
-                    </GridViewColumn>
-                </GridView>
-            </ListView.View>
-        </ListView>
+        <HeaderedItemsControl Header="Active downloads" x:Name="IcDownloads" />
     </DockPanel>
 </rxui:ReactiveUserControl>

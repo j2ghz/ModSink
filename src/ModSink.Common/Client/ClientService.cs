@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reactive.Disposables;
@@ -13,6 +14,7 @@ using ModSink.Common.Models;
 using ModSink.Common.Models.Client;
 using ModSink.Common.Models.Group;
 using ModSink.Common.Models.Repo;
+using ReactiveUI;
 
 namespace ModSink.Common.Client
 {
@@ -35,6 +37,7 @@ namespace ModSink.Common.Client
             filesAvailable.Edit(l => { l.AddOrUpdate(fileAccessService.FilesAvailable()); });
             LogTo.Warning("Creating pipeline");
             Repos = GroupUrls.Connect()
+                .ObserveOn(RxApp.TaskpoolScheduler)
                 .Transform(g => new Uri(g))
                 .TransformAsync(Load<Group>)
                 .TransformMany(g => g.RepoInfos.Select(r => new Uri(g.BaseUri, r.Uri)),repoUri=> repoUri)
@@ -43,17 +46,20 @@ namespace ModSink.Common.Client
                 .AsObservableCache()
                 .DisposeWithThrowExceptions(disposable);
             OnlineFiles = Repos.Connect()
+                .ObserveOn(RxApp.TaskpoolScheduler)
                 .TransformMany(
                     repo => repo.Files.Select(kvp => new OnlineFile(kvp.Key, new Uri(repo.BaseUri, kvp.Value))),
                     of => of.FileSignature)
                 .AsObservableCache()
                 .DisposeWithThrowExceptions(disposable);
             Modpacks = Repos.Connect()
+                .ObserveOn(RxApp.TaskpoolScheduler)
                 .RemoveKey()
                 .TransformMany(r => r.Modpacks)
                 .AsObservableList()
                 .DisposeWithThrowExceptions(disposable);
             QueuedDownloads = Modpacks.Connect()
+                .ObserveOn(RxApp.TaskpoolScheduler)
                 .AutoRefresh(m => m.Selected)
                 .Filter(m => m.Selected)
                 .TransformMany(m => m.Mods)
@@ -66,6 +72,7 @@ namespace ModSink.Common.Client
                 .AsObservableCache()
                 .DisposeWithThrowExceptions(disposable);
             ActiveDownloads = QueuedDownloads.Connect()
+                .ObserveOn(RxApp.TaskpoolScheduler)
                 .Top(Comparer<QueuedDownload>.Default, 2)
                 .Transform(qd => new ActiveDownload(qd, GetTemporaryFileStream(qd.FileSignature),
                     () => AddNewFile(qd.FileSignature), downloader))
