@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Anotar.Serilog;
 using ModSink.Common.Models.Repo;
 
 namespace ModSink.Common.Client
@@ -14,6 +15,7 @@ namespace ModSink.Common.Client
         {
             FileSignature = fileSignature;
             Source = source;
+            LogTo.Verbose("Created QueuedDownload for {signature}", fileSignature);
         }
     }
 }

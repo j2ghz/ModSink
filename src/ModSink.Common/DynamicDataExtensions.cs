@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using DynamicData;
@@ -16,6 +17,7 @@ namespace ModSink.Common
             o.Connect().Subscribe().DisposeWith(disposable);
             o.Connect().Subscribe(_ => { },
                 ex => RxApp.MainThreadScheduler.Schedule(() => RxApp.DefaultExceptionHandler.OnError(ex)));
+            o.Connect().Subscribe(_ => { }, _ => Debugger.Break());
             return o;
         }
 
@@ -26,6 +28,7 @@ namespace ModSink.Common
             o.Connect().Subscribe().DisposeWith(disposable);
             o.Connect().Subscribe(_ => { },
                 ex => RxApp.MainThreadScheduler.Schedule(() => RxApp.DefaultExceptionHandler.OnError(ex)));
+            o.Connect().Subscribe(_ => { }, _ => Debugger.Break());
             return o;
         }
     }

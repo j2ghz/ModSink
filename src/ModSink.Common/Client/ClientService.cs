@@ -1,6 +1,6 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reactive.Disposables;
@@ -9,6 +9,7 @@ using System.Runtime.Serialization;
 using System.Threading.Tasks;
 using Anotar.Serilog;
 using DynamicData;
+using DynamicData.Kernel;
 using Humanizer;
 using ModSink.Common.Models;
 using ModSink.Common.Models.Client;
@@ -40,9 +41,9 @@ namespace ModSink.Common.Client
                 .ObserveOn(RxApp.TaskpoolScheduler)
                 .Transform(g => new Uri(g))
                 .TransformAsync(Load<Group>)
-                .TransformMany(g => g.RepoInfos.Select(r => new Uri(g.BaseUri, r.Uri)),repoUri=> repoUri)
+                .TransformMany(g => g.RepoInfos.Select(r => new Uri(g.BaseUri, r.Uri)), repoUri => repoUri)
                 .TransformAsync(Load<Repo>)
-                .OnItemUpdated((repo,_)=>LogTo.Information("Repo from {url} has been loaded",repo.BaseUri))
+                .OnItemUpdated((repo, _) => LogTo.Information("Repo from {url} has been loaded", repo.BaseUri))
                 .AsObservableCache()
                 .DisposeWithThrowExceptions(disposable);
             OnlineFiles = Repos.Connect()
@@ -65,15 +66,22 @@ namespace ModSink.Common.Client
                 .TransformMany(m => m.Mods)
                 .TransformMany(m => m.Mod.Files.Values)
                 .AddKey(fs => fs)
-                .Filter(fs => !filesAvailable.Items.Contains(fs))
+                .LeftJoin(filesAvailable.Connect(), f => f,
+                    (required, available) => !available.HasValue
+                        ? Optional<FileSignature>.Create(required)
+                        : Optional<FileSignature>.None)
+                .Filter(opt => opt.HasValue)
+                .Transform(opt => opt.Value)
                 .InnerJoin(OnlineFiles.Connect(), of => of.FileSignature,
                     (fs, of) => new QueuedDownload(fs, of.Uri))
-                .OnItemUpdated((qd, _) => LogTo.Information("Download added to queue ({file} from {url})", qd.FileSignature,qd.Source))
+                .OnItemUpdated((qd, _) =>
+                    LogTo.Information("Download added to queue ({file} from {url})", qd.FileSignature, qd.Source))
                 .AsObservableCache()
                 .DisposeWithThrowExceptions(disposable);
             ActiveDownloads = QueuedDownloads.Connect()
                 .ObserveOn(RxApp.TaskpoolScheduler)
-                .Top(Comparer<QueuedDownload>.Default, 2)
+                .Sort(Comparer<QueuedDownload>.Create((a,b)=>0),SortOptimisations.ComparesImmutableValuesOnly)
+                .Top(2)
                 .Transform(qd => new ActiveDownload(qd, GetTemporaryFileStream(qd.FileSignature),
                     () => AddNewFile(qd.FileSignature), downloader))
                 .DisposeMany()
@@ -86,7 +94,7 @@ namespace ModSink.Common.Client
         public IObservableCache<QueuedDownload, FileSignature> QueuedDownloads { get; }
         public IObservableCache<Repo, Uri> Repos { get; }
         public IObservableCache<ActiveDownload, FileSignature> ActiveDownloads { get; }
-        public ISourceCache<string, string> GroupUrls { get; } = new SourceCache<string,string>(u=>u);
+        public ISourceCache<string, string> GroupUrls { get; } = new SourceCache<string, string>(u => u);
 
         public void Dispose()
         {

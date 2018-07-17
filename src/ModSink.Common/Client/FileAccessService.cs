@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Anotar.Serilog;
 using ModSink.Common.Models.Repo;
 
 namespace ModSink.Common.Client
@@ -18,8 +19,14 @@ namespace ModSink.Common.Client
 
         IEnumerable<FileSignature> IFileAccessService.FilesAvailable()
         {
-            return localDir.EnumerateFiles().Where(f => f.Name.EndsWith(".tmp"))
-                .Select(f => new FileSignature(new HashValue(f.Name), f.Length));
+            foreach (var fileInfo in localDir.EnumerateFiles()
+                .Where(f => !f.Name.EndsWith(".tmp")))
+                fileInfo.Delete();
+
+            return localDir.EnumerateFiles()
+                .Where(f => !f.Name.EndsWith(".tmp"))
+                .Select(f => new FileSignature(new HashValue(f.Name), f.Length))
+                .Do(file => LogTo.Verbose("File {file} has been discovered", file.Hash));
         }
 
         Stream IFileAccessService.Read(FileSignature fileSignature, bool temporary)
