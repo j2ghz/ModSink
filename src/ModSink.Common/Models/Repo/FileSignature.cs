@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 
 namespace ModSink.Common.Models.Repo
 {
     [Serializable]
+    [DebuggerDisplay("{Hash} | {Length}")]
     public struct FileSignature : IEquatable<FileSignature>
     {
         public FileSignature(HashValue hash, ulong length)
@@ -43,6 +45,11 @@ namespace ModSink.Common.Models.Repo
             {
                 return (Hash.GetHashCode() * 397) ^ Length.GetHashCode();
             }
+        }
+
+        public override string ToString()
+        {
+            return $"{Hash.ToString()} - {Length}";
         }
     }
 }

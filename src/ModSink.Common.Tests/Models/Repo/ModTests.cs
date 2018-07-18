@@ -3,9 +3,8 @@ using System.IO;
 using System.Linq;
 using Bogus;
 using ModSink.Common.Models.Repo;
-using ModSink.Common.Tests;
 
-namespace Modsink.Common.Tests.Models.Repo
+namespace ModSink.Common.Tests.Models.Repo
 {
     public class ModTests : TestWithFaker<Mod>
     {

@@ -3,4 +3,5 @@
 <Weavers>
   <Anotar.Serilog />
   <Visualize />
+  <NullGuard IncludeDebugAssert="false" />
 </Weavers>

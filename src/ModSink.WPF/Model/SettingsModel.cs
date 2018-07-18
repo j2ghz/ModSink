@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using DynamicData;
 using DynamicData.Binding;
@@ -17,7 +18,8 @@ namespace ModSink.WPF.Model
                 .Subscribe();
 
             // Temporary to ease testing
-            client.GroupUrls.Add(@"https://modsink.j2ghz.com/group.bin");
+            RxApp.TaskpoolScheduler.Schedule(() =>
+                client.GroupUrls.AddOrUpdate(@"https://modsink.j2ghz.com/group.bin"));
         }
 
         public ClientService Client { get; }

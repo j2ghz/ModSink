@@ -1,4 +1,5 @@
-﻿using System.Reactive.Disposables;
+﻿using System;
+using System.Reactive.Disposables;
 using ModSink.WPF.ViewModel;
 using ReactiveUI;
 
@@ -12,8 +13,8 @@ namespace ModSink.WPF.View
 
             this.WhenActivated(d =>
             {
-                this.OneWayBind(ViewModel, vm => vm.QueueCount, v => v.TbQueueCount.Text).DisposeWith(d);
-                this.OneWayBind(ViewModel, vm => vm.Downloads, v => v.LvDownloads.ItemsSource).DisposeWith(d);
+                this.OneWayBind(ViewModel, vm => vm.Status, v => v.TbStatus.Text).DisposeWith(d);
+                this.OneWayBind(ViewModel, vm => vm.Downloads, v => v.IcDownloads.ItemsSource).DisposeWith(d);
             });
         }
     }

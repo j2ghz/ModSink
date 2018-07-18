@@ -1,7 +1,5 @@
-﻿using System;
-using Bogus;
+﻿using Bogus;
 using FluentAssertions;
-using FluentAssertions.Equivalency;
 using Xunit;
 
 namespace ModSink.Common.Tests

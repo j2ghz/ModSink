@@ -4,9 +4,6 @@ using ReactiveUI;
 
 namespace ModSink.WPF.View
 {
-    /// <summary>
-    ///     Interaction logic for ModpackView.xaml
-    /// </summary>
     public partial class ModpackView : ReactiveUserControl<ModpackViewModel>
     {
         public ModpackView()
@@ -18,7 +15,7 @@ namespace ModSink.WPF.View
                 this.OneWayBind(ViewModel, vm => vm.Modpack.Name, v => v.TbName.Text).DisposeWith(d);
                 this.OneWayBind(ViewModel, vm => vm.Size, v => v.TbSize.Text).DisposeWith(d);
                 this.OneWayBind(ViewModel, vm => vm.Modpack.Mods, v => v.LbMods.ItemsSource).DisposeWith(d);
-                this.BindCommand(ViewModel, vm => vm.Download, v => v.BtnInstall).DisposeWith(d);
+                this.Bind(ViewModel, vm => vm.Modpack.Selected, v => v.ChkInstall.IsChecked).DisposeWith(d);
             });
         }
     }

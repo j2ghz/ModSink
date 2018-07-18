@@ -76,14 +76,15 @@ namespace ModSink.CLI
                     }
                     else
                     {
-                        var downloader = new HttpClientDownloader();
-                        var client = new ClientService(new DownloadService(downloader), null, downloader,
-                            new BinaryFormatter());
+                        throw new NotImplementedException();
+                        //var downloader = new HttpClientDownloader();
+                        //var client = new ClientService(new DownloadService(downloader), null, downloader,
+                        //    new BinaryFormatter());
 
-                        Console.WriteLine("Downloading repo");
-                        client.GroupUrls.Add(uriStr);
-                        foreach (var repo in client.Repos.Items)
-                            DumpRepo(repo);
+                        //Console.WriteLine("Downloading repo");
+                        //client.GroupUrls.Add(uriStr);
+                        //foreach (var repo in client.Repos.Items)
+                        //    DumpRepo(repo);
                     }
 
                     return 0;

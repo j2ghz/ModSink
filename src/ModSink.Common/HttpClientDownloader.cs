@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 using System.Net;
 using System.Net.Http;
@@ -10,6 +11,7 @@ using Fusillade;
 using Humanizer;
 using Humanizer.Bytes;
 using ModSink.Common.Client;
+using ReactiveUI;
 using static ModSink.Common.Client.DownloadProgress;
 
 namespace ModSink.Common
@@ -29,12 +31,12 @@ namespace ModSink.Common
                         observer.OnNext(new DownloadProgress(size, downloaded, state)));
                     //Get response
                     report(ByteSize.FromBytes(0), ByteSize.FromBytes(0), TransferState.AwaitingResponse);
+                    LogTo.Verbose("Sent request to {url}", source);
                     var response = await client.GetAsync(source, HttpCompletionOption.ResponseHeadersRead,
                         cancel);
 
                     //Read response
                     report(ByteSize.FromBytes(0), ByteSize.FromBytes(0), TransferState.ReadingResponse);
-
                     try
                     {
                         response.EnsureSuccessStatusCode();
@@ -55,7 +57,6 @@ namespace ModSink.Common
                     var length = ByteSize.FromBytes(response.Content.Headers.ContentLength ?? 0);
 
                     report(length, ByteSize.FromBytes(0), TransferState.ReadingResponse);
-
                     var totalRead = 0;
                     using (var input = await response.Content.ReadAsStreamAsync())
                     {
@@ -78,11 +79,12 @@ namespace ModSink.Common
                 }
                 catch (Exception e)
                 {
+                    //Debugger.Break(); some downloads are immediatelly cancelled
                     observer.OnError(e);
                 }
 
                 return Disposable.Empty;
-            }).Publish();
+            }).SubscribeOn(RxApp.TaskpoolScheduler).Publish();
         }
     }
 }

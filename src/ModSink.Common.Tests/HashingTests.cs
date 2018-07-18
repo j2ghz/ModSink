@@ -2,10 +2,9 @@
 using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
-using ModSink.Common;
 using Xunit;
 
-namespace Modsink.Common.Tests
+namespace ModSink.Common.Tests
 {
     public class HashingTests
     {

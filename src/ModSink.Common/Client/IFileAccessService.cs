@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using ModSink.Common.Models.Repo;
@@ -7,20 +9,14 @@ namespace ModSink.Common.Client
 {
     public interface IFileAccessService
     {
-        Task Delete(FileSignature fileSignature);
 
-        Task<FileInfo> GetFileInfo(FileSignature fileSignature);
+        IEnumerable<FileSignature> FilesAvailable();
 
-        string GetFileName(FileSignature fileSignature);
+        Stream Read(FileSignature fileSignature,bool temporary);
 
-        FileInfo GetFileUri(FileSignature fileSignature);
+        Stream Write(FileSignature fileSignature,bool temporary);
 
-        Task<bool> IsFileAvailable(FileSignature fileSignature);
+        void TemporaryFinished(FileSignature fileSignature);
 
-        Task<Stream> Read(FileSignature fileSignature);
-
-        Task<Stream> Write(FileSignature fileSignature);
-
-        Task<(bool available, Lazy<Task<Stream>> stream)> WriteIfMissingOrInvalid(FileSignature fileSignature);
     }
 }

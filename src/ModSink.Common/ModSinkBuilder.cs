@@ -30,8 +30,7 @@ namespace ModSink.Common
 
         public ModSink Build()
         {
-            return new ModSink(new ClientService(new DownloadService(downloader),
-                new FileAccessService(localStorageDirectory), downloader, formatter));
+            return new ModSink(new ClientService(downloader, formatter, localStorageDirectory));
         }
     }
 }

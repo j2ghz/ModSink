@@ -1,8 +1,12 @@
 using System;
 using System.Diagnostics;
+using System.IO;
 using System.Net;
 using System.Reflection;
+using System.Threading;
 using System.Windows;
+using System.Windows.Media;
+using System.Windows.Threading;
 using Anotar.Serilog;
 using CountlySDK;
 using ModSink.WPF.Helpers;
@@ -65,25 +69,28 @@ namespace ModSink.WPF
         protected override void OnStartup(StartupEventArgs e)
         {
             Log.Information("Starting ModSink ({version})", FullVersion);
-
-            InitializeDependencyInjection();
-
+            Log.Information("Dispatcher managed thread identifier = {0}", Dispatcher.Thread.ManagedThreadId);
+            Log.Information("WPF rendering capability (tier) = {0}", RenderCapability.Tier / 0x10000);
+            RenderCapability.TierChanged += (s, a) =>
+                Log.Information("WPF rendering capability (tier) = {0}", RenderCapability.Tier / 0x10000);
             Log.Information("Starting UI");
-
             base.OnStartup(e);
+            InitializeDependencyInjection();
         }
+
 
         private void SetupLogging()
         {
             Log.Logger = new LoggerConfiguration()
+                .WriteTo.Debug(
+                    outputTemplate: "{Level:u3} [{SourceContext}-{ThreadId}] {Message:lj}{NewLine}{Exception}")
                 .WriteTo.LiterateConsole(
                     outputTemplate:
-                    "{Timestamp:HH:mm:ss} {Level:u3} [{SourceContext}@{ThreadId}] {Message:lj} {Properties}{NewLine}{Exception}")
-                .WriteTo.Debug()
+                    "{Timestamp:HH:mm:ss} {Level:u3} [{SourceContext}-{ThreadId}] {Message:lj}{NewLine}{Exception}")
                 .WriteTo.RollingFile(
-                    "./Logs/{Date}.log",
+                    Path.Combine(PathProvider.Logs.FullName, "{Date}.log"),
                     outputTemplate:
-                    "{Timestamp:o} [{Level:u3}] ({SourceContext}) {Properties} {Message}{NewLine}{Exception}")
+                    "{Timestamp:o} {Level:u3} [{SourceContext}-{ThreadId}] {Message} {Properties}{NewLine}{Exception}")
                 .Enrich.FromLogContext()
                 .Enrich.WithThreadId()
                 .Enrich.With<ExceptionEnricher>()
