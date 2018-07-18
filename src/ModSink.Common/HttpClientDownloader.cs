@@ -25,8 +25,8 @@ namespace ModSink.Common
         {
             return Observable.Create<DownloadProgress>(async (observer, cancel) =>
             {
-                //try
-                //{
+                try
+                {
                     var report = new Action<ByteSize, ByteSize, TransferState>((size, downloaded, state) =>
                         observer.OnNext(new DownloadProgress(size, downloaded, state)));
                     //Get response
@@ -76,12 +76,12 @@ namespace ModSink.Common
                     //Finish
                     report(length, totalRead.Bytes(), TransferState.Finished);
                     observer.OnCompleted();
-                //}
-                //catch (Exception e)
-                //{
-                //    Debugger.Break();
-                //    observer.OnError(e);
-                //}
+                }
+                catch (Exception e)
+                {
+                    Debugger.Break();
+                    observer.OnError(e);
+                }
 
                 return Disposable.Empty;
             }).SubscribeOn(RxApp.TaskpoolScheduler).Publish();

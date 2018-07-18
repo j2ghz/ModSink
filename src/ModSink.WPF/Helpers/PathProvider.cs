@@ -12,6 +12,7 @@ namespace ModSink.WPF.Helpers
 
         public static DirectoryInfo Downloads => AppData.ChildDir("Downloads");
         public static DirectoryInfo Temp => AppData.ChildDir("Temp");
+        public static DirectoryInfo Logs => AppData.ChildDir("Logs");
 
         public static void EnsureFoldersExist()
         {

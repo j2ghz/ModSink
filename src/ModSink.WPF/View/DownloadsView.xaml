@@ -13,6 +13,12 @@
         <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
             <TextBlock x:Name="TbStatus" />
         </StackPanel>
-        <HeaderedItemsControl Header="Active downloads" x:Name="IcDownloads" />
+        <ItemsControl x:Name="IcDownloads">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <WrapPanel Orientation="Horizontal" />
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+        </ItemsControl>
     </DockPanel>
 </rxui:ReactiveUserControl>

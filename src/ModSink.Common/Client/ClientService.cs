@@ -81,7 +81,7 @@ namespace ModSink.Common.Client
             ActiveDownloads = QueuedDownloads.Connect()
                 .ObserveOn(RxApp.TaskpoolScheduler)
                 .Sort(Comparer<QueuedDownload>.Create((a,b)=>0),SortOptimisations.ComparesImmutableValuesOnly)
-                .Top(2)
+                .Top(5)
                 .Transform(qd => new ActiveDownload(qd, GetTemporaryFileStream(qd.FileSignature),
                     () => AddNewFile(qd.FileSignature), downloader))
                 .DisposeMany()

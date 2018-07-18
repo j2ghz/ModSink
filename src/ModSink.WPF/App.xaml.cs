@@ -1,5 +1,6 @@
 using System;
 using System.Diagnostics;
+using System.IO;
 using System.Net;
 using System.Reflection;
 using System.Threading;
@@ -85,7 +86,7 @@ namespace ModSink.WPF
                     outputTemplate:
                     "{Timestamp:HH:mm:ss} {Level:u3} [{SourceContext}-{ThreadId}] {Message:lj}{NewLine}{Exception}")
                 .WriteTo.RollingFile(
-                    "./Logs/{Date}.log",
+                    Path.Combine(PathProvider.Logs.FullName, "{Date}.log"),
                     outputTemplate:
                     "{Timestamp:o} [{Level:u3}] ({SourceContext}) {Properties} {Message}{NewLine}{Exception}")
                 .Enrich.FromLogContext()
