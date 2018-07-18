@@ -6,6 +6,7 @@
                         xmlns:local="clr-namespace:ModSink.WPF.View"
                         xmlns:rx="http://reactiveui.net"
                         xmlns:viewModel="clr-namespace:ModSink.WPF.ViewModel"
+                        xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
                         mc:Ignorable="d"
                         Width="150"
                         Margin="5">
@@ -14,17 +15,15 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="Auto" />
         </Grid.ColumnDefinitions>
 
-        <TextBlock x:Name="TbName" Grid.ColumnSpan="3" />
-        <TextBlock x:Name="TbSpeed" Grid.Row="1" Grid.Column="0" />
-        <TextBlock x:Name="TbDownloaded" Grid.Row="1" Grid.Column="1" />
-        <TextBlock x:Name="TbSize" Grid.Row="1" Grid.Column="2" />
-        <ProgressBar x:Name="ProgressBar" Grid.Row="2" Grid.ColumnSpan="3" />
+        <TextBlock x:Name="TbName" />
+        <TextBlock x:Name="TbState" Grid.Row="1" />
+        <TextBlock x:Name="TbStatus" Grid.Row="2" />
+        <mah:MetroProgressBar x:Name="ProgressBar" Grid.Row="3" />
     </Grid>
 </rx:ReactiveUserControl>

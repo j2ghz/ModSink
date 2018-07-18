@@ -2,6 +2,7 @@
 using System.IO;
 using System.Reactive;
 using System.Reactive.Disposables;
+using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using Anotar.Serilog;
 using Humanizer.Bytes;
@@ -24,6 +25,8 @@ namespace ModSink.Common.Client
             Destination = tempDestination;
             LogTo.Verbose("Created ActiveDownload for {signature}", source.FileSignature);
             var dProg = downloader.Download(Source, Destination, source.FileSignature.Length);
+            dProg.DistinctUntilChanged(dp => dp.State).Subscribe(dp =>
+                LogTo.Debug("[{download}] State changed to {state}", Name, dp.State));
             dProg.Subscribe(progress).DisposeWith(disposable);
             dProg.Connect().DisposeWith(disposable);
             dProg.Subscribe(_ => { }, () =>

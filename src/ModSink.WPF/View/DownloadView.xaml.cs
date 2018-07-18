@@ -1,4 +1,5 @@
 ﻿using System.Reactive.Disposables;
+using ModSink.Common.Client;
 using ModSink.WPF.ViewModel;
 using ReactiveUI;
 
@@ -13,10 +14,11 @@ namespace ModSink.WPF.View
             this.WhenActivated(d =>
             {
                 this.OneWayBind(ViewModel, vm => vm.Name, v => v.TbName.Text).DisposeWith(d);
-                this.OneWayBind(ViewModel, vm => vm.Speed, v => v.TbSpeed.Text).DisposeWith(d);
-                this.OneWayBind(ViewModel, vm => vm.Downloaded, v => v.TbDownloaded.Text).DisposeWith(d);
-                this.OneWayBind(ViewModel, vm => vm.Size, v => v.TbSize.Text).DisposeWith(d);
+                this.OneWayBind(ViewModel, vm => vm.State, v => v.TbState.Text).DisposeWith(d);
+                this.OneWayBind(ViewModel, vm => vm.Status, v => v.TbStatus.Text).DisposeWith(d);
                 this.OneWayBind(ViewModel, vm => vm.Progress, v => v.ProgressBar.Value).DisposeWith(d);
+                this.OneWayBind(ViewModel, vm => vm.State, v => v.ProgressBar.IsIndeterminate,
+                    s => s != DownloadProgress.TransferState.Downloading).DisposeWith(d);
             });
         }
     }

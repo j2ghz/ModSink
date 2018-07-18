@@ -79,7 +79,7 @@ namespace ModSink.Common
                 }
                 catch (Exception e)
                 {
-                    Debugger.Break();
+                    //Debugger.Break(); some downloads are immediatelly cancelled
                     observer.OnError(e);
                 }
 

@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Threading;
 using System.Windows;
 using System.Windows.Media;
+using System.Windows.Threading;
 using Anotar.Serilog;
 using CountlySDK;
 using ModSink.WPF.Helpers;
@@ -68,7 +69,7 @@ namespace ModSink.WPF
         protected override void OnStartup(StartupEventArgs e)
         {
             Log.Information("Starting ModSink ({version})", FullVersion);
-            Log.Information("Dispatcher managed thread identifier = {0}", Thread.CurrentThread.ManagedThreadId);
+            Log.Information("Dispatcher managed thread identifier = {0}", Dispatcher.Thread.ManagedThreadId);
             Log.Information("WPF rendering capability (tier) = {0}", RenderCapability.Tier / 0x10000);
             RenderCapability.TierChanged += (s, a) =>
                 Log.Information("WPF rendering capability (tier) = {0}", RenderCapability.Tier / 0x10000);
@@ -80,7 +81,8 @@ namespace ModSink.WPF
 
         private void SetupLogging()
         {
-            Log.Logger = new LoggerConfiguration().WriteTo.Debug(
+            Log.Logger = new LoggerConfiguration()
+                .WriteTo.Debug(
                     outputTemplate: "{Level:u3} [{SourceContext}-{ThreadId}] {Message:lj}{NewLine}{Exception}")
                 .WriteTo.LiterateConsole(
                     outputTemplate:
@@ -88,7 +90,7 @@ namespace ModSink.WPF
                 .WriteTo.RollingFile(
                     Path.Combine(PathProvider.Logs.FullName, "{Date}.log"),
                     outputTemplate:
-                    "{Timestamp:o} [{Level:u3}] ({SourceContext}) {Properties} {Message}{NewLine}{Exception}")
+                    "{Timestamp:o} {Level:u3} [{SourceContext}-{ThreadId}] {Message} {Properties}{NewLine}{Exception}")
                 .Enrich.FromLogContext()
                 .Enrich.WithThreadId()
                 .Enrich.With<ExceptionEnricher>()

@@ -14,7 +14,8 @@ namespace ModSink.WPF.ViewModel
         private readonly ObservableAsPropertyHelper<double> progress;
         private readonly ObservableAsPropertyHelper<string> size;
         private readonly ObservableAsPropertyHelper<string> speed;
-        private readonly ObservableAsPropertyHelper<string> state;
+        private readonly ObservableAsPropertyHelper<DownloadProgress.TransferState> state;
+        private readonly ObservableAsPropertyHelper<string> status;
 
         public DownloadViewModel(ActiveDownload activeDownload)
         {
@@ -37,7 +38,11 @@ namespace ModSink.WPF.ViewModel
             progress = dpRealtime.Where(p => p.Size.Bits > 0).Select(p => 100d * p.Downloaded.Bits / p.Size.Bits)
                 .ToProperty(this, x => x.Progress);
             size = dpRealtime.Select(p => p.Size.Humanize("G03")).ToProperty(this, x => x.Size);
-            state = dpRealtime.Select(p => p.State.Humanize()).ToProperty(this, x => x.State);
+            state = dpRealtime.Select(p => p.State).ToProperty(this, x => x.State);
+
+            status = dp.Select(p =>
+                    $"{p.Current.Downloaded.Humanize("G03")}/{p.Current.Size.Humanize("G03")} @ {p.Speed.Humanize("G03")}")
+                .ToProperty(this, x => x.Status);
 
             LogErrors(downloaded);
             LogErrors(progress);
@@ -46,9 +51,11 @@ namespace ModSink.WPF.ViewModel
             LogErrors(state);
         }
 
-        public string State => state.Value;
+        public DownloadProgress.TransferState State => state.Value;
         public string Downloaded => downloaded.Value;
         public string Name { get; }
+
+        public string Status => status.Value;
         public double Progress => progress.Value;
         public string Size => size.Value;
         public string Speed => speed.Value;
@@ -56,7 +63,7 @@ namespace ModSink.WPF.ViewModel
         private void LogErrors(IHandleObservableErrors oaph)
         {
             oaph.ThrownExceptions.Subscribe(e =>
-                LogTo.Error(e, "[{download}] failed", this.Name));
+                LogTo.Error(e, "[{download}] failed", Name));
         }
     }
 }
