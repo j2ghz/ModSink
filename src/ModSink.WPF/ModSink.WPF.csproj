@@ -48,7 +48,7 @@
     <PackageReference Include="Serilog.Sinks.Debug" Version="1.0.1" />
     <PackageReference Include="Serilog.Sinks.Literate" Version="3.0.0" />
     <PackageReference Include="Serilog.Sinks.RollingFile" Version="3.3.0" />
-    <PackageReference Include="Splat.Serilog" Version="1.0.3-Beta" />
+    <PackageReference Include="Splat.Serilog" Version="2.0.0" />
     <PackageReference Include="System.Net.Http" Version="4.3.3" />
     <PackageReference Include="GitVersionTask" Version="4.0.0-beta*">
       <PrivateAssets>All</PrivateAssets>
