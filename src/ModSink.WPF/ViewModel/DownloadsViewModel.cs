@@ -25,7 +25,7 @@ namespace ModSink.WPF.ViewModel
             status = clientService.QueuedDownloads.CountChanged
                 .CombineLatest(clientService.ActiveDownloads.CountChanged, (queue, active) =>
                     $"Downloading {"file".ToQuantity(active)}, {"file".ToQuantity(queue)} in queue")
-                .ToProperty(this, t => t.Status);
+                .ToProperty(this, t => t.Status, scheduler: RxApp.MainThreadScheduler);
         }
 
         public ObservableCollectionExtended<DownloadViewModel> Downloads { get; } =
