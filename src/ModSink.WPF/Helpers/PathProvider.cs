@@ -11,14 +11,12 @@ namespace ModSink.WPF.Helpers
                 Environment.SpecialFolderOption.Create), nameof(ModSink)));
 
         public static DirectoryInfo Downloads => AppData.ChildDir("Downloads");
-        public static DirectoryInfo Temp => AppData.ChildDir("Temp");
         public static DirectoryInfo Logs => AppData.ChildDir("Logs");
 
         public static void EnsureFoldersExist()
         {
             if (!AppData.Exists) AppData.Create();
             if (!Downloads.Exists) Downloads.Create();
-            if (!Temp.Exists) Temp.Create();
         }
     }
 }

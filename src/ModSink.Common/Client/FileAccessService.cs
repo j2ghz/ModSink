@@ -43,7 +43,10 @@ namespace ModSink.Common.Client
 
         public void TemporaryFinished(FileSignature fileSignature)
         {
-            GetFileInfo(fileSignature, true).MoveTo(GetFileInfo(fileSignature, false).FullName);
+            var temp = GetFileInfo(fileSignature, true);
+            var final = GetFileInfo(fileSignature, false);
+            LogTo.Verbose("Renaming file {src} to {dst}", temp, final);
+            temp.MoveTo(final.FullName);
         }
 
         private FileInfo GetFileInfo(FileSignature fileSignature, bool temporary)

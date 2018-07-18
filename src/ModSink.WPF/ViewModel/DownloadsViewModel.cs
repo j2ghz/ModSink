@@ -22,11 +22,19 @@ namespace ModSink.WPF.ViewModel
                 .Bind(Downloads)
                 .Subscribe()
                 .DisposeWith(disposable);
+            clientService.QueuedDownloads.Connect()
+                .Transform(qd=>qd.FileSignature.Hash.ToString())
+                .Bind(Queue)
+                .Subscribe()
+                .DisposeWith(disposable);
             status = clientService.QueuedDownloads.CountChanged
                 .CombineLatest(clientService.ActiveDownloads.CountChanged, (queue, active) =>
                     $"Downloading {"file".ToQuantity(active)}, {"file".ToQuantity(queue)} in queue")
                 .ToProperty(this, t => t.Status, scheduler: RxApp.MainThreadScheduler);
         }
+
+        public IObservableCollection<string> Queue { get; } =
+            new ObservableCollectionExtended<string>();
 
         public ObservableCollectionExtended<DownloadViewModel> Downloads { get; } =
             new ObservableCollectionExtended<DownloadViewModel>();

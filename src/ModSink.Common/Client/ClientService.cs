@@ -74,8 +74,6 @@ namespace ModSink.Common.Client
                 .Transform(opt => opt.Value)
                 .InnerJoin(OnlineFiles.Connect(), of => of.FileSignature,
                     (fs, of) => new QueuedDownload(fs, of.Uri))
-                .OnItemUpdated((qd, _) =>
-                    LogTo.Information("Download added to queue ({file} from {url})", qd.FileSignature, qd.Source))
                 .AsObservableCache()
                 .DisposeWithThrowExceptions(disposable);
             ActiveDownloads = QueuedDownloads.Connect()
@@ -83,7 +81,11 @@ namespace ModSink.Common.Client
                 .Sort(Comparer<QueuedDownload>.Create((a,b)=>0),SortOptimisations.ComparesImmutableValuesOnly)
                 .Top(5)
                 .Transform(qd => new ActiveDownload(qd, GetTemporaryFileStream(qd.FileSignature),
-                    () => AddNewFile(qd.FileSignature), downloader))
+                    () =>
+                    {
+                        LogTo.Verbose("ActiveDownload {name} finished",qd.FileSignature.Hash);
+                        AddNewFile(qd.FileSignature);
+                    }, downloader))
                 .DisposeMany()
                 .AsObservableCache()
                 .DisposeWithThrowExceptions(disposable);
@@ -104,6 +106,7 @@ namespace ModSink.Common.Client
         private void AddNewFile(FileSignature fileSignature)
         {
             fileAccessService.TemporaryFinished(fileSignature);
+            LogTo.Verbose("File {name} is now available", fileSignature.Hash);
             filesAvailable.AddOrUpdate(fileSignature);
         }
 

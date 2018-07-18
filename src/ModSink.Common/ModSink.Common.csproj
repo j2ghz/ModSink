@@ -15,6 +15,7 @@
 
   <ItemGroup>
     <PackageReference Include="Anotar.Serilog.Fody" Version="4.6.2" />
+    <PackageReference Include="Ben.Demystifier" Version="0.1.1" />
     <PackageReference Include="DynamicData" Version="6.4.0.2419" />
     <PackageReference Include="Flurl" Version="2.7.1" />
     <PackageReference Include="Fody" Version="3.1.3" />

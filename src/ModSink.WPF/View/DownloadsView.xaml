@@ -13,6 +13,7 @@
         <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
             <TextBlock x:Name="TbStatus" />
         </StackPanel>
+        <ListBox Name="LbQueue" DockPanel.Dock="Left" />
         <ItemsControl x:Name="IcDownloads">
             <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>
