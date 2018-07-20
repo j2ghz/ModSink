@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -78,12 +77,12 @@ namespace ModSink.Common.Client
                 .DisposeWithThrowExceptions(disposable);
             ActiveDownloads = QueuedDownloads.Connect()
                 .ObserveOn(RxApp.TaskpoolScheduler)
-                .Sort(Comparer<QueuedDownload>.Create((a,b)=>0),SortOptimisations.ComparesImmutableValuesOnly)
+                .Sort(Comparer<QueuedDownload>.Create((a, b) => 0), SortOptimisations.ComparesImmutableValuesOnly)
                 .Top(5)
                 .Transform(qd => new ActiveDownload(qd, GetTemporaryFileStream(qd.FileSignature),
                     () =>
                     {
-                        LogTo.Verbose("ActiveDownload {name} finished",qd.FileSignature.Hash);
+                        LogTo.Verbose("ActiveDownload {name} finished", qd.FileSignature.Hash);
                         AddNewFile(qd.FileSignature);
                     }, downloader))
                 .DisposeMany()

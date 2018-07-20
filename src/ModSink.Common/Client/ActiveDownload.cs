@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
 using System.IO;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
@@ -24,20 +23,19 @@ namespace ModSink.Common.Client
             Source = source.Source;
             Name = source.FileSignature.Hash.ToString();
             Destination = tempDestination;
-            LogTo.Verbose("Created ActiveDownload for {signature}", source.FileSignature);
+            LogTo.Debug("Created ActiveDownload for {signature}", source.FileSignature);
             var dProg = downloader.Download(Source, Destination, source.FileSignature.Length);
-            dProg.Log(this).Subscribe(progress).DisposeWith(disposable);
+            dProg.Subscribe(progress).DisposeWith(disposable);
             dProg.Connect().DisposeWith(disposable);
 
             progress.DistinctUntilChanged(dp => dp.State).Subscribe(dp =>
-                LogTo.Debug("[{download}] State changed to {state}", Name, dp.State));
-            
+                LogTo.Verbose("[{download}] State changed to {state}", Name, dp.State));
+
             progress.Subscribe(_ => { }, () =>
             {
                 Destination.Dispose();
                 completed();
             });
-           
         }
 
         public string Name { get; }
@@ -49,6 +47,7 @@ namespace ModSink.Common.Client
 
         public void Dispose()
         {
+            LogTo.Debug("Removed ActiveDownload for {signature}", Name);
             disposable?.Dispose();
             progress?.Dispose();
             Destination?.Dispose();
