@@ -22,14 +22,14 @@ namespace ModSink.Common
         public IConnectableObservable<DownloadProgress> Download(Uri source, Stream destination,
             ulong expectedLength = 0)
         {
-            return Observable.Create<DownloadProgress>(async (observer, cancel) =>
+            return Observable.Create<DownloadProgress>(async observer =>
             {
                 var report = new Action<ByteSize, ByteSize, TransferState>((size, downloaded, state) =>
                     observer.OnNext(new DownloadProgress(size, downloaded, state)));
                 //Get response
                 report(ByteSize.FromBytes(0), ByteSize.FromBytes(0), TransferState.AwaitingResponse);
-                var response = await client.GetAsync(source, HttpCompletionOption.ResponseHeadersRead,
-                    cancel);
+                var response = await client.GetAsync(source, HttpCompletionOption.ResponseHeadersRead
+                );
 
                 //Read response
                 report(ByteSize.FromBytes(0), ByteSize.FromBytes(0), TransferState.ReadingResponse);
@@ -63,7 +63,7 @@ namespace ModSink.Common
 
                     //Download
                     report(length, ByteSize.FromBytes(0), TransferState.Downloading);
-                    while ((read = await input.ReadAsync(buffer, 0, buffer.Length, cancel)) > 0)
+                    while ((read = await input.ReadAsync(buffer, 0, buffer.Length)) > 0)
                     {
                         destination.Write(buffer, 0, read);
                         totalRead += read;

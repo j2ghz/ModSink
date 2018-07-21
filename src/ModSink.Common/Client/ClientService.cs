@@ -65,12 +65,20 @@ namespace ModSink.Common.Client
                 .TransformMany(m => m.Mods)
                 .TransformMany(m => m.Mod.Files.Values)
                 .AddKey(fs => fs)
+                .LogVerbose("requiredFiles")
                 .LeftJoin(filesAvailable.Connect(), f => f,
-                    (required, available) => !available.HasValue
-                        ? Optional<FileSignature>.Create(required)
-                        : Optional<FileSignature>.None)
+                    (required, available) =>
+                    {
+                        LogTo.Verbose(
+                            available.HasValue ? "File {signature} is available" : "File {signature} is not available",
+                            required);
+                        return !available.HasValue
+                            ? Optional<FileSignature>.Create(required)
+                            : Optional<FileSignature>.None;
+                    })
                 .Filter(opt => opt.HasValue)
                 .Transform(opt => opt.Value)
+                .LogVerbose("missingFiles")
                 .InnerJoin(OnlineFiles.Connect(), of => of.FileSignature,
                     (fs, of) => new QueuedDownload(fs, of.Uri))
                 .AsObservableCache()
@@ -86,6 +94,7 @@ namespace ModSink.Common.Client
                         AddNewFile(qd.FileSignature);
                     }, downloader))
                 .DisposeMany()
+                .LogVerbose("activeDownloads")
                 .AsObservableCache()
                 .DisposeWithThrowExceptions(disposable);
         }

@@ -83,7 +83,7 @@ namespace ModSink.WPF
         {
             Log.Logger = new LoggerConfiguration()
                 .WriteTo.Debug(
-                    outputTemplate: "{Level:u3} [{SourceContext}-{ThreadId}] {Message:lj}{NewLine}{Exception}")
+                    outputTemplate: "{Level:u3} [{SourceContext}] {Message:lj}{NewLine}{Exception}")
                 .WriteTo.LiterateConsole(
                     outputTemplate:
                     "{Timestamp:HH:mm:ss} {Level:u3} [{SourceContext}-{ThreadId}] {Message:lj}{NewLine}{Exception}")
