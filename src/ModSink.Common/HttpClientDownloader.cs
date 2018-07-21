@@ -19,9 +19,10 @@ namespace ModSink.Common
     {
         private readonly HttpClient client = new HttpClient(NetCache.UserInitiated);
 
-        public IConnectableObservable<DownloadProgress> Download(Uri source, Stream destination,
+        public IConnectableObservable<DownloadProgress> Download(Uri source, Lazy<Stream> destination,
             ulong expectedLength = 0)
         {
+            LogTo.Verbose("Creating observable for download");
             return Observable.Create<DownloadProgress>(async observer =>
             {
                 var report = new Action<ByteSize, ByteSize, TransferState>((size, downloaded, state) =>
@@ -65,7 +66,7 @@ namespace ModSink.Common
                     report(length, ByteSize.FromBytes(0), TransferState.Downloading);
                     while ((read = await input.ReadAsync(buffer, 0, buffer.Length)) > 0)
                     {
-                        destination.Write(buffer, 0, read);
+                        await destination.Value.WriteAsync(buffer, 0, read);
                         totalRead += read;
                         report(length, totalRead.Bytes(), TransferState.Downloading);
                     }

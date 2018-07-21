@@ -16,7 +16,7 @@ namespace ModSink.Common.Tests
             var client = new HttpClientDownloader();
             using (var stream = new MemoryStream())
             {
-                var obs = client.Download(new Uri(@"https://google.com/favicon.ico"), stream);
+                var obs = client.Download(new Uri(@"https://google.com/favicon.ico"), new Lazy<Stream>(()=> stream));
                 using (var d = obs.Connect())
                 {
                     var progress = await obs;

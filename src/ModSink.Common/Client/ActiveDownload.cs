@@ -17,14 +17,13 @@ namespace ModSink.Common.Client
             new BehaviorSubject<DownloadProgress>(new DownloadProgress(ByteSize.FromBytes(0), ByteSize.FromBytes(0),
                 DownloadProgress.TransferState.NotStarted));
 
-        public ActiveDownload(in QueuedDownload source, Stream tempDestination, Action completed,
+        public ActiveDownload(in QueuedDownload source, Lazy<Stream> destination, Action completed,
             IDownloader downloader)
         {
             Source = source.Source;
             Name = source.FileSignature.Hash.ToString();
-            Destination = tempDestination;
             LogTo.Debug("Created ActiveDownload for {signature}", source.FileSignature);
-            var dProg = downloader.Download(Source, Destination, source.FileSignature.Length);
+            var dProg = downloader.Download(Source, destination, source.FileSignature.Length);
             dProg.Subscribe(progress).DisposeWith(disposable);
             dProg.Connect().DisposeWith(disposable);
 
@@ -33,14 +32,13 @@ namespace ModSink.Common.Client
 
             progress.Subscribe(_ => { }, () =>
             {
-                Destination.Dispose();
+                destination.Value?.Dispose();
                 completed();
+                this.Dispose();
             });
         }
 
         public string Name { get; }
-
-        public Stream Destination { get; }
         public IObservable<DownloadProgress> Progress => progress;
         public Uri Source { get; }
 
@@ -50,7 +48,6 @@ namespace ModSink.Common.Client
             LogTo.Debug("Removed ActiveDownload for {signature}", Name);
             disposable?.Dispose();
             progress?.Dispose();
-            Destination?.Dispose();
         }
     }
 }

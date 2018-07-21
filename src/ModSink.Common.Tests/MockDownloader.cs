@@ -19,7 +19,7 @@ namespace ModSink.Common.Tests
             this.paths = paths;
         }
 
-        public IConnectableObservable<DownloadProgress> Download(Uri source, Stream destination,
+        public IConnectableObservable<DownloadProgress> Download(Uri source, Lazy<Stream> destination,
             ulong expectedLength = 0)
         {
             return Observable.Create<DownloadProgress>(async (observer, cancel) =>
@@ -32,7 +32,7 @@ namespace ModSink.Common.Tests
                     DownloadProgress.TransferState.ReadingResponse));
                 observer.OnNext(new DownloadProgress(stream.Length.Bytes(), 0.Bits(),
                     DownloadProgress.TransferState.Downloading));
-                await stream.CopyToAsync(destination);
+                await stream.CopyToAsync(destination.Value);
 
                 var totalRead = 0;
                 var buffer = new byte[16 * 1024];
@@ -42,7 +42,7 @@ namespace ModSink.Common.Tests
                     DownloadProgress.TransferState.Downloading));
                 while ((read = await stream.ReadAsync(buffer, 0, buffer.Length, cancel)) > 0)
                 {
-                    destination.Write(buffer, 0, read);
+                    destination.Value.Write(buffer, 0, read);
                     totalRead += read;
                     observer.OnNext(new DownloadProgress(stream.Length.Bytes(), totalRead.Bytes(),
                         DownloadProgress.TransferState.Downloading));

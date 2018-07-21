@@ -20,7 +20,8 @@ namespace ModSink.Common.Client
         IEnumerable<FileSignature> IFileAccessService.FilesAvailable()
         {
             foreach (var fileInfo in localDir.EnumerateFiles()
-                .Where(f => f.Name.EndsWith(".tmp")))
+                //.Where(f => f.Name.EndsWith(".tmp"))
+            )
                 fileInfo.Delete();
 
             return localDir.EnumerateFiles()

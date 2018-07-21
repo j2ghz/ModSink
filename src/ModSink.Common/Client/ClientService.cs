@@ -59,13 +59,12 @@ namespace ModSink.Common.Client
                 .AsObservableList()
                 .DisposeWithThrowExceptions(disposable);
             QueuedDownloads = Modpacks.Connect()
-                .ObserveOn(RxApp.TaskpoolScheduler)
                 .AutoRefresh(m => m.Selected)
+                .ObserveOn(RxApp.TaskpoolScheduler)
                 .Filter(m => m.Selected)
                 .TransformMany(m => m.Mods)
                 .TransformMany(m => m.Mod.Files.Values)
                 .AddKey(fs => fs)
-                .LogVerbose("requiredFiles")
                 .LeftJoin(filesAvailable.Connect(), f => f,
                     (required, available) =>
                     {
@@ -78,22 +77,22 @@ namespace ModSink.Common.Client
                     })
                 .Filter(opt => opt.HasValue)
                 .Transform(opt => opt.Value)
-                .LogVerbose("missingFiles")
                 .InnerJoin(OnlineFiles.Connect(), of => of.FileSignature,
                     (fs, of) => new QueuedDownload(fs, of.Uri))
                 .AsObservableCache()
                 .DisposeWithThrowExceptions(disposable);
             ActiveDownloads = QueuedDownloads.Connect()
                 .ObserveOn(RxApp.TaskpoolScheduler)
-                .Sort(Comparer<QueuedDownload>.Create((a, b) => 0), SortOptimisations.ComparesImmutableValuesOnly)
+                .Sort(Comparer<QueuedDownload>.Create((_,__) => 0), SortOptimisations.ComparesImmutableValuesOnly)
                 .Top(5)
-                .Transform(qd => new ActiveDownload(qd, GetTemporaryFileStream(qd.FileSignature),
+                .LogVerbose("activeDownloadsSimple")
+                .Transform(qd => new ActiveDownload(qd,
+                    new Lazy<Stream>(() => GetTemporaryFileStream(qd.FileSignature)),
                     () =>
                     {
                         LogTo.Verbose("ActiveDownload {name} finished", qd.FileSignature.Hash);
                         AddNewFile(qd.FileSignature);
                     }, downloader))
-                .DisposeMany()
                 .LogVerbose("activeDownloads")
                 .AsObservableCache()
                 .DisposeWithThrowExceptions(disposable);
@@ -128,7 +127,7 @@ namespace ModSink.Common.Client
             LogTo.Information("Loading {T} from {url}", typeof(T), uri);
             using (var mem = new MemoryStream())
             {
-                await downloader.Download(uri, mem);
+                await downloader.Download(uri, new Lazy<Stream>(() => mem));
                 LogTo.Debug("Deserializing, size: {size}", mem.Length.Bytes().Humanize("G03"));
                 mem.Position = 0;
                 var t = (T) serializationFormatter.Deserialize(mem);
