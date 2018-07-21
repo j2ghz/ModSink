@@ -6,10 +6,11 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using Anotar.Serilog;
-using Fusillade;
 using Humanizer;
 using Humanizer.Bytes;
 using ModSink.Common.Client;
+using Polly;
+using Polly.Extensions.Http;
 using ReactiveUI;
 using static ModSink.Common.Client.DownloadProgress;
 
@@ -17,7 +18,7 @@ namespace ModSink.Common
 {
     public class HttpClientDownloader : IDownloader
     {
-        private readonly HttpClient client = new HttpClient(NetCache.UserInitiated);
+        private readonly HttpClient client = new HttpClient();
 
         public IConnectableObservable<DownloadProgress> Download(Uri source, Lazy<Stream> destination,
             ulong expectedLength = 0)
@@ -29,8 +30,12 @@ namespace ModSink.Common
                     observer.OnNext(new DownloadProgress(size, downloaded, state)));
                 //Get response
                 report(ByteSize.FromBytes(0), ByteSize.FromBytes(0), TransferState.AwaitingResponse);
-                var response = await client.GetAsync(source, HttpCompletionOption.ResponseHeadersRead
-                );
+                var response = await HttpPolicyExtensions
+                    .HandleTransientHttpError()
+                    .WaitAndRetryAsync(3, i => Math.Pow(2, i - 1).Seconds())
+                    .ExecuteAsync(async () =>
+                        await client.GetAsync(source, HttpCompletionOption.ResponseHeadersRead
+                        ));
 
                 //Read response
                 report(ByteSize.FromBytes(0), ByteSize.FromBytes(0), TransferState.ReadingResponse);
@@ -52,7 +57,11 @@ namespace ModSink.Common
                         if (Convert.ToUInt64(response.Content.Headers.ContentLength) != expectedLength)
                             throw new HttpRequestException(
                                 $"Size of the download ({response.Content.Headers.ContentLength}) differed from expected ({expectedLength})");
-                var length = ByteSize.FromBytes(response.Content.Headers.ContentLength ?? 0);
+
+                var length = response.Content.Headers.ContentLength.HasValue &&
+                             response.Content.Headers.ContentLength > 0
+                    ? response.Content.Headers.ContentLength.Value.Bytes()
+                    : Convert.ToInt32(expectedLength).Bytes();
 
                 report(length, ByteSize.FromBytes(0), TransferState.ReadingResponse);
 
