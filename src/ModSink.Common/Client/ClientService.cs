@@ -83,7 +83,7 @@ namespace ModSink.Common.Client
                 .DisposeWithThrowExceptions(disposable);
             ActiveDownloads = QueuedDownloads.Connect()
                 .ObserveOn(RxApp.TaskpoolScheduler)
-                .Sort(Comparer<QueuedDownload>.Create((_,__) => 0), SortOptimisations.ComparesImmutableValuesOnly)
+                .Sort(Comparer<QueuedDownload>.Create((_,__) => 0))
                 .Top(5)
                 .LogVerbose("activeDownloadsSimple")
                 .Transform(qd => new ActiveDownload(qd,

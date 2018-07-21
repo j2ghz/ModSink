@@ -11,13 +11,13 @@ namespace ModSink.WPF.ViewModel
 {
     public class DownloadViewModel : ReactiveObject, IDisposable
     {
+        private readonly CompositeDisposable disposable = new CompositeDisposable();
         private readonly ObservableAsPropertyHelper<string> downloaded;
         private readonly ObservableAsPropertyHelper<double> progress;
         private readonly ObservableAsPropertyHelper<string> size;
         private readonly ObservableAsPropertyHelper<string> speed;
         private readonly ObservableAsPropertyHelper<DownloadProgress.TransferState> state;
         private readonly ObservableAsPropertyHelper<string> status;
-        private readonly CompositeDisposable disposable = new CompositeDisposable();
 
         public DownloadViewModel(ActiveDownload activeDownload)
         {
@@ -27,45 +27,32 @@ namespace ModSink.WPF.ViewModel
                 .Buffer(2, 1)
                 .Select(progList => new DownloadProgressCombined(progList.Last(), progList.First()));
 
-            speed = dp
+            speed = LogErrorsAndDispose(dp
                 .Select(p => p.Speed.Humanize("G03"))
-                .ToProperty(this, x => x.Speed)
-                .DisposeWith(disposable);
+                .ToProperty(this, x => x.Speed));
 
-            downloaded = activeDownload.Progress
+            downloaded = LogErrorsAndDispose(activeDownload.Progress
                 .Sample(TimeSpan.FromMilliseconds(250))
                 .Select(p => p.Downloaded.Humanize("G03"))
-                .ToProperty(this, x => x.Downloaded)
-                .DisposeWith(disposable);
+                .ToProperty(this, x => x.Downloaded));
 
             var dpRealtime = activeDownload.Progress
                 .Sample(TimeSpan.FromSeconds(1.0 / 60));
-            
-            progress = dpRealtime
+
+            progress = LogErrorsAndDispose(dpRealtime
                 .Where(p => p.Size.Bits > 0)
                 .Select(p => 100d * p.Downloaded.Bits / p.Size.Bits)
-                .ToProperty(this, x => x.Progress)
-                .DisposeWith(disposable);
-            size = dpRealtime
+                .ToProperty(this, x => x.Progress));
+            size = LogErrorsAndDispose(dpRealtime
                 .Select(p => p.Size.Humanize("G03"))
-                .ToProperty(this, x => x.Size)
-                .DisposeWith(disposable);
-            state = dpRealtime
+                .ToProperty(this, x => x.Size));
+            state = LogErrorsAndDispose(dpRealtime
                 .Select(p => p.State)
-                .ToProperty(this, x => x.State)
-                .DisposeWith(disposable);
-            status = dp
+                .ToProperty(this, x => x.State));
+            status = LogErrorsAndDispose(dp
                 .Select(p =>
                     $"{p.Current.Downloaded.Humanize("G03")}/{p.Current.Size.Humanize("G03")} @ {p.Speed.Humanize("G03")}")
-                .ToProperty(this, x => x.Status)
-                .DisposeWith(disposable);
-
-            LogErrors(downloaded);
-            LogErrors(progress);
-            LogErrors(size);
-            LogErrors(speed);
-            LogErrors(state);
-            LogErrors(status);
+                .ToProperty(this, x => x.Status));
         }
 
         public DownloadProgress.TransferState State => state.Value;
@@ -77,15 +64,17 @@ namespace ModSink.WPF.ViewModel
         public string Size => size.Value;
         public string Speed => speed.Value;
 
-        private void LogErrors(IHandleObservableErrors oaph)
-        {
-            oaph.ThrownExceptions.Subscribe(e =>
-                LogTo.Error(e, "[{download}] failed", Name));
-        }
-
         public void Dispose()
         {
             disposable?.Dispose();
+        }
+
+        private ObservableAsPropertyHelper<T> LogErrorsAndDispose<T>(ObservableAsPropertyHelper<T> oaph)
+        {
+            oaph.ThrownExceptions.Subscribe(e =>
+                LogTo.Error(e, "[{download}] failed", Name));
+            oaph.DisposeWith(disposable);
+            return oaph;
         }
     }
 }

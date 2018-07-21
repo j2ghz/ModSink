@@ -34,7 +34,7 @@ namespace ModSink.Common.Client
             {
                 destination.Value?.Dispose();
                 completed();
-                this.Dispose();
+                Dispose();
             });
         }
 
