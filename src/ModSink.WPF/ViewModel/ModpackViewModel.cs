@@ -20,8 +20,6 @@ namespace ModSink.WPF.ViewModel
 
         public Modpack Modpack { get; }
 
-        public ReactiveCommand Download { get; }
-
         public string Size { get; }
     }
 }
