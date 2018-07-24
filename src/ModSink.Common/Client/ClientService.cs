@@ -83,16 +83,17 @@ namespace ModSink.Common.Client
                 .DisposeWithThrowExceptions(disposable);
             ActiveDownloads = QueuedDownloads.Connect()
                 .ObserveOn(RxApp.TaskpoolScheduler)
-                .Sort(Comparer<QueuedDownload>.Create((_,__) => 0))
+                .Sort(Comparer<QueuedDownload>.Create((_, __) => 0))
                 .Top(5)
                 .LogVerbose("activeDownloadsSimple")
-                .Transform(qd => new ActiveDownload(qd,
-                    new Lazy<Stream>(() => GetTemporaryFileStream(qd.FileSignature)),
+                .Transform(qd => new ActiveDownload(
+                    downloader.Download(qd.Source, new Lazy<Stream>(() => GetTemporaryFileStream(qd.FileSignature)),
+                        qd.FileSignature.Length),
                     () =>
                     {
                         LogTo.Verbose("ActiveDownload {name} finished", qd.FileSignature.Hash);
                         AddNewFile(qd.FileSignature);
-                    }, downloader))
+                    }, qd.FileSignature.ToString()))
                 .LogVerbose("activeDownloads")
                 .AsObservableCache()
                 .DisposeWithThrowExceptions(disposable);

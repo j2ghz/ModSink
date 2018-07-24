@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
@@ -17,35 +16,27 @@ namespace ModSink.Common.Client
             new BehaviorSubject<DownloadProgress>(new DownloadProgress(ByteSize.FromBytes(0), ByteSize.FromBytes(0),
                 DownloadProgress.TransferState.NotStarted));
 
-        public ActiveDownload(in QueuedDownload source, Lazy<Stream> destination, Action completed,
-            IDownloader downloader)
+        public ActiveDownload(IConnectableObservable<DownloadProgress> downloadProgress, Action completed, string name)
         {
-            Source = source.Source;
-            Name = source.FileSignature.Hash.ToString();
-            LogTo.Debug("Created ActiveDownload for {signature}", source.FileSignature);
-            var dProg = downloader.Download(Source, destination, source.FileSignature.Length);
-            dProg.Subscribe(progress).DisposeWith(disposable);
-            dProg.Connect().DisposeWith(disposable);
-
+            Name = name;
+            LogTo.Verbose("[{download}] Created ActiveDownload", Name);
+            downloadProgress.Subscribe(progress).DisposeWith(disposable);
+            downloadProgress.Connect().DisposeWith(disposable);
             progress.DistinctUntilChanged(dp => dp.State).Subscribe(dp =>
-                LogTo.Verbose("[{download}] State changed to {state}", Name, dp.State));
-
+                LogTo.Verbose("[{download}] State changed to {state}", Name, dp.State)).DisposeWith(disposable);
             progress.Subscribe(_ => { }, () =>
             {
-                destination.Value?.Dispose();
                 completed();
                 Dispose();
-            });
+            }).DisposeWith(disposable);
         }
 
         public string Name { get; }
         public IObservable<DownloadProgress> Progress => progress;
-        public Uri Source { get; }
-
 
         public void Dispose()
         {
-            LogTo.Debug("Removed ActiveDownload for {signature}", Name);
+            LogTo.Verbose("[{download}] Removed ActiveDownload", Name);
             disposable?.Dispose();
             progress?.Dispose();
         }
