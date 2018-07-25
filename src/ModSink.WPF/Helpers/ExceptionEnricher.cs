@@ -8,7 +8,9 @@ namespace ModSink.WPF.Helpers
     {
         public void Enrich(LogEvent logEvent, ILogEventPropertyFactory propertyFactory)
         {
-            logEvent.AddOrUpdateProperty(propertyFactory.CreateProperty("Exception", logEvent.Exception.Demystify()));
+            if (logEvent.Exception != null)
+                logEvent.AddOrUpdateProperty(
+                    propertyFactory.CreateProperty("Exception", logEvent.Exception.Demystify()));
         }
     }
 }
