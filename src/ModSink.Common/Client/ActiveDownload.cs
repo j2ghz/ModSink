@@ -26,8 +26,8 @@ namespace ModSink.Common.Client
                 LogTo.Verbose("[{download}] State changed to {state}", Name, dp.State)).DisposeWith(disposable);
             progress.Subscribe(_ => { }, () =>
             {
-                completed();
                 Dispose();
+                completed();
             }).DisposeWith(disposable);
         }
 

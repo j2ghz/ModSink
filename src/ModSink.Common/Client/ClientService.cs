@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Runtime.Serialization;
@@ -14,6 +15,7 @@ using ModSink.Common.Models;
 using ModSink.Common.Models.Client;
 using ModSink.Common.Models.Group;
 using ModSink.Common.Models.Repo;
+using Polly;
 using ReactiveUI;
 
 namespace ModSink.Common.Client
@@ -86,14 +88,19 @@ namespace ModSink.Common.Client
                 .Sort(Comparer<QueuedDownload>.Create((_, __) => 0))
                 .Top(5)
                 .LogVerbose("activeDownloadsSimple")
-                .Transform(qd => new ActiveDownload(
-                    downloader.Download(qd.Source, new Lazy<Stream>(() => GetTemporaryFileStream(qd.FileSignature)),
-                        qd.FileSignature.Length),
-                    () =>
-                    {
-                        LogTo.Verbose("ActiveDownload {name} finished", qd.FileSignature.Hash);
-                        AddNewFile(qd.FileSignature);
-                    }, qd.FileSignature.ToString()))
+                .Transform(qd =>
+                {
+                    var destination = new Lazy<Stream>(() => GetTemporaryFileStream(qd.FileSignature));
+                    return new ActiveDownload(
+                        downloader.Download(qd.Source, destination,
+                            qd.FileSignature.Length),
+                        () =>
+                        {
+                            destination.Value.Dispose();
+                            LogTo.Verbose("ActiveDownload {name} finished", qd.FileSignature.Hash);
+                            AddNewFile(qd.FileSignature);
+                        }, qd.FileSignature.ToString());
+                })
                 .LogVerbose("activeDownloads")
                 .AsObservableCache()
                 .DisposeWithThrowExceptions(disposable);
