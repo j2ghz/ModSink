@@ -40,7 +40,7 @@ namespace ModSink.Common.Tests.Client
         private readonly DirectoryInfo tempRoot = new DirectoryInfo(Path.GetTempPath()).ChildDir("ModSink")
             .ChildDir(Guid.NewGuid().ToString());
 
-        [Fact]
+        [Fact(Skip = "Outdated test")]
         public void DownloadRepo()
         {
             Log.Logger = new LoggerConfiguration().WriteTo.Debug().CreateLogger();
