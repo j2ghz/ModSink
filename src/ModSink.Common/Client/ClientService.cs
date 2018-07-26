@@ -35,31 +35,13 @@ namespace ModSink.Common.Client
             this.serializationFormatter = serializationFormatter;
             filesAvailable.Edit(l => { l.AddOrUpdate(fileAccessService.FilesAvailable()); });
             LogTo.Warning("Creating pipeline");
-            Repos = GroupUrls.Connect()
-                .Transform(g => new Uri(g))
-                .TransformAsync(Load<Group>)
-                .TransformMany(g => g.RepoInfos.Select(r => new Uri(g.BaseUri, r.Uri)), repoUri => repoUri)
-                .TransformAsync(Load<Repo>)
-                .OnItemUpdated((repo, _) => LogTo.Information("Repo from {url} has been loaded", repo.BaseUri))
-                .AsObservableCache()
+            Repos = GetReposFromGroups(GroupUrls).DisposeWith(disposable);
+            OnlineFiles = GetOnlineFileFromRepos(Repos)
                 .DisposeWith(disposable);
-            OnlineFiles = Repos.Connect()
-                .TransformMany(
-                    repo => repo.Files.Select(kvp => new OnlineFile(kvp.Key, new Uri(repo.BaseUri, kvp.Value))),
-                    of => of.FileSignature)
-                .AsObservableCache()
-                .DisposeWith(disposable);
-            Modpacks = Repos.Connect()
-                .RemoveKey()
-                .TransformMany(r => r.Modpacks)
-                .AsObservableList()
-                .DisposeWith(disposable);
-            QueuedDownloads = Modpacks.Connect()
-                .AutoRefresh(m => m.Selected)
-                .Filter(m => m.Selected)
-                .TransformMany(m => m.Mods)
-                .TransformMany(m => m.Mod.Files.Values)
-                .AddKey(fs => fs)
+            Modpacks = GetModpacksFromRepos(Repos).DisposeWith(disposable);
+            QueuedDownloads = GetDownloadsFromModpacks(Modpacks)
+                .DisposeWith(disposable)
+                .Connect()
                 .LeftJoin(filesAvailable.Connect(), f => f,
                     (required, available) =>
                     {
@@ -98,6 +80,26 @@ namespace ModSink.Common.Client
                 .DisposeWith(disposable);
         }
 
+        private static IObservableCache<FileSignature, FileSignature> GetDownloadsFromModpacks(
+            IObservableList<Modpack> modpacks)
+        {
+            return modpacks.Connect()
+                            .AutoRefresh(m => m.Selected)
+                            .Filter(m => m.Selected)
+                            .TransformMany(m => m.Mods)
+                            .TransformMany(m => m.Mod.Files.Values)
+                            .AddKey(fs => fs)
+                            .AsObservableCache();
+        }
+
+        private static IObservableList<Modpack> GetModpacksFromRepos(IConnectableCache<Repo, Uri> repos)
+        {
+            return repos.Connect()
+                            .RemoveKey()
+                            .TransformMany(r => r.Modpacks)
+                            .AsObservableList();
+        }
+
         public IObservableList<Modpack> Modpacks { get; }
         public IObservableCache<OnlineFile, FileSignature> OnlineFiles { get; }
         public IObservableCache<QueuedDownload, FileSignature> QueuedDownloads { get; }
@@ -108,6 +110,26 @@ namespace ModSink.Common.Client
         public void Dispose()
         {
             disposable.Dispose();
+        }
+
+        private static IObservableCache<OnlineFile, FileSignature> GetOnlineFileFromRepos(IConnectableCache<Repo, Uri> repos)
+        {
+            return repos.Connect()
+                .TransformMany(
+                    repo => repo.Files.Select(kvp => new OnlineFile(kvp.Key, new Uri(repo.BaseUri, kvp.Value))),
+                    of => of.FileSignature)
+                .AsObservableCache();
+        }
+
+        private IObservableCache<Repo, Uri> GetReposFromGroups(IConnectableCache<string, string> groups)
+        {
+            return groups.Connect()
+                .Transform(g => new Uri(g))
+                .TransformAsync(Load<Group>)
+                .TransformMany(g => g.RepoInfos.Select(r => new Uri(g.BaseUri, r.Uri)), repoUri => repoUri)
+                .TransformAsync(Load<Repo>)
+                .OnItemUpdated((repo, _) => LogTo.Information("Repo from {url} has been loaded", repo.BaseUri))
+                .AsObservableCache();
         }
 
         private void AddNewFile(FileSignature fileSignature)
