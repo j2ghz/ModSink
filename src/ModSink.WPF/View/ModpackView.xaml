@@ -6,13 +6,18 @@
                           xmlns:local="clr-namespace:ModSink.WPF.View"
                           xmlns:rxui="http://reactiveui.net"
                           xmlns:vm="clr-namespace:ModSink.WPF.ViewModel"
+                          xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
                           mc:Ignorable="d"
                           d:DesignHeight="450" d:DesignWidth="800">
     <DockPanel LastChildFill="True" Margin="5">
         <TextBlock x:Name="TbName" FontSize="32" DockPanel.Dock="Top" Padding="5" />
         <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" Margin="2">
             <TextBlock x:Name="TbSize" />
-            <CheckBox Content="Should be downloaded?"  x:Name="ChkInstall" Margin="15,5" />
+            <mah:ToggleSwitch x:Name="ChkInstall"
+                              Margin="15,5"
+                              OffLabel="Download?"
+                              OnLabel="Will be downloaded"
+                              Style="{StaticResource MahApps.Metro.Styles.ToggleSwitch.Win10}" />
         </StackPanel>
         <ListBox x:Name="LbMods" />
     </DockPanel>
