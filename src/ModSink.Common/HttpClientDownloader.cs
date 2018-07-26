@@ -85,7 +85,7 @@ namespace ModSink.Common
                 report(length, totalRead.Bytes(), TransferState.Finished);
                 observer.OnCompleted();
 
-                return Disposable.Empty;
+                return destination.Value;
             }).SubscribeOn(RxApp.TaskpoolScheduler).Publish();
         }
     }

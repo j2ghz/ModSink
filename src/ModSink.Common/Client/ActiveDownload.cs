@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
@@ -24,11 +25,7 @@ namespace ModSink.Common.Client
             downloadProgress.Connect().DisposeWith(disposable);
             progress.DistinctUntilChanged(dp => dp.State).Subscribe(dp =>
                 LogTo.Verbose("[{download}] State changed to {state}", Name, dp.State)).DisposeWith(disposable);
-            progress.Subscribe(_ => { }, () =>
-            {
-                Dispose();
-                completed();
-            }).DisposeWith(disposable);
+            progress.Subscribe(_ => { }, completed).DisposeWith(disposable);
         }
 
         public string Name { get; }

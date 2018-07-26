@@ -39,7 +39,6 @@ namespace ModSink.Common.Client
             filesAvailable.Edit(l => { l.AddOrUpdate(fileAccessService.FilesAvailable()); });
             LogTo.Warning("Creating pipeline");
             Repos = GroupUrls.Connect()
-                .ObserveOn(RxApp.TaskpoolScheduler)
                 .Transform(g => new Uri(g))
                 .TransformAsync(Load<Group>)
                 .TransformMany(g => g.RepoInfos.Select(r => new Uri(g.BaseUri, r.Uri)), repoUri => repoUri)
@@ -48,21 +47,18 @@ namespace ModSink.Common.Client
                 .AsObservableCache()
                 .DisposeWithThrowExceptions(disposable);
             OnlineFiles = Repos.Connect()
-                .ObserveOn(RxApp.TaskpoolScheduler)
                 .TransformMany(
                     repo => repo.Files.Select(kvp => new OnlineFile(kvp.Key, new Uri(repo.BaseUri, kvp.Value))),
                     of => of.FileSignature)
                 .AsObservableCache()
                 .DisposeWithThrowExceptions(disposable);
             Modpacks = Repos.Connect()
-                .ObserveOn(RxApp.TaskpoolScheduler)
                 .RemoveKey()
                 .TransformMany(r => r.Modpacks)
                 .AsObservableList()
                 .DisposeWithThrowExceptions(disposable);
             QueuedDownloads = Modpacks.Connect()
                 .AutoRefresh(m => m.Selected)
-                .ObserveOn(RxApp.TaskpoolScheduler)
                 .Filter(m => m.Selected)
                 .TransformMany(m => m.Mods)
                 .TransformMany(m => m.Mod.Files.Values)
@@ -84,7 +80,6 @@ namespace ModSink.Common.Client
                 .AsObservableCache()
                 .DisposeWithThrowExceptions(disposable);
             ActiveDownloads = QueuedDownloads.Connect()
-                .ObserveOn(RxApp.TaskpoolScheduler)
                 .Sort(Comparer<QueuedDownload>.Create((_, __) => 0))
                 .Top(5)
                 .LogVerbose("activeDownloadsSimple")
