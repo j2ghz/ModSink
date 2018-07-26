@@ -18,7 +18,7 @@ namespace ModSink.Common
             o.DisposeWith(disposable);
             o.Connect().Subscribe().DisposeWith(disposable);
             o.Connect().Subscribe(_ => { },
-                ex => RxApp.MainThreadScheduler.Schedule(() => RxApp.DefaultExceptionHandler.OnError(ex)));
+                ex => RxApp.MainThreadScheduler.Schedule(() => RxApp.DefaultExceptionHandler.OnNext(ex)));
             o.Connect().Subscribe(_ => { }, _ => Debugger.Break());
             return o;
         }
@@ -29,7 +29,7 @@ namespace ModSink.Common
             o.DisposeWith(disposable);
             o.Connect().Subscribe().DisposeWith(disposable);
             o.Connect().Subscribe(_ => { },
-                ex => RxApp.MainThreadScheduler.Schedule(() => RxApp.DefaultExceptionHandler.OnError(ex)));
+                ex => RxApp.MainThreadScheduler.Schedule(() => RxApp.DefaultExceptionHandler.OnNext(ex)));
             o.Connect().Subscribe(_ => { }, _ => Debugger.Break());
             return o;
         }

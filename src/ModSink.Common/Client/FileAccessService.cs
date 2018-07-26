@@ -1,8 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Anotar.Serilog;
+using Humanizer;
 using ModSink.Common.Models.Repo;
+using Polly;
 
 namespace ModSink.Common.Client
 {
@@ -20,7 +23,8 @@ namespace ModSink.Common.Client
         IEnumerable<FileSignature> IFileAccessService.FilesAvailable()
         {
             foreach (var fileInfo in localDir.EnumerateFiles()
-                .Where(f => f.Name.EndsWith(".tmp")))
+                //.Where(f => f.Name.EndsWith(".tmp"))
+            )
                 fileInfo.Delete();
 
             return localDir.EnumerateFiles()
@@ -38,7 +42,13 @@ namespace ModSink.Common.Client
         Stream IFileAccessService.Write(FileSignature fileSignature, bool temporary)
         {
             var file = GetFileInfo(fileSignature, temporary);
-            return file.Open(FileMode.Create, FileAccess.Write, FileShare.None);
+
+            return Policy
+                .Handle<IOException>()
+                .WaitAndRetry(5, i => Math.Pow(2, i).Seconds(),
+                    (exception, duration) => LogTo.Warning(exception,
+                        "Opening file {file} for write failed after {duration}", file.FullName, duration))
+                .Execute(() => file.Open(FileMode.Create, FileAccess.Write, FileShare.None));
         }
 
         public void TemporaryFinished(FileSignature fileSignature)
@@ -46,7 +56,14 @@ namespace ModSink.Common.Client
             var temp = GetFileInfo(fileSignature, true);
             var final = GetFileInfo(fileSignature, false);
             LogTo.Verbose("Renaming file {src} to {dst}", temp, final);
-            temp.MoveTo(final.FullName);
+
+            Policy
+                .Handle<IOException>()
+                .WaitAndRetry(5, i => Math.Pow(2, i).Seconds(),
+                    (exception, duration) => LogTo.Warning(exception,
+                        "Moving file from {src} to {dst} has failed after {duration}", temp.FullName, final.FullName,
+                        duration))
+                .Execute(() => temp.MoveTo(final.FullName));
         }
 
         private FileInfo GetFileInfo(FileSignature fileSignature, bool temporary)

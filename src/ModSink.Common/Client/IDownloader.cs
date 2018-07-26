@@ -6,6 +6,6 @@ namespace ModSink.Common.Client
 {
     public interface IDownloader
     {
-        IConnectableObservable<DownloadProgress> Download(Uri source, Stream destination, ulong expectedLength = 0);
+        IConnectableObservable<DownloadProgress> Download(Uri source, Lazy<Stream> destination, ulong expectedLength = 0);
     }
 }

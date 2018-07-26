@@ -2,11 +2,11 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Net;
+using System.Reactive;
+using System.Reactive.Concurrency;
 using System.Reflection;
-using System.Threading;
 using System.Windows;
 using System.Windows.Media;
-using System.Windows.Threading;
 using Anotar.Serilog;
 using CountlySDK;
 using ModSink.WPF.Helpers;
@@ -109,6 +109,12 @@ namespace ModSink.WPF
                     FatalException(args.Exception, sender.GetType());
                 };
             }
+
+            RxApp.DefaultExceptionHandler = Observer.Create<Exception>(ex =>
+            {
+                if (Debugger.IsAttached) Debugger.Break();
+                RxApp.MainThreadScheduler.Schedule(() => throw ex);
+            });
 
             PresentationTraceSources.Refresh();
             PresentationTraceSources.DataBindingSource.Listeners.Add(new RelayTraceListener(m =>
