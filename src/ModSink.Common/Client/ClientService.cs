@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Runtime.Serialization;
@@ -15,8 +14,6 @@ using ModSink.Common.Models;
 using ModSink.Common.Models.Client;
 using ModSink.Common.Models.Group;
 using ModSink.Common.Models.Repo;
-using Polly;
-using ReactiveUI;
 
 namespace ModSink.Common.Client
 {
@@ -45,18 +42,18 @@ namespace ModSink.Common.Client
                 .TransformAsync(Load<Repo>)
                 .OnItemUpdated((repo, _) => LogTo.Information("Repo from {url} has been loaded", repo.BaseUri))
                 .AsObservableCache()
-                .DisposeWithThrowExceptions(disposable);
+                .DisposeWith(disposable);
             OnlineFiles = Repos.Connect()
                 .TransformMany(
                     repo => repo.Files.Select(kvp => new OnlineFile(kvp.Key, new Uri(repo.BaseUri, kvp.Value))),
                     of => of.FileSignature)
                 .AsObservableCache()
-                .DisposeWithThrowExceptions(disposable);
+                .DisposeWith(disposable);
             Modpacks = Repos.Connect()
                 .RemoveKey()
                 .TransformMany(r => r.Modpacks)
                 .AsObservableList()
-                .DisposeWithThrowExceptions(disposable);
+                .DisposeWith(disposable);
             QueuedDownloads = Modpacks.Connect()
                 .AutoRefresh(m => m.Selected)
                 .Filter(m => m.Selected)
@@ -78,7 +75,7 @@ namespace ModSink.Common.Client
                 .InnerJoin(OnlineFiles.Connect(), of => of.FileSignature,
                     (fs, of) => new QueuedDownload(fs, of.Uri))
                 .AsObservableCache()
-                .DisposeWithThrowExceptions(disposable);
+                .DisposeWith(disposable);
             ActiveDownloads = QueuedDownloads.Connect()
                 .Sort(Comparer<QueuedDownload>.Create((_, __) => 0))
                 .Top(5)
@@ -98,7 +95,7 @@ namespace ModSink.Common.Client
                 })
                 .LogVerbose("activeDownloads")
                 .AsObservableCache()
-                .DisposeWithThrowExceptions(disposable);
+                .DisposeWith(disposable);
         }
 
         public IObservableList<Modpack> Modpacks { get; }
