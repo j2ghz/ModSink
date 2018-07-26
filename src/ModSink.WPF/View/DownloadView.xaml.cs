@@ -14,7 +14,7 @@ namespace ModSink.WPF.View
 
             this.WhenActivated(d =>
             {
-                this.OneWayBind(ViewModel, vm => vm.Name, v => v.TbName.Text).DisposeWith(d);
+                this.OneWayBind(ViewModel, vm => vm.Name, v => v.GroupBox.Header).DisposeWith(d);
                 this.OneWayBind(ViewModel, vm => vm.State, v => v.TbState.Text, ts=>ts.Humanize(LetterCasing.Sentence)).DisposeWith(d);
                 this.OneWayBind(ViewModel, vm => vm.Status, v => v.TbStatus.Text).DisposeWith(d);
                 this.OneWayBind(ViewModel, vm => vm.Progress, v => v.ProgressBar.Value).DisposeWith(d);

@@ -8,22 +8,13 @@
                         xmlns:viewModel="clr-namespace:ModSink.WPF.ViewModel"
                         xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
                         mc:Ignorable="d"
-                        Width="150"
+                        Width="500"
                         Margin="5">
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-        </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto" />
-        </Grid.ColumnDefinitions>
-
-        <TextBlock x:Name="TbName" />
-        <TextBlock x:Name="TbState" Grid.Row="1" />
-        <TextBlock x:Name="TbStatus" Grid.Row="2" />
-        <mah:MetroProgressBar x:Name="ProgressBar" Grid.Row="3" />
-    </Grid>
+    <GroupBox Name="GroupBox">
+        <StackPanel>
+            <TextBlock x:Name="TbState" />
+            <TextBlock x:Name="TbStatus" />
+            <mah:MetroProgressBar x:Name="ProgressBar" />
+        </StackPanel>
+    </GroupBox>
 </rx:ReactiveUserControl>
