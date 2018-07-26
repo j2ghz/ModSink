@@ -24,7 +24,7 @@ namespace ModSink.Common
             ulong expectedLength = 0)
         {
             LogTo.Verbose("Creating observable for download");
-            return Observable.Create<DownloadProgress>(async observer =>
+            return Observable.Create<DownloadProgress>(async (observer,cancel) =>
             {
                 var report = new Action<ByteSize, ByteSize, TransferState>((size, downloaded, state) =>
                     observer.OnNext(new DownloadProgress(size, downloaded, state)));
@@ -34,8 +34,7 @@ namespace ModSink.Common
                     .HandleTransientHttpError()
                     .WaitAndRetryAsync(3, i => Math.Pow(2, i - 1).Seconds())
                     .ExecuteAsync(async () =>
-                        await client.GetAsync(source, HttpCompletionOption.ResponseHeadersRead
-                        ));
+                        await client.GetAsync(source, HttpCompletionOption.ResponseHeadersRead, cancel));
 
                 //Read response
                 report(ByteSize.FromBytes(0), ByteSize.FromBytes(0), TransferState.ReadingResponse);
@@ -73,9 +72,9 @@ namespace ModSink.Common
 
                     //Download
                     report(length, ByteSize.FromBytes(0), TransferState.Downloading);
-                    while ((read = await input.ReadAsync(buffer, 0, buffer.Length)) > 0)
+                    while ((read = await input.ReadAsync(buffer, 0, buffer.Length, cancel)) > 0)
                     {
-                        await destination.Value.WriteAsync(buffer, 0, read);
+                        await destination.Value.WriteAsync(buffer, 0, read, cancel);
                         totalRead += read;
                         report(length, totalRead.Bytes(), TransferState.Downloading);
                     }
