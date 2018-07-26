@@ -6,7 +6,6 @@ configuration: Release
 install:
   - choco install gitversion.portable -pre -y
   - choco install codecov
-  - dotnet tool install -g coveralls.net
 
 before_build:
   - ps: gitversion /l console /output buildserver /updateAssemblyInfo
@@ -22,7 +21,6 @@ artifacts:
 test_script:
 - cmd: dotnet test "src\ModSink.Common.Tests\ModSink.Common.Tests.csproj" --configuration Release --no-build  /p:CollectCoverage=true /p:CoverletOutputFormat=opencover
 - cmd: codecov -f "src\ModSink.Common.Tests\coverage.opencover.xml" -t 78e056d7-ce59-4f6d-b177-85fa3501d898
-- cmd: csmacnz.coveralls --opencover -i "src\ModSink.Common.Tests\coverage.opencover.xml" --repoToken $env:COVERALLS_REPO_TOKEN --commitId $env:APPVEYOR_REPO_COMMIT --commitBranch $env:APPVEYOR_REPO_BRANCH --commitAuthor $env:APPVEYOR_REPO_COMMIT_AUTHOR --commitEmail $env:APPVEYOR_REPO_COMMIT_AUTHOR_EMAIL --commitMessage $env:APPVEYOR_REPO_COMMIT_MESSAGE --jobId $env:APPVEYOR_JOB_ID
 
 deploy:
 - provider: GitHub
