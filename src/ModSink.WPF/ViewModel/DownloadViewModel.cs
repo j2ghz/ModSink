@@ -29,12 +29,12 @@ namespace ModSink.WPF.ViewModel
 
             speed = LogErrorsAndDispose(dp
                 .Select(p => p.Speed.Humanize("G03"))
-                .ToProperty(this, x => x.Speed));
+                .ToProperty(this, x => x.Speed, scheduler: RxApp.MainThreadScheduler));
 
             downloaded = LogErrorsAndDispose(activeDownload.Progress
                 .Sample(TimeSpan.FromMilliseconds(250))
                 .Select(p => p.Downloaded.Humanize("G03"))
-                .ToProperty(this, x => x.Downloaded));
+                .ToProperty(this, x => x.Downloaded, scheduler: RxApp.MainThreadScheduler));
 
             var dpRealtime = activeDownload.Progress
                 .Sample(TimeSpan.FromSeconds(1.0 / 60));
@@ -42,17 +42,17 @@ namespace ModSink.WPF.ViewModel
             progress = LogErrorsAndDispose(dpRealtime
                 .Where(p => p.Size.Bits > 0)
                 .Select(p => 100d * p.Downloaded.Bits / p.Size.Bits)
-                .ToProperty(this, x => x.Progress));
+                .ToProperty(this, x => x.Progress, scheduler: RxApp.MainThreadScheduler));
             size = LogErrorsAndDispose(dpRealtime
                 .Select(p => p.Size.Humanize("G03"))
-                .ToProperty(this, x => x.Size));
+                .ToProperty(this, x => x.Size, scheduler: RxApp.MainThreadScheduler));
             state = LogErrorsAndDispose(dpRealtime
                 .Select(p => p.State)
-                .ToProperty(this, x => x.State));
+                .ToProperty(this, x => x.State, scheduler: RxApp.MainThreadScheduler));
             status = LogErrorsAndDispose(dp
                 .Select(p =>
                     $"{p.Current.Downloaded.Humanize("G03")}/{p.Current.Size.Humanize("G03")} @ {p.Speed.Humanize("G03")}")
-                .ToProperty(this, x => x.Status));
+                .ToProperty(this, x => x.Status, scheduler: RxApp.MainThreadScheduler));
         }
 
         public DownloadProgress.TransferState State => state.Value;
