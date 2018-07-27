@@ -36,10 +36,10 @@ namespace ModSink.Common.Client
             filesAvailable.Edit(l => { l.AddOrUpdate(fileAccessService.FilesAvailable()); });
             LogTo.Warning("Creating pipeline");
             Repos = GetReposFromGroups(GroupUrls).DisposeWith(disposable);
-            OnlineFiles = GetOnlineFileFromRepos(Repos)
+            OnlineFiles = DynamicDataChain.GetOnlineFileFromRepos(Repos)
                 .DisposeWith(disposable);
-            Modpacks = GetModpacksFromRepos(Repos).DisposeWith(disposable);
-            QueuedDownloads = GetDownloadsFromModpacks(Modpacks)
+            Modpacks = DynamicDataChain.GetModpacksFromRepos(Repos).DisposeWith(disposable);
+            QueuedDownloads = DynamicDataChain.GetDownloadsFromModpacks(Modpacks)
                 .DisposeWith(disposable)
                 .Connect()
                 .LeftJoin(filesAvailable.Connect(), f => f,
@@ -80,45 +80,23 @@ namespace ModSink.Common.Client
                 .DisposeWith(disposable);
         }
 
-        private static IObservableCache<FileSignature, FileSignature> GetDownloadsFromModpacks(
-            IObservableList<Modpack> modpacks)
-        {
-            return modpacks.Connect()
-                            .AutoRefresh(m => m.Selected)
-                            .Filter(m => m.Selected)
-                            .TransformMany(m => m.Mods)
-                            .TransformMany(m => m.Mod.Files.Values)
-                            .AddKey(fs => fs)
-                            .AsObservableCache();
-        }
-
-        private static IObservableList<Modpack> GetModpacksFromRepos(IConnectableCache<Repo, Uri> repos)
-        {
-            return repos.Connect()
-                            .RemoveKey()
-                            .TransformMany(r => r.Modpacks)
-                            .AsObservableList();
-        }
-
+        public IObservableCache<ActiveDownload, FileSignature> ActiveDownloads { get; }
+        public ISourceCache<string, string> GroupUrls { get; } = new SourceCache<string, string>(u => u);
         public IObservableList<Modpack> Modpacks { get; }
         public IObservableCache<OnlineFile, FileSignature> OnlineFiles { get; }
         public IObservableCache<QueuedDownload, FileSignature> QueuedDownloads { get; }
         public IObservableCache<Repo, Uri> Repos { get; }
-        public IObservableCache<ActiveDownload, FileSignature> ActiveDownloads { get; }
-        public ISourceCache<string, string> GroupUrls { get; } = new SourceCache<string, string>(u => u);
 
         public void Dispose()
         {
             disposable.Dispose();
         }
 
-        private static IObservableCache<OnlineFile, FileSignature> GetOnlineFileFromRepos(IConnectableCache<Repo, Uri> repos)
+        private void AddNewFile(FileSignature fileSignature)
         {
-            return repos.Connect()
-                .TransformMany(
-                    repo => repo.Files.Select(kvp => new OnlineFile(kvp.Key, new Uri(repo.BaseUri, kvp.Value))),
-                    of => of.FileSignature)
-                .AsObservableCache();
+            fileAccessService.TemporaryFinished(fileSignature);
+            LogTo.Verbose("File {name} is now available", fileSignature.Hash);
+            filesAvailable.AddOrUpdate(fileSignature);
         }
 
         private IObservableCache<Repo, Uri> GetReposFromGroups(IConnectableCache<string, string> groups)
@@ -130,13 +108,6 @@ namespace ModSink.Common.Client
                 .TransformAsync(Load<Repo>)
                 .OnItemUpdated((repo, _) => LogTo.Information("Repo from {url} has been loaded", repo.BaseUri))
                 .AsObservableCache();
-        }
-
-        private void AddNewFile(FileSignature fileSignature)
-        {
-            fileAccessService.TemporaryFinished(fileSignature);
-            LogTo.Verbose("File {name} is now available", fileSignature.Hash);
-            filesAvailable.AddOrUpdate(fileSignature);
         }
 
         private Stream GetTemporaryFileStream(FileSignature argFileSignature)
