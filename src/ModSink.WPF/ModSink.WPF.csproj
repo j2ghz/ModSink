@@ -53,7 +53,6 @@
     <PackageReference Include="GitVersionTask" Version="4.0.0-beta*">
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="Visualize.Fody" Version="1.1.0" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="PresentationCore" />

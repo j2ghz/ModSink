@@ -41,7 +41,7 @@ namespace ModSink.Common.Models.Repo
 
         public override int GetHashCode()
         {
-            return Value.GetHashCode();
+            return Value?.GetHashCode() ?? 0;
         }
         /// <summary>
         /// Converts to filename or display string
