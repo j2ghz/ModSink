@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Bogus;
 using DynamicData;
 using FluentAssertions;
@@ -14,11 +15,16 @@ namespace ModSink.Common.Tests.Client
         public void GetModpacksFromReposTest()
         {
             var faker = new Faker();
-            var repos = new SourceCache<Repo, Uri>(r=>r.BaseUri);
+            var repos = new SourceCache<Repo, Uri>(r => r.BaseUri);
             var modpacks = DynamicDataChain.GetModpacksFromRepos(repos);
             modpacks.Count.Should().Be(0);
-            repos.AddOrUpdate(new Repo(){BaseUri = new Uri(faker.Internet.UrlWithPath()) });
-            modpacks.Count.Should().Be(1);
+            repos.AddOrUpdate(
+                new Repo
+                {
+                    BaseUri = new Uri(faker.Internet.UrlWithPath()),
+                    Modpacks = new List<Modpack> {new Modpack(), new Modpack()}
+                });
+            modpacks.Count.Should().Be(2);
         }
     }
 }
