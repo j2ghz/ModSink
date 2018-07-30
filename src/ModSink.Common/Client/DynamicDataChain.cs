@@ -14,7 +14,8 @@ namespace ModSink.Common.Client
             IObservableList<Modpack> modpacks)
         {
             return modpacks.Connect()
-                .ObserveOn(RxApp.MainThreadScheduler)
+                .SubscribeOn(RxApp.TaskpoolScheduler)
+                .ObserveOn(RxApp.TaskpoolScheduler)
                 .AutoRefresh(m => m.Selected, scheduler: RxApp.MainThreadScheduler)
                 .Filter(m => m.Selected)
                 .TransformMany(m => m.Mods)
@@ -26,7 +27,8 @@ namespace ModSink.Common.Client
         public static IObservableList<Modpack> GetModpacksFromRepos(IConnectableCache<Repo, Uri> repos)
         {
             return repos.Connect()
-                .ObserveOn(RxApp.MainThreadScheduler)
+                .SubscribeOn(RxApp.TaskpoolScheduler)
+                .ObserveOn(RxApp.TaskpoolScheduler)
                 .RemoveKey()
                 .TransformMany(r => r.Modpacks)
                 .AsObservableList();
@@ -36,7 +38,8 @@ namespace ModSink.Common.Client
             IConnectableCache<Repo, Uri> repos)
         {
             return repos.Connect()
-                .ObserveOn(RxApp.MainThreadScheduler)
+                .SubscribeOn(RxApp.TaskpoolScheduler)
+                .ObserveOn(RxApp.TaskpoolScheduler)
                 .TransformMany(
                     repo => repo.Files.Select(kvp => new OnlineFile(kvp.Key, new Uri(repo.BaseUri, kvp.Value))),
                     of => of.FileSignature)
