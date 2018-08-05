@@ -7,6 +7,7 @@ namespace ModSink.Common.Models.Repo
     public class Mod
     {
         public IDictionary<Uri, FileSignature> Files { get; set; }
+        public Guid Id { get; } = new Guid();
 
         public string Name { get; set; }
 

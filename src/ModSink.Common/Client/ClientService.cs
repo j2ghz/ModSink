@@ -14,6 +14,7 @@ using ModSink.Common.Models;
 using ModSink.Common.Models.Client;
 using ModSink.Common.Models.Group;
 using ModSink.Common.Models.Repo;
+using ReactiveUI;
 
 namespace ModSink.Common.Client
 {
@@ -82,7 +83,7 @@ namespace ModSink.Common.Client
 
         public IObservableCache<ActiveDownload, FileSignature> ActiveDownloads { get; }
         public ISourceCache<string, string> GroupUrls { get; } = new SourceCache<string, string>(u => u);
-        public IObservableList<Modpack> Modpacks { get; }
+        public IObservableCache<Modpack, Guid> Modpacks { get; }
         public IObservableCache<OnlineFile, FileSignature> OnlineFiles { get; }
         public IObservableCache<QueuedDownload, FileSignature> QueuedDownloads { get; }
         public IObservableCache<Repo, Uri> Repos { get; }
@@ -102,6 +103,7 @@ namespace ModSink.Common.Client
         private IObservableCache<Repo, Uri> GetReposFromGroups(IConnectableCache<string, string> groups)
         {
             return groups.Connect()
+                .ObserveOn(RxApp.TaskpoolScheduler)
                 .Transform(g => new Uri(g))
                 .TransformAsync(Load<Group>)
                 .TransformMany(g => g.RepoInfos.Select(r => new Uri(g.BaseUri, r.Uri)), repoUri => repoUri)
