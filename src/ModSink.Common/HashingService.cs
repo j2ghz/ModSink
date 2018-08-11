@@ -54,7 +54,10 @@ namespace ModSink.Common
             while (directoryStack.Count > 0)
             {
                 var dir = directoryStack.Pop();
-                dir.EnumerateDirectories().ForEach(directoryStack.Push);
+                foreach (var d in dir.EnumerateDirectories())
+                {
+                    directoryStack.Push(d);
+                }
                 foreach (var file in dir.EnumerateFiles()) yield return file;
             }
         }

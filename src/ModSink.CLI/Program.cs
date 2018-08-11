@@ -6,7 +6,6 @@ using System.Reactive.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Threading;
 using System.Threading.Tasks;
-using DynamicData;
 using Humanizer;
 using Microsoft.Extensions.CommandLineUtils;
 using ModSink.Common;
@@ -14,84 +13,13 @@ using ModSink.Common.Client;
 using ModSink.Common.Models.Group;
 using ModSink.Common.Models.Repo;
 using Serilog;
+using Serilog.Formatting.Compact;
+using Serilog.Sinks.SystemConsole.Themes;
 
 namespace ModSink.CLI
 {
     public static class Program
     {
-        private static void AddColCheck(this CommandLineApplication app)
-        {
-            app.Command("collcheck", command =>
-            {
-                command.Description = "Checks files for collisions";
-                command.HelpOption("-?|-h|--help");
-                var pathArg = command.Argument("[path]", "Path to folder");
-
-                command.OnExecute(() =>
-                {
-                    var pathStr = pathArg.Value ?? ".";
-                    var path = Path.Combine(Directory.GetCurrentDirectory(), pathStr);
-                    IHashFunction xxhash = new XXHash64();
-                    var hashing = new HashingService(xxhash);
-                    hashing.GetFiles(new DirectoryInfo(path))
-                        .Select(f =>
-                        {
-                            var hash = hashing.GetFileHash(f, CancellationToken.None).GetAwaiter().GetResult();
-                            Console.WriteLine($"{hash} {Path.GetRelativePath(path, f.FullName)}");
-                            return new {f, hash};
-                        })
-                        .GroupBy(a => a.hash.ToString())
-                        .Where(g => g.Count() > 1)
-                        .ForEach(g =>
-                        {
-                            Console.WriteLine(g.Key);
-                            foreach (var i in g)
-                                Console.WriteLine($"    {i.f.FullName}");
-                            Console.WriteLine();
-                        });
-
-                    Console.WriteLine("Done.");
-                    return 0;
-                });
-            });
-        }
-
-        private static void AddDump(this CommandLineApplication app)
-        {
-            app.Command("dump", command =>
-            {
-                command.Description = "Writes out the contents of a repo";
-                command.HelpOption("-?|-h|--help");
-                var uriArg = command.Argument("[uri]", "Uri to repo to download");
-
-                command.OnExecute(() =>
-                {
-                    var uriStr = uriArg.Value;
-                    var uri = new Uri(uriStr);
-                    if (uri.IsFile)
-                    {
-                        var repo = (Repo) new BinaryFormatter().Deserialize(new FileInfo(uri.LocalPath).OpenRead());
-                        repo.BaseUri = new Uri("http://base.uri/repo/");
-                        DumpRepo(repo);
-                    }
-                    else
-                    {
-                        throw new NotImplementedException();
-                        //var downloader = new HttpClientDownloader();
-                        //var client = new ClientService(new DownloadService(downloader), null, downloader,
-                        //    new BinaryFormatter());
-
-                        //Console.WriteLine("Downloading repo");
-                        //client.GroupUrls.Add(uriStr);
-                        //foreach (var repo in client.Repos.Items)
-                        //    DumpRepo(repo);
-                    }
-
-                    return 0;
-                });
-            });
-        }
-
         private static void AddCheck(this CommandLineApplication app)
         {
             app.Command("check", command =>
@@ -135,6 +63,78 @@ namespace ModSink.CLI
                         }
 
                         Console.WriteLine();
+                    }
+
+                    return 0;
+                });
+            });
+        }
+
+        private static void AddColCheck(this CommandLineApplication app)
+        {
+            app.Command("collcheck", command =>
+            {
+                command.Description = "Checks files for collisions";
+                command.HelpOption("-?|-h|--help");
+                var pathArg = command.Argument("[path]", "Path to folder");
+
+                command.OnExecute(() =>
+                {
+                    var pathStr = pathArg.Value ?? ".";
+                    var path = Path.Combine(Directory.GetCurrentDirectory(), pathStr);
+                    IHashFunction xxhash = new XXHash64();
+                    var hashing = new HashingService(xxhash);
+                    foreach (var g in hashing.GetFiles(new DirectoryInfo(path))
+                        .Select(f =>
+                        {
+                            var hash = hashing.GetFileHash(f, CancellationToken.None).GetAwaiter().GetResult();
+                            Console.WriteLine($"{hash} {Path.GetRelativePath(path, f.FullName)}");
+                            return new {f, hash};
+                        })
+                        .GroupBy(a => a.hash.ToString())
+                        .Where(g => g.Count() > 1))
+                    {
+                        Console.WriteLine(g.Key);
+                        foreach (var i in g)
+                            Console.WriteLine($"    {i.f.FullName}");
+                        Console.WriteLine();
+                    }
+
+                    Console.WriteLine("Done.");
+                    return 0;
+                });
+            });
+        }
+
+        private static void AddDump(this CommandLineApplication app)
+        {
+            app.Command("dump", command =>
+            {
+                command.Description = "Writes out the contents of a repo";
+                command.HelpOption("-?|-h|--help");
+                var uriArg = command.Argument("[uri]", "Uri to repo to download");
+
+                command.OnExecute(() =>
+                {
+                    var uriStr = uriArg.Value;
+                    var uri = new Uri(uriStr);
+                    if (uri.IsFile)
+                    {
+                        var repo = (Repo) new BinaryFormatter().Deserialize(new FileInfo(uri.LocalPath).OpenRead());
+                        repo.BaseUri = new Uri("http://base.uri/repo/");
+                        DumpRepo(repo);
+                    }
+                    else
+                    {
+                        throw new NotImplementedException();
+                        //var downloader = new HttpClientDownloader();
+                        //var client = new ClientService(new DownloadService(downloader), null, downloader,
+                        //    new BinaryFormatter());
+
+                        //Console.WriteLine("Downloading repo");
+                        //client.GroupUrls.Add(uriStr);
+                        //foreach (var repo in client.Repos.Items)
+                        //    DumpRepo(repo);
                     }
 
                     return 0;
@@ -342,10 +342,18 @@ namespace ModSink.CLI
         public static void Main(string[] args)
         {
             Log.Logger = new LoggerConfiguration()
-                .WriteTo.Console(outputTemplate:
-                    "{Timestamp:HH:mm:ss} {Level:u3} [{SourceContext}] {Properties} {Message:lj}{NewLine}{Exception}")
+                .WriteTo.Console(
+                    theme: AnsiConsoleTheme.Code,
+                    outputTemplate:
+                    "{Timestamp:HH:mm:ss} {Level:u3} {SourceContext} {Message:lj} {Properties} {NewLine}{Exception}")
+                .WriteTo.File(new CompactJsonFormatter(), "log.txt", fileSizeLimitBytes: 10 * 1024 * 1024,
+                    buffered: true, flushToDiskInterval: 10.Seconds(), rollingInterval: RollingInterval.Day,
+                    rollOnFileSizeLimit: true)
                 .MinimumLevel.Verbose()
                 .Enrich.FromLogContext()
+                .Enrich.WithDemystifiedStackTraces()
+                .Enrich.WithMemoryUsage()
+                .Enrich.WithThreadId()
                 .CreateLogger();
 
             var app = new CommandLineApplication

@@ -27,10 +27,13 @@ namespace ModSink.Common.Client
             )
                 fileInfo.Delete();
 
-            return localDir.EnumerateFiles()
+            foreach (var file in localDir.EnumerateFiles()
                 .Where(f => !f.Name.EndsWith(".tmp"))
-                .Select(f => new FileSignature(new HashValue(f.Name), f.Length))
-                .Do(file => LogTo.Verbose("File {file} has been discovered", file.Hash));
+                .Select(f => new FileSignature(new HashValue(f.Name), f.Length)))
+            {
+                LogTo.Verbose("File {file} has been discovered", file.Hash);
+                yield return file;
+            }
         }
 
         Stream IFileAccessService.Read(FileSignature fileSignature, bool temporary)
