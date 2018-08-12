@@ -14,9 +14,9 @@ namespace ModSink.Common.Client
             IObservableCache<Modpack, Guid> modpacks)
         {
             return modpacks.Connect()
+                .AutoRefresh(m => m.Selected, scheduler: RxApp.TaskpoolScheduler)
                 .SubscribeOn(RxApp.TaskpoolScheduler)
                 .ObserveOn(RxApp.TaskpoolScheduler)
-                .AutoRefresh(m => m.Selected, scheduler: RxApp.MainThreadScheduler)
                 .Filter(m => m.Selected)
                 .TransformMany(m => m.Mods, m => m.Mod.Id)
                 .TransformMany(m => m.Mod.Files.Values, fs => fs)
