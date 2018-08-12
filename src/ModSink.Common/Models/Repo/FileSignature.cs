@@ -6,7 +6,7 @@ namespace ModSink.Common.Models.Repo
 {
     [Serializable]
     [DebuggerDisplay("{Hash} | {Length}")]
-    public struct FileSignature : IEquatable<FileSignature>
+    public struct FileSignature : IEquatable<FileSignature>, IComparable<FileSignature>
     {
         public FileSignature(HashValue hash, ulong length)
         {
@@ -50,6 +50,13 @@ namespace ModSink.Common.Models.Repo
         public override string ToString()
         {
             return $"{Hash.ToString()} - {Length}";
+        }
+
+        public int CompareTo(FileSignature other)
+        {
+            var hash = Hash.CompareTo(other.Hash);
+            if (hash != 0) return hash;
+            return Length.CompareTo(other.Length);
         }
     }
 }

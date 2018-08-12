@@ -14,6 +14,7 @@ using ModSink.Common.Models;
 using ModSink.Common.Models.Client;
 using ModSink.Common.Models.Group;
 using ModSink.Common.Models.Repo;
+using ReactiveUI;
 
 namespace ModSink.Common.Client
 {
@@ -35,31 +36,13 @@ namespace ModSink.Common.Client
             this.serializationFormatter = serializationFormatter;
             filesAvailable.Edit(l => { l.AddOrUpdate(fileAccessService.FilesAvailable()); });
             LogTo.Warning("Creating pipeline");
-            Repos = GroupUrls.Connect()
-                .Transform(g => new Uri(g))
-                .TransformAsync(Load<Group>)
-                .TransformMany(g => g.RepoInfos.Select(r => new Uri(g.BaseUri, r.Uri)), repoUri => repoUri)
-                .TransformAsync(Load<Repo>)
-                .OnItemUpdated((repo, _) => LogTo.Information("Repo from {url} has been loaded", repo.BaseUri))
-                .AsObservableCache()
+            Repos = GetReposFromGroups(GroupUrls).DisposeWith(disposable);
+            OnlineFiles = DynamicDataChain.GetOnlineFileFromRepos(Repos)
                 .DisposeWith(disposable);
-            OnlineFiles = Repos.Connect()
-                .TransformMany(
-                    repo => repo.Files.Select(kvp => new OnlineFile(kvp.Key, new Uri(repo.BaseUri, kvp.Value))),
-                    of => of.FileSignature)
-                .AsObservableCache()
-                .DisposeWith(disposable);
-            Modpacks = Repos.Connect()
-                .RemoveKey()
-                .TransformMany(r => r.Modpacks)
-                .AsObservableList()
-                .DisposeWith(disposable);
-            QueuedDownloads = Modpacks.Connect()
-                .AutoRefresh(m => m.Selected)
-                .Filter(m => m.Selected)
-                .TransformMany(m => m.Mods)
-                .TransformMany(m => m.Mod.Files.Values)
-                .AddKey(fs => fs)
+            Modpacks = DynamicDataChain.GetModpacksFromRepos(Repos).DisposeWith(disposable);
+            QueuedDownloads = DynamicDataChain.GetDownloadsFromModpacks(Modpacks)
+                .DisposeWith(disposable)
+                .Connect()
                 .LeftJoin(filesAvailable.Connect(), f => f,
                     (required, available) =>
                     {
@@ -98,12 +81,12 @@ namespace ModSink.Common.Client
                 .DisposeWith(disposable);
         }
 
-        public IObservableList<Modpack> Modpacks { get; }
+        public IObservableCache<ActiveDownload, FileSignature> ActiveDownloads { get; }
+        public ISourceCache<string, string> GroupUrls { get; } = new SourceCache<string, string>(u => u);
+        public IObservableCache<Modpack, Guid> Modpacks { get; }
         public IObservableCache<OnlineFile, FileSignature> OnlineFiles { get; }
         public IObservableCache<QueuedDownload, FileSignature> QueuedDownloads { get; }
         public IObservableCache<Repo, Uri> Repos { get; }
-        public IObservableCache<ActiveDownload, FileSignature> ActiveDownloads { get; }
-        public ISourceCache<string, string> GroupUrls { get; } = new SourceCache<string, string>(u => u);
 
         public void Dispose()
         {
@@ -115,6 +98,18 @@ namespace ModSink.Common.Client
             fileAccessService.TemporaryFinished(fileSignature);
             LogTo.Verbose("File {name} is now available", fileSignature.Hash);
             filesAvailable.AddOrUpdate(fileSignature);
+        }
+
+        private IObservableCache<Repo, Uri> GetReposFromGroups(IConnectableCache<string, string> groups)
+        {
+            return groups.Connect()
+                .ObserveOn(RxApp.TaskpoolScheduler)
+                .Transform(g => new Uri(g))
+                .TransformAsync(Load<Group>)
+                .TransformMany(g => g.RepoInfos.Select(r => new Uri(g.BaseUri, r.Uri)), repoUri => repoUri)
+                .TransformAsync(Load<Repo>)
+                .OnItemUpdated((repo, _) => LogTo.Information("Repo from {url} has been loaded", repo.BaseUri))
+                .AsObservableCache();
         }
 
         private Stream GetTemporaryFileStream(FileSignature argFileSignature)

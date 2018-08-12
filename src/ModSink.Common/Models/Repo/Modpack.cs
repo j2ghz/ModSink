@@ -9,6 +9,8 @@ namespace ModSink.Common.Models.Repo
     public class Modpack : INotifyPropertyChanged
     {
         private bool selected;
+
+        public Guid Id { get; } = Guid.NewGuid();
         public ICollection<ModEntry> Mods { get; set; }
         public string Name { get; set; }
 

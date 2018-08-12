@@ -6,7 +6,7 @@ using System.Reactive.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Threading;
 using System.Threading.Tasks;
-using DynamicData;
+using Flurl.Http;
 using Humanizer;
 using Microsoft.Extensions.CommandLineUtils;
 using ModSink.Common;
@@ -19,6 +19,56 @@ namespace ModSink.CLI
 {
     public static class Program
     {
+        private static void AddCheck(this CommandLineApplication app)
+        {
+            app.Command("check", command =>
+            {
+                command.Description =
+                    "Checks that every file in the folder is named as its hash and deletes if it's not";
+                command.HelpOption("-?|-h|--help");
+                var pathArg = command.Argument("[path]", "Path to folder to check");
+
+                command.OnExecute(async () =>
+                {
+                    var pathStr = pathArg.Value ?? "./hashed";
+                    var path = Path.Combine(Directory.GetCurrentDirectory(), pathStr);
+
+                    var hashing = new HashingService(new XXHash64());
+
+                    foreach (var file in hashing.GetFiles(new DirectoryInfo(path)).OrderBy(f => f.Length))
+                    {
+                        if (file.Length <= 0)
+                        {
+                            file.Delete();
+                            continue;
+                        }
+
+                        var size = file.Length.Bytes();
+                        var hashFromName = Path.GetFileNameWithoutExtension(file.FullName);
+                        Console.Write($"{size.Humanize("#").PadLeft(10)}: {hashFromName} | ");
+                        HashValue hash;
+                        using (var src = file.OpenRead())
+                        {
+                            var start = DateTime.Now;
+                            hash = await hashing.GetFileHash(src, CancellationToken.None);
+                            var speed = size.Per(DateTime.Now - start);
+                            Console.Write($"{hash} | {speed.Humanize("#").PadLeft(10)} | ");
+                        }
+
+                        if (hash.ToString() != hashFromName)
+                        {
+                            Console.Write("DELETE");
+                            file.Delete();
+                        }
+
+                        Console.WriteLine();
+                    }
+
+                    return 0;
+                });
+            });
+        }
+
         private static void AddColCheck(this CommandLineApplication app)
         {
             app.Command("collcheck", command =>
@@ -66,75 +116,27 @@ namespace ModSink.CLI
 
                 command.OnExecute(() =>
                 {
-                    var uriStr = uriArg.Value;
-                    var uri = new Uri(uriStr);
-                    if (uri.IsFile)
+                    var groupUriStr = uriArg.Value;
+                    var groupUri = new Uri(groupUriStr);
+                    if (groupUri.IsFile)
                     {
-                        var repo = (Repo) new BinaryFormatter().Deserialize(new FileInfo(uri.LocalPath).OpenRead());
+                        var repo = (Repo) new BinaryFormatter().Deserialize(new FileInfo(groupUri.LocalPath)
+                            .OpenRead());
                         repo.BaseUri = new Uri("http://base.uri/repo/");
                         DumpRepo(repo);
                     }
                     else
                     {
-                        throw new NotImplementedException();
-                        //var downloader = new HttpClientDownloader();
-                        //var client = new ClientService(new DownloadService(downloader), null, downloader,
-                        //    new BinaryFormatter());
-
-                        //Console.WriteLine("Downloading repo");
-                        //client.GroupUrls.Add(uriStr);
-                        //foreach (var repo in client.Repos.Items)
-                        //    DumpRepo(repo);
-                    }
-
-                    return 0;
-                });
-            });
-        }
-
-        private static void AddCheck(this CommandLineApplication app)
-        {
-            app.Command("check", command =>
-            {
-                command.Description =
-                    "Checks that every file in the folder is named as its hash and deletes if it's not";
-                command.HelpOption("-?|-h|--help");
-                var pathArg = command.Argument("[path]", "Path to folder to check");
-
-                command.OnExecute(async () =>
-                {
-                    var pathStr = pathArg.Value ?? "./hashed";
-                    var path = Path.Combine(Directory.GetCurrentDirectory(), pathStr);
-
-                    var hashing = new HashingService(new XXHash64());
-
-                    foreach (var file in hashing.GetFiles(new DirectoryInfo(path)).OrderBy(f => f.Length))
-                    {
-                        if (file.Length <= 0)
+                        var formatter = new BinaryFormatter();
+                        foreach (var repoUri in ((Group) formatter.Deserialize(groupUriStr.GetStreamAsync().GetAwaiter()
+                                .GetResult()))
+                            .RepoInfos)
                         {
-                            file.Delete();
-                            continue;
+                            var repo = (Repo) formatter.Deserialize(new Uri(groupUri, repoUri.Uri).ToString()
+                                .GetStreamAsync().GetAwaiter()
+                                .GetResult());
+                            DumpRepo(repo);
                         }
-
-                        var size = file.Length.Bytes();
-                        var hashFromName = Path.GetFileNameWithoutExtension(file.FullName);
-                        Console.Write($"{size.Humanize("#").PadLeft(10)}: {hashFromName} | ");
-                        HashValue hash;
-                        using (var src = file.OpenRead())
-                        {
-                            var start = DateTime.Now;
-                            hash = await hashing.GetFileHash(src, CancellationToken.None);
-                            var speed = size.Per(DateTime.Now - start);
-                            Console.Write($"{hash} | {speed.Humanize("#").PadLeft(10)} | ");
-                        }
-
-                        if (hash.ToString() != hashFromName)
-                        {
-                            Console.Write("DELETE");
-                            file.Delete();
-                        }
-
-                        Console.WriteLine();
                     }
 
                     return 0;
@@ -326,15 +328,15 @@ namespace ModSink.CLI
         {
             Console.WriteLine($"Repo at {repo.BaseUri}");
             Console.WriteLine("Files:");
-            foreach (var file in repo.Files)
+            foreach (var file in repo.Files.OrderBy(f=>f.Key))
                 Console.WriteLine($"\t{file.Key} at {new Uri(repo.BaseUri, file.Value)}");
 
             Console.WriteLine("ModPacks:");
-            foreach (var modpack in repo.Modpacks)
+            foreach (var modpack in repo.Modpacks.OrderBy(m=>m.Name))
             {
                 Console.WriteLine($"\tModpack '{modpack.Name}'");
                 Console.WriteLine("\tMods:");
-                foreach (var mod in modpack.Mods)
+                foreach (var mod in modpack.Mods.OrderBy(m=>m.Mod.Name))
                     Console.WriteLine($"\t\tMod: '{mod.Mod.Name}' [{mod.Mod.Files.Count} files]");
             }
         }

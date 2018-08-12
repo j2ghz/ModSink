@@ -5,7 +5,7 @@ using System.Linq;
 namespace ModSink.Common.Models.Repo
 {
     [Serializable]
-    public struct HashValue : IEquatable<HashValue>
+    public struct HashValue : IEquatable<HashValue>, IComparable<HashValue>
     {
         public HashValue(byte[] value)
         {
@@ -41,15 +41,28 @@ namespace ModSink.Common.Models.Repo
 
         public override int GetHashCode()
         {
-            return Value.GetHashCode();
+            return Value?.GetHashCode() ?? 0;
         }
+
         /// <summary>
-        /// Converts to filename or display string
+        ///     Converts to filename or display string
         /// </summary>
         /// <returns>XX-XX-XX-XX-XX-XX-XX-XX format</returns>
         public override string ToString()
         {
             return BitConverter.ToString(Value);
+        }
+
+        /// <inheritdoc />
+        public int CompareTo(HashValue other)
+        {
+            for (var i = 0; i < Math.Max(Value.Length, other.Value.Length); i++)
+            {
+                var comparison = Value[i].CompareTo(other.Value[i]);
+                if (comparison != 0) return comparison;
+            }
+
+            return 0;
         }
     }
 }

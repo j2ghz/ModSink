@@ -19,7 +19,7 @@ namespace ModSink.WPF.Model
 
             // Temporary to ease testing
             RxApp.TaskpoolScheduler.Schedule(() =>
-                client.GroupUrls.AddOrUpdate(@"https://modsink.j2ghz.com/group.bin"));
+                client.GroupUrls.AddOrUpdate(@"https://files.417rct.org/Swifty_repos/modsink/group.bin"));
         }
 
         public ClientService Client { get; }

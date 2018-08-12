@@ -3,6 +3,5 @@
 <Weavers>
   <Anotar.Serilog />
   <Costura />
-  <Visualize />
   <ReactiveUI />
 </Weavers>
