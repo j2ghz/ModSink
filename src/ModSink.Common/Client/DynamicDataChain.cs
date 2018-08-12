@@ -28,7 +28,7 @@ namespace ModSink.Common.Client
             return repos.Connect()
                 .SubscribeOn(RxApp.TaskpoolScheduler)
                 .ObserveOn(RxApp.TaskpoolScheduler)
-                .TransformMany(r => r.Modpacks, m => m.Id)
+                .TransformMany(r => r.Modpacks, m => Guid.NewGuid())
                 .AsObservableCache();
         }
 
