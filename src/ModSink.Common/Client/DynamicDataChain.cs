@@ -26,7 +26,7 @@ namespace ModSink.Common.Client
             IObservable<IChangeSet<Repo, Uri>> repos)
         {
             return repos
-                .TransformMany(r => r.Modpacks, m => Guid.NewGuid());
+                .TransformMany(r => r.Modpacks, m => m.Id);
         }
 
         public static IObservable<IChangeSet<OnlineFile, FileSignature>> GetOnlineFileFromRepos(
