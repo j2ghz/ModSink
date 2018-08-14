@@ -20,7 +20,7 @@ namespace ModSink.Common.Tests.Client
             using (TestUtils.WithScheduler(ImmediateScheduler.Instance))
             {
                 var modpacks = new SourceCache<Modpack, Guid>(_ => new Guid());
-                var files = DynamicDataChain.GetDownloadsFromModpacks(modpacks);
+                var files = DynamicDataChain.GetDownloadsFromModpacks(modpacks.Connect()).AsObservableCache();
                 files.Count.Should().Be(0);
                 var modpack = new Modpack
                 {
@@ -54,7 +54,7 @@ namespace ModSink.Common.Tests.Client
             {
                 var faker = new Faker();
                 var repos = new SourceCache<Repo, Uri>(r => r.BaseUri);
-                var modpacks = DynamicDataChain.GetModpacksFromRepos(repos);
+                var modpacks = DynamicDataChain.GetModpacksFromRepos(repos.Connect()).AsObservableCache();
                 modpacks.Count.Should().Be(0);
                 repos.AddOrUpdate(
                     new Repo

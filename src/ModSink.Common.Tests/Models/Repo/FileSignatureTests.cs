@@ -1,5 +1,6 @@
 ﻿using Bogus;
 using FluentAssertions;
+using FluentAssertions.Primitives;
 using ModSink.Common.Models.Repo;
 using Xunit;
 
@@ -13,7 +14,7 @@ namespace ModSink.Common.Tests.Models.Repo
         [Fact]
         public void IsSerializeable()
         {
-            for (var i = 0; i < 10; i++) FileSignature.Should().BeBinarySerializable();
+            for (var i = 0; i < 10; i++) new ObjectAssertions(FileSignature).BeBinarySerializable();
         }
 
         [Fact]

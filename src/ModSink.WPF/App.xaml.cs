@@ -62,6 +62,7 @@ namespace ModSink.WPF
 
             //TODO: Load plugins, waiting on https://stackoverflow.com/questions/46351411
         }
+       
 
         protected override void OnExit(ExitEventArgs e)
         {
@@ -135,6 +136,7 @@ namespace ModSink.WPF
             Countly.UserDetails.Username = Environment.UserName;
             Countly.UserDetails.Organization = Environment.MachineName;
             Countly.StartSession("https://countly.j2ghz.com", "54c6bf3a77021fadb7bd5b2a66490b465d4382ac", FullVersion);
+            DispatcherMonitor.Start();
         }
     }
 }

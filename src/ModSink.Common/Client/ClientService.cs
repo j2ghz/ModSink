@@ -35,14 +35,13 @@ namespace ModSink.Common.Client
             this.serializationFormatter = serializationFormatter;
             filesAvailable.Edit(l => { l.AddOrUpdate(fileAccessService.FilesAvailable()); });
             LogTo.Warning("Creating pipeline");
-            Repos = GetReposFromGroups(GroupUrls);
+            Repos = DynamicDataChain.GetReposFromGroups(GroupUrls.Connect(),Load<Group>,Load<Repo>).AsObservableCache();
             d.Add(Repos);
-            OnlineFiles = DynamicDataChain.GetOnlineFileFromRepos(Repos);
+            OnlineFiles = DynamicDataChain.GetOnlineFileFromRepos(Repos.Connect()).AsObservableCache();
             d.Add(OnlineFiles);
-            Modpacks = DynamicDataChain.GetModpacksFromRepos(Repos);
+            Modpacks = DynamicDataChain.GetModpacksFromRepos(Repos.Connect()).AsObservableCache();
             d.Add(Modpacks);
-            QueuedDownloads = DynamicDataChain.GetDownloadsFromModpacks(Modpacks)
-                .Connect()
+            QueuedDownloads = DynamicDataChain.GetDownloadsFromModpacks(Modpacks.Connect())
                 .LeftJoin(filesAvailable.Connect(), f => f,
                     (required, available) =>
                     {
@@ -98,17 +97,6 @@ namespace ModSink.Common.Client
             fileAccessService.TemporaryFinished(fileSignature);
             LogTo.Verbose("File {name} is now available", fileSignature.Hash);
             filesAvailable.AddOrUpdate(fileSignature);
-        }
-
-        private IObservableCache<Repo, Uri> GetReposFromGroups(IConnectableCache<string, string> groups)
-        {
-            return groups.Connect()
-                .Transform(g => new Uri(g))
-                .TransformAsync(Load<Group>)
-                .TransformMany(g => g.RepoInfos.Select(r => new Uri(g.BaseUri, r.Uri)), repoUri => repoUri)
-                .TransformAsync(Load<Repo>)
-                .OnItemUpdated((repo, _) => LogTo.Information("Repo from {url} has been loaded", repo.BaseUri))
-                .AsObservableCache();
         }
 
         private Stream GetTemporaryFileStream(FileSignature argFileSignature)
