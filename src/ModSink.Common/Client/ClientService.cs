@@ -36,11 +36,14 @@ namespace ModSink.Common.Client
             this.serializationFormatter = serializationFormatter;
             filesAvailable.Edit(l => { l.AddOrUpdate(fileAccessService.FilesAvailable()); });
             LogTo.Warning("Creating pipeline");
-            Repos = GetReposFromGroups(GroupUrls).DisposeWith(disposable);
-            OnlineFiles = DynamicDataChain.GetOnlineFileFromRepos(Repos)
+            Repos = DynamicDataChain.GetReposFromGroups(GroupUrls.Connect(), Load<Group>, Load<Repo>).AsObservableCache().DisposeWith(disposable);
+            OnlineFiles = DynamicDataChain.GetOnlineFileFromRepos(Repos.Connect())
+                .AsObservableCache()
                 .DisposeWith(disposable);
-            Modpacks = DynamicDataChain.GetModpacksFromRepos(Repos).DisposeWith(disposable);
-            QueuedDownloads = DynamicDataChain.GetDownloadsFromModpacks(Modpacks)
+            Modpacks = DynamicDataChain.GetModpacksFromRepos(Repos.Connect()).AsObservableCache()
+                .DisposeWith(disposable);
+            QueuedDownloads = DynamicDataChain.GetDownloadsFromModpacks(Modpacks.Connect())
+                .AsObservableCache()
                 .DisposeWith(disposable)
                 .Connect()
                 .LeftJoin(filesAvailable.Connect(), f => f,
@@ -98,18 +101,6 @@ namespace ModSink.Common.Client
             fileAccessService.TemporaryFinished(fileSignature);
             LogTo.Verbose("File {name} is now available", fileSignature.Hash);
             filesAvailable.AddOrUpdate(fileSignature);
-        }
-
-        private IObservableCache<Repo, Uri> GetReposFromGroups(IConnectableCache<string, string> groups)
-        {
-            return groups.Connect()
-                .ObserveOn(RxApp.TaskpoolScheduler)
-                .Transform(g => new Uri(g))
-                .TransformAsync(Load<Group>)
-                .TransformMany(g => g.RepoInfos.Select(r => new Uri(g.BaseUri, r.Uri)), repoUri => repoUri)
-                .TransformAsync(Load<Repo>)
-                .OnItemUpdated((repo, _) => LogTo.Information("Repo from {url} has been loaded", repo.BaseUri))
-                .AsObservableCache();
         }
 
         private Stream GetTemporaryFileStream(FileSignature argFileSignature)

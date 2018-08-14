@@ -1,47 +1,53 @@
 ﻿using System;
 using System.Linq;
-using System.Reactive.Linq;
+using System.Threading.Tasks;
+using Anotar.Serilog;
 using DynamicData;
 using ModSink.Common.Models.Client;
+using ModSink.Common.Models.Group;
 using ModSink.Common.Models.Repo;
 using ReactiveUI;
 
 namespace ModSink.Common.Client
 {
-    public static class DynamicDataChain
+    public class DynamicDataChain
     {
-        public static IObservableCache<FileSignature, FileSignature> GetDownloadsFromModpacks(
-            IObservableCache<Modpack, Guid> modpacks)
+        public static IObservable<IChangeSet<FileSignature, FileSignature>> GetDownloadsFromModpacks(
+            IObservable<IChangeSet<Modpack, Guid>> modpacks)
         {
-            return modpacks.Connect()
+            return modpacks
                 .AutoRefresh(m => m.Selected, scheduler: RxApp.TaskpoolScheduler)
-                .SubscribeOn(RxApp.TaskpoolScheduler)
-                .ObserveOn(RxApp.TaskpoolScheduler)
                 .Filter(m => m.Selected)
                 .TransformMany(m => m.Mods, m => m.Mod.Id)
-                .TransformMany(m => m.Mod.Files.Values, fs => fs)
-                .AsObservableCache();
+                .TransformMany(m => m.Mod.Files.Values, fs => fs);
         }
 
-        public static IObservableCache<Modpack, Guid> GetModpacksFromRepos(IConnectableCache<Repo, Uri> repos)
+        public static IObservable<IChangeSet<Modpack, Guid>> GetModpacksFromRepos(
+            IObservable<IChangeSet<Repo, Uri>> repos)
         {
-            return repos.Connect()
-                .SubscribeOn(RxApp.TaskpoolScheduler)
-                .ObserveOn(RxApp.TaskpoolScheduler)
-                .TransformMany(r => r.Modpacks, m => Guid.NewGuid())
-                .AsObservableCache();
+            return repos
+                .TransformMany(r => r.Modpacks, m => Guid.NewGuid());
         }
 
-        public static IObservableCache<OnlineFile, FileSignature> GetOnlineFileFromRepos(
-            IConnectableCache<Repo, Uri> repos)
+        public static IObservable<IChangeSet<OnlineFile, FileSignature>> GetOnlineFileFromRepos(
+            IObservable<IChangeSet<Repo, Uri>> repos)
         {
-            return repos.Connect()
-                .SubscribeOn(RxApp.TaskpoolScheduler)
-                .ObserveOn(RxApp.TaskpoolScheduler)
+            return repos
                 .TransformMany(
                     repo => repo.Files.Select(kvp => new OnlineFile(kvp.Key, new Uri(repo.BaseUri, kvp.Value))),
-                    of => of.FileSignature)
-                .AsObservableCache();
+                    of => of.FileSignature);
+        }
+
+        public static IObservable<IChangeSet<Repo, Uri>> GetReposFromGroups(
+            IObservable<IChangeSet<string, string>> groups,
+            Func<Uri, Task<Group>> loadGroup, Func<Uri, Task<Repo>> loadRepo)
+        {
+            return groups
+                .Transform(g => new Uri(g))
+                .TransformAsync(loadGroup)
+                .TransformMany(g => g.RepoInfos.Select(r => new Uri(g.BaseUri, r.Uri)), repoUri => repoUri)
+                .TransformAsync(loadRepo)
+                .OnItemUpdated((repo, _) => LogTo.Information("Repo from {url} has been loaded", repo.BaseUri));
         }
     }
 }
