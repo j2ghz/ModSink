@@ -11,7 +11,6 @@ using Humanizer.Bytes;
 using ModSink.Common.Client;
 using Polly;
 using Polly.Extensions.Http;
-using ReactiveUI;
 using static ModSink.Common.Client.DownloadProgress;
 
 namespace ModSink.Common
@@ -85,7 +84,7 @@ namespace ModSink.Common
                 observer.OnCompleted();
 
                 return destination.Value;
-            }).SubscribeOn(RxApp.TaskpoolScheduler).Publish();
+            }).Publish();
         }
     }
 }

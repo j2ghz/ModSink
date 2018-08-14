@@ -1,15 +1,15 @@
 ﻿using System;
-using System.IO;
+using System.ComponentModel;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
+using System.Runtime.CompilerServices;
 using Anotar.Serilog;
 using Humanizer.Bytes;
-using ReactiveUI;
 
 namespace ModSink.Common.Client
 {
-    public class ActiveDownload : ReactiveObject, IDisposable
+    public class ActiveDownload :  IDisposable
     {
         private readonly CompositeDisposable disposable = new CompositeDisposable();
 
@@ -21,11 +21,11 @@ namespace ModSink.Common.Client
         {
             Name = name;
             LogTo.Verbose("[{download}] Created ActiveDownload", Name);
-            downloadProgress.Subscribe(progress).DisposeWith(disposable);
-            downloadProgress.Connect().DisposeWith(disposable);
-            progress.DistinctUntilChanged(dp => dp.State).Subscribe(dp =>
-                LogTo.Verbose("[{download}] State changed to {state}", Name, dp.State)).DisposeWith(disposable);
-            progress.Subscribe(_ => { }, completed).DisposeWith(disposable);
+            disposable.Add(downloadProgress.Subscribe(progress));
+            disposable.Add(downloadProgress.Connect());
+            disposable.Add(progress.DistinctUntilChanged(dp => dp.State).Subscribe(dp =>
+                LogTo.Verbose("[{download}] State changed to {state}", Name, dp.State)));
+            disposable.Add(progress.Subscribe(_ => { }, completed));
         }
 
         public string Name { get; }

@@ -14,13 +14,12 @@ using ModSink.Common.Models;
 using ModSink.Common.Models.Client;
 using ModSink.Common.Models.Group;
 using ModSink.Common.Models.Repo;
-using ReactiveUI;
 
 namespace ModSink.Common.Client
 {
     public class ClientService : IDisposable
     {
-        private readonly CompositeDisposable disposable = new CompositeDisposable();
+        private readonly CompositeDisposable d = new CompositeDisposable();
         private readonly IDownloader downloader;
         private readonly IFileAccessService fileAccessService;
 
@@ -36,12 +35,13 @@ namespace ModSink.Common.Client
             this.serializationFormatter = serializationFormatter;
             filesAvailable.Edit(l => { l.AddOrUpdate(fileAccessService.FilesAvailable()); });
             LogTo.Warning("Creating pipeline");
-            Repos = GetReposFromGroups(GroupUrls).DisposeWith(disposable);
-            OnlineFiles = DynamicDataChain.GetOnlineFileFromRepos(Repos)
-                .DisposeWith(disposable);
-            Modpacks = DynamicDataChain.GetModpacksFromRepos(Repos).DisposeWith(disposable);
+            Repos = GetReposFromGroups(GroupUrls);
+            d.Add(Repos);
+            OnlineFiles = DynamicDataChain.GetOnlineFileFromRepos(Repos);
+            d.Add(OnlineFiles);
+            Modpacks = DynamicDataChain.GetModpacksFromRepos(Repos);
+            d.Add(Modpacks);
             QueuedDownloads = DynamicDataChain.GetDownloadsFromModpacks(Modpacks)
-                .DisposeWith(disposable)
                 .Connect()
                 .LeftJoin(filesAvailable.Connect(), f => f,
                     (required, available) =>
@@ -57,8 +57,8 @@ namespace ModSink.Common.Client
                 .Transform(opt => opt.Value)
                 .InnerJoin(OnlineFiles.Connect(), of => of.FileSignature,
                     (fs, of) => new QueuedDownload(fs, of.Uri))
-                .AsObservableCache()
-                .DisposeWith(disposable);
+                .AsObservableCache();
+            d.Add(QueuedDownloads);
             ActiveDownloads = QueuedDownloads.Connect()
                 .Sort(Comparer<QueuedDownload>.Create((_, __) => 0))
                 .Top(5)
@@ -77,8 +77,8 @@ namespace ModSink.Common.Client
                         }, qd.FileSignature.ToString());
                 })
                 .LogVerbose("activeDownloads")
-                .AsObservableCache()
-                .DisposeWith(disposable);
+                .AsObservableCache();
+            d.Add(ActiveDownloads);
         }
 
         public IObservableCache<ActiveDownload, FileSignature> ActiveDownloads { get; }
@@ -90,7 +90,7 @@ namespace ModSink.Common.Client
 
         public void Dispose()
         {
-            disposable.Dispose();
+            d.Dispose();
         }
 
         private void AddNewFile(FileSignature fileSignature)
@@ -103,7 +103,6 @@ namespace ModSink.Common.Client
         private IObservableCache<Repo, Uri> GetReposFromGroups(IConnectableCache<string, string> groups)
         {
             return groups.Connect()
-                .ObserveOn(RxApp.TaskpoolScheduler)
                 .Transform(g => new Uri(g))
                 .TransformAsync(Load<Group>)
                 .TransformMany(g => g.RepoInfos.Select(r => new Uri(g.BaseUri, r.Uri)), repoUri => repoUri)
