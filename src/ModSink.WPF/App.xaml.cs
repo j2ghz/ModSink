@@ -94,7 +94,6 @@ namespace ModSink.WPF
                     "{Timestamp:o} {Level:u3} [{SourceContext}-{ThreadId}] {Message} {Properties}{NewLine}{Exception}")
                 .Enrich.FromLogContext()
                 .Enrich.WithThreadId()
-                .Enrich.With<ExceptionEnricher>()
                 .MinimumLevel.Verbose()
                 .CreateLogger();
             Log.Information("Log initialized");
