@@ -34,7 +34,7 @@ namespace ModSink.Common.Client
         {
             return repos
                 .TransformMany(
-                    repo => repo.Files.Select(kvp => new OnlineFile(kvp.Key, new Uri(repo.BaseUri, kvp.Value))),
+                    repo => repo.Files.Select(kvp => new OnlineFile(kvp.Key, repo.CombineBaseUri(kvp.Value))),
                     of => of.FileSignature);
         }
 
@@ -45,7 +45,7 @@ namespace ModSink.Common.Client
             return groups
                 .Transform(g => new Uri(g))
                 .TransformAsync(loadGroup)
-                .TransformMany(g => g.RepoInfos.Select(r => new Uri(g.BaseUri, r.Uri)), repoUri => repoUri)
+                .TransformMany(g => g.RepoInfos.Select(r => g.CombineBaseUri(r.Uri)), repoUri => repoUri)
                 .TransformAsync(loadRepo)
                 .OnItemUpdated((repo, _) => LogTo.Information("Repo from {url} has been loaded", repo.BaseUri));
         }
