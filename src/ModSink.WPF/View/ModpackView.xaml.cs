@@ -1,4 +1,5 @@
 ﻿using System.Reactive.Disposables;
+using System.Windows.Controls.Primitives;
 using ModSink.WPF.ViewModel;
 using ReactiveUI;
 
@@ -14,8 +15,7 @@ namespace ModSink.WPF.View
             {
                 this.OneWayBind(ViewModel, vm => vm.Modpack.Name, v => v.TbName.Text).DisposeWith(d);
                 this.OneWayBind(ViewModel, vm => vm.Size, v => v.TbSize.Text).DisposeWith(d);
-                this.OneWayBind(ViewModel, vm => vm.Modpack.Mods, v => v.LbMods.ItemsSource).DisposeWith(d);
-                this.Bind(ViewModel, vm => vm.Modpack.Selected, v => v.ChkInstall.IsChecked).DisposeWith(d);
+                this.BindCommand(ViewModel, vm => vm.Install, v => v.ChkInstall).DisposeWith(d);
             });
         }
     }
