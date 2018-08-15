@@ -21,6 +21,8 @@ artifacts:
 test_script:
 - cmd: dotnet test "src\ModSink.Common.Tests\ModSink.Common.Tests.csproj" --configuration Release --no-build  /p:CollectCoverage=true /p:CoverletOutputFormat=opencover
 - cmd: codecov -f "src\ModSink.Common.Tests\coverage.opencover.xml" -t 78e056d7-ce59-4f6d-b177-85fa3501d898
+- cmd: dotnet test "src\ModSink.WPF.Tests\ModSink.WPF.Tests.csproj" --configuration Release --no-build  /p:CollectCoverage=true /p:CoverletOutputFormat=opencover
+- cmd: codecov -f "src\ModSink.WPF.Tests\coverage.opencover.xml" -t 78e056d7-ce59-4f6d-b177-85fa3501d898
 
 deploy:
 - provider: GitHub
