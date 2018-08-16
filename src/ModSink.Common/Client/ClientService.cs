@@ -47,15 +47,9 @@ namespace ModSink.Common.Client
                 .DisposeWith(disposable)
                 .Connect()
                 .LeftJoin(filesAvailable.Connect(), f => f,
-                    (required, available) =>
-                    {
-                        LogTo.Verbose(
-                            available.HasValue ? "File {signature} is available" : "File {signature} is not available",
-                            required);
-                        return !available.HasValue
-                            ? Optional<FileSignature>.Create(required)
-                            : Optional<FileSignature>.None;
-                    })
+                    (required, available) => !available.HasValue
+                        ? Optional<FileSignature>.Create(required)
+                        : Optional<FileSignature>.None)
                 .Filter(opt => opt.HasValue)
                 .Transform(opt => opt.Value)
                 .InnerJoin(OnlineFiles.Connect(), of => of.FileSignature,

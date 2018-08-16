@@ -12,6 +12,9 @@
     <ApplicationIcon>modsink_x3S_icon.ico</ApplicationIcon>
     <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+  </PropertyGroup>
     
   <ItemGroup>
     <!-- App.xaml -->
