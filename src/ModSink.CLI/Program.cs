@@ -129,13 +129,16 @@ namespace ModSink.CLI
                     else
                     {
                         var formatter = new BinaryFormatter();
-                        foreach (var repoUri in ((Group) formatter.Deserialize(groupUriStr.GetStreamAsync().GetAwaiter()
-                                .GetResult()))
-                            .RepoInfos)
+                        var group = (Group) formatter.Deserialize(groupUriStr.GetStreamAsync().GetAwaiter()
+                            .GetResult());
+                        group.BaseUri = groupUri;
+                        foreach (var repoInfo in group.RepoInfos)
                         {
-                            var repo = (Repo) formatter.Deserialize(new Uri(groupUri, repoUri.Uri).ToString()
+                            var repoUri = group.CombineBaseUri(repoInfo.Uri);
+                            var repo = (Repo) formatter.Deserialize(repoUri.ToString()
                                 .GetStreamAsync().GetAwaiter()
                                 .GetResult());
+                            repo.BaseUri = repoUri;
                             DumpRepo(repo);
                         }
                     }
@@ -329,15 +332,15 @@ namespace ModSink.CLI
         {
             Console.WriteLine($"Repo at {repo.BaseUri}");
             Console.WriteLine("Files:");
-            foreach (var file in repo.Files.OrderBy(f=>f.Key))
-                Console.WriteLine($"\t{file.Key} at {new Uri(repo.BaseUri, file.Value)}");
+            foreach (var file in repo.Files.OrderBy(f => f.Key))
+                Console.WriteLine($"\t{file.Key} at {repo.CombineBaseUri(file.Value)}");
 
             Console.WriteLine("ModPacks:");
-            foreach (var modpack in repo.Modpacks.OrderBy(m=>m.Name))
+            foreach (var modpack in repo.Modpacks.OrderBy(m => m.Name))
             {
                 Console.WriteLine($"\tModpack '{modpack.Name}'");
                 Console.WriteLine("\tMods:");
-                foreach (var mod in modpack.Mods.OrderBy(m=>m.Mod.Name))
+                foreach (var mod in modpack.Mods.OrderBy(m => m.Mod.Name))
                     Console.WriteLine($"\t\tMod: '{mod.Mod.Name}' [{mod.Mod.Files.Count} files]");
             }
         }

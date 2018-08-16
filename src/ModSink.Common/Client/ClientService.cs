@@ -104,7 +104,7 @@ namespace ModSink.Common.Client
             return fileAccessService.Write(argFileSignature, true);
         }
 
-        private async Task<T> Load<T>(Uri uri) where T : IBaseUri
+        private async Task<T> Load<T>(Uri uri) where T : WithBaseUri
         {
             LogTo.Information("Loading {T} from {url}", typeof(T), uri);
             using (var mem = new MemoryStream())

@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using System.Threading.Tasks;
 using Humanizer;
 using Humanizer.Bytes;
 using ModSink.Common.Models.Repo;
@@ -16,7 +17,11 @@ namespace ModSink.WPF.ViewModel
                     .SelectMany(m => m.Mod.Files)
                     .Select(f => f.Value.Length)
                     .Aggregate((sum, a) => sum + a)).Humanize("G03");
+            Install = ReactiveCommand.CreateFromTask(() => Task.Run(() => Modpack.Selected = true),
+                outputScheduler: RxApp.TaskpoolScheduler);
         }
+
+        public ReactiveCommand Install { get; }
 
         public Modpack Modpack { get; }
 

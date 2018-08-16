@@ -13,11 +13,9 @@
         <TextBlock x:Name="TbName" FontSize="32" DockPanel.Dock="Top" Padding="5" />
         <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" Margin="2">
             <TextBlock x:Name="TbSize" />
-            <mah:ToggleSwitch x:Name="ChkInstall"
-                              Margin="15,5"
-                              OffLabel="Download?"
-                              OnLabel="Will be downloaded"
-                              Style="{StaticResource MahApps.Metro.Styles.ToggleSwitch.Win10}" />
+            <ToggleButton 
+                x:Name="ChkInstall"
+                Content="Download"/>
         </StackPanel>
         <ListBox x:Name="LbMods" />
     </DockPanel>
