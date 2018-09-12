@@ -6,7 +6,7 @@
 
   <ItemGroup>
     <PackageReference Include="Bogus" Version="22.3.2" />
-    <PackageReference Include="coverlet.msbuild" Version="2.1.1" />
+    <PackageReference Include="coverlet.msbuild" Version="2.3.0" />
     <PackageReference Include="FluentAssertions" Version="5.4.1" />
     <PackageReference Include="JetBrains.DotMemoryUnit" Version="3.0.20171219.105559" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.8.0" />
