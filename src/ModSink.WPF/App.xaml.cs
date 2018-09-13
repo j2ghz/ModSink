@@ -106,6 +106,7 @@ namespace ModSink.WPF
                 .Enrich.WithMemoryUsage()
                 .MinimumLevel.Verbose()
                 .CreateLogger();
+            
             Log.Information("Log initialized");
             if (!Debugger.IsAttached)
             {
@@ -136,7 +137,10 @@ namespace ModSink.WPF
             Countly.UserDetails.Username = Environment.UserName;
             Countly.UserDetails.Organization = Environment.MachineName;
             Countly.StartSession("https://countly.j2ghz.com", "54c6bf3a77021fadb7bd5b2a66490b465d4382ac", FullVersion);
-            DispatcherMonitor.Start();
+            if (!Debugger.IsAttached)
+            {
+                DispatcherMonitor.Start();
+            }
         }
     }
 }

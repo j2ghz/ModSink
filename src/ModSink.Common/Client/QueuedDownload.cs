@@ -15,7 +15,6 @@ namespace ModSink.Common.Client
         {
             FileSignature = fileSignature;
             Source = source;
-            LogTo.Verbose("Created QueuedDownload for {signature}", fileSignature);
         }
     }
 }

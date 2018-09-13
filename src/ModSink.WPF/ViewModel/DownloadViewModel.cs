@@ -71,8 +71,6 @@ namespace ModSink.WPF.ViewModel
 
         private ObservableAsPropertyHelper<T> LogErrorsAndDispose<T>(ObservableAsPropertyHelper<T> oaph)
         {
-            oaph.ThrownExceptions.Subscribe(e =>
-                LogTo.Error(e, "[{download}] failed", Name));
             oaph.DisposeWith(disposable);
             return oaph;
         }
