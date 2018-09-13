@@ -5,35 +5,11 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using Anotar.Serilog;
 using DynamicData;
-using ReactiveUI;
 
 namespace ModSink.Common
 {
     public static class DynamicDataExtensions
     {
-        public static IObservableCache<TObject, TKey> DisposeWithThrowExceptions<TObject, TKey>(
-            this IObservableCache<TObject, TKey> o,
-            CompositeDisposable disposable)
-        {
-            o.DisposeWith(disposable);
-            o.Connect().Subscribe().DisposeWith(disposable);
-            o.Connect().Subscribe(_ => { },
-                ex => RxApp.MainThreadScheduler.Schedule(() => RxApp.DefaultExceptionHandler.OnNext(ex)));
-            o.Connect().Subscribe(_ => { }, _ => Debugger.Break());
-            return o;
-        }
-
-        public static IObservableList<T> DisposeWithThrowExceptions<T>(this IObservableList<T> o,
-            CompositeDisposable disposable)
-        {
-            o.DisposeWith(disposable);
-            o.Connect().Subscribe().DisposeWith(disposable);
-            o.Connect().Subscribe(_ => { },
-                ex => RxApp.MainThreadScheduler.Schedule(() => RxApp.DefaultExceptionHandler.OnNext(ex)));
-            o.Connect().Subscribe(_ => { }, _ => Debugger.Break());
-            return o;
-        }
-
         public static IObservable<IChangeSet<T>> LogVerbose<T>(this IObservable<IChangeSet<T>> source, string prefix)
         {
             return source.Do(changeSet =>

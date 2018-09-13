@@ -14,6 +14,8 @@ using ModSink.Common.Client;
 using ModSink.Common.Models.Group;
 using ModSink.Common.Models.Repo;
 using Serilog;
+using Serilog.Formatting.Compact;
+using Serilog.Sinks.SystemConsole.Themes;
 
 namespace ModSink.CLI
 {
@@ -83,7 +85,7 @@ namespace ModSink.CLI
                     var path = Path.Combine(Directory.GetCurrentDirectory(), pathStr);
                     IHashFunction xxhash = new XXHash64();
                     var hashing = new HashingService(xxhash);
-                    hashing.GetFiles(new DirectoryInfo(path))
+                    foreach (var g in hashing.GetFiles(new DirectoryInfo(path))
                         .Select(f =>
                         {
                             var hash = hashing.GetFileHash(f, CancellationToken.None).GetAwaiter().GetResult();
@@ -91,14 +93,13 @@ namespace ModSink.CLI
                             return new {f, hash};
                         })
                         .GroupBy(a => a.hash.ToString())
-                        .Where(g => g.Count() > 1)
-                        .ForEach(g =>
-                        {
-                            Console.WriteLine(g.Key);
-                            foreach (var i in g)
-                                Console.WriteLine($"    {i.f.FullName}");
-                            Console.WriteLine();
-                        });
+                        .Where(g => g.Count() > 1))
+                    {
+                        Console.WriteLine(g.Key);
+                        foreach (var i in g)
+                            Console.WriteLine($"    {i.f.FullName}");
+                        Console.WriteLine();
+                    }
 
                     Console.WriteLine("Done.");
                     return 0;
@@ -347,10 +348,18 @@ namespace ModSink.CLI
         public static void Main(string[] args)
         {
             Log.Logger = new LoggerConfiguration()
-                .WriteTo.Console(outputTemplate:
-                    "{Timestamp:HH:mm:ss} {Level:u3} [{SourceContext}] {Properties} {Message:lj}{NewLine}{Exception}")
+                .WriteTo.Console(
+                    theme: AnsiConsoleTheme.Code,
+                    outputTemplate:
+                    "{Timestamp:HH:mm:ss} {Level:u3} {SourceContext} {Message:lj} {Properties} {NewLine}{Exception}")
+                .WriteTo.File(new CompactJsonFormatter(), "log.txt", fileSizeLimitBytes: 10 * 1024 * 1024,
+                    buffered: true, flushToDiskInterval: 10.Seconds(), rollingInterval: RollingInterval.Day,
+                    rollOnFileSizeLimit: true)
                 .MinimumLevel.Verbose()
                 .Enrich.FromLogContext()
+                .Enrich.WithDemystifiedStackTraces()
+                .Enrich.WithMemoryUsage()
+                .Enrich.WithThreadId()
                 .CreateLogger();
 
             var app = new CommandLineApplication
