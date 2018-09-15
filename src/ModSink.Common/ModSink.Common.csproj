@@ -31,4 +31,8 @@
     <PackageReference Include="System.Net.Http" Version="4.3.3" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\ModSink.Common.FSharp\ModSink.Common.FSharp.fsproj" />
+  </ItemGroup>
+
 </Project>

@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="RepoDomainModel.fs" />
+    <Compile Include="DynamicDataEx.fs" />
+    <Compile Include="RepoUtilities.fs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="DynamicData.ReactiveUI" Version="6.4.0.2419" />
+  </ItemGroup>
+
+</Project>
