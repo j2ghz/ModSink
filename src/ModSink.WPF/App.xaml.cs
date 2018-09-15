@@ -9,11 +9,14 @@ using System.Windows;
 using System.Windows.Media;
 using Anotar.Serilog;
 using CountlySDK;
+using Humanizer;
 using ModSink.WPF.Helpers;
 using ModSink.WPF.ViewModel;
 using ReactiveUI;
 using Serilog;
 using Serilog.Debugging;
+using Serilog.Formatting.Compact;
+using Serilog.Sinks.SystemConsole.Themes;
 using Splat;
 using Splat.Serilog;
 using ILogger = Splat.ILogger;
@@ -33,6 +36,18 @@ namespace ModSink.WPF
         private static string FullVersion => typeof(App).GetTypeInfo().Assembly
             .GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion;
 
+        private void FatalException(Exception e, Type source)
+        {
+            ConsoleManager.Show();
+            Log.ForContext(source).Fatal(e, "{exceptionText}", e.ToStringDemystified());
+            Countly.RecordException(e.Message, e.ToStringDemystified(), null, true);
+            if (Debugger.IsAttached == false)
+            {
+                Console.WriteLine(WPF.Properties.Resources.FatalExceptionPressAnyKeyToContinue);
+                Console.ReadKey();
+            }
+        }
+
         private void InitializeDependencyInjection()
         {
             //TODO: FIX:
@@ -48,18 +63,6 @@ namespace ModSink.WPF
             //TODO: Load plugins, waiting on https://stackoverflow.com/questions/46351411
         }
        
-
-        private void FatalException(Exception e, Type source)
-        {
-            ConsoleManager.Show();
-            Log.ForContext(source).Fatal(e, "{exceptionText}", e.ToStringDemystified());
-            Countly.RecordException(e.Message, e.ToStringDemystified(), null, true);
-            if (Debugger.IsAttached == false)
-            {
-                Console.WriteLine(WPF.Properties.Resources.FatalExceptionPressAnyKeyToContinue);
-                Console.ReadKey();
-            }
-        }
 
         protected override void OnExit(ExitEventArgs e)
         {
@@ -85,17 +88,25 @@ namespace ModSink.WPF
             Log.Logger = new LoggerConfiguration()
                 .WriteTo.Debug(
                     outputTemplate: "{Level:u3} [{SourceContext}] {Message:lj}{NewLine}{Exception}")
-                .WriteTo.LiterateConsole(
+                .WriteTo.Trace()
+                .WriteTo.Console(theme: AnsiConsoleTheme.Code,
                     outputTemplate:
-                    "{Timestamp:HH:mm:ss} {Level:u3} [{SourceContext}-{ThreadId}] {Message:lj}{NewLine}{Exception}")
-                .WriteTo.RollingFile(
-                    Path.Combine(PathProvider.Logs.FullName, "{Date}.log"),
-                    outputTemplate:
-                    "{Timestamp:o} {Level:u3} [{SourceContext}-{ThreadId}] {Message} {Properties}{NewLine}{Exception}")
+                    "{Timestamp:HH:mm:ss} {Level:u3} {SourceContext} {ThreadId} {Message:lj}{Properties:j}{NewLine}{Exception}")
+                .WriteTo.File(
+                    new CompactJsonFormatter(),
+                    Path.Combine(PathProvider.Logs.FullName, "Log.txt"),
+                    buffered: true,
+                    fileSizeLimitBytes: 10 * 1024 * 1024,
+                    flushToDiskInterval: 10.Seconds(),
+                    rollingInterval: RollingInterval.Day,
+                    rollOnFileSizeLimit: true)
                 .Enrich.FromLogContext()
                 .Enrich.WithThreadId()
+                .Enrich.WithDemystifiedStackTraces()
+                .Enrich.WithMemoryUsage()
                 .MinimumLevel.Verbose()
                 .CreateLogger();
+            
             Log.Information("Log initialized");
             if (!Debugger.IsAttached)
             {
@@ -126,7 +137,10 @@ namespace ModSink.WPF
             Countly.UserDetails.Username = Environment.UserName;
             Countly.UserDetails.Organization = Environment.MachineName;
             Countly.StartSession("https://countly.j2ghz.com", "54c6bf3a77021fadb7bd5b2a66490b465d4382ac", FullVersion);
-            DispatcherMonitor.Start();
+            if (!Debugger.IsAttached)
+            {
+                DispatcherMonitor.Start();
+            }
         }
     }
 }

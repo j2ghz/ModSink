@@ -6,7 +6,6 @@ using DynamicData;
 using ModSink.Common.Models.Client;
 using ModSink.Common.Models.Group;
 using ModSink.Common.Models.Repo;
-using ReactiveUI;
 
 namespace ModSink.Common.Client
 {
@@ -16,7 +15,7 @@ namespace ModSink.Common.Client
             IObservable<IChangeSet<Modpack, Guid>> modpacks)
         {
             return modpacks
-                .AutoRefresh(m => m.Selected, scheduler: RxApp.TaskpoolScheduler)
+                .AutoRefresh(m => m.Selected)
                 .Filter(m => m.Selected)
                 .TransformMany(m => m.Mods, m => m.Mod.Id)
                 .TransformMany(m => m.Mod.Files.Values, fs => fs);
