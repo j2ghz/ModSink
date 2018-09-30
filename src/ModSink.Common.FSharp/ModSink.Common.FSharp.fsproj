@@ -6,7 +6,6 @@
 
   <ItemGroup>
     <Compile Include="RepoDomainModel.fs" />
-    <Compile Include="DynamicDataEx.fs" />
     <Compile Include="RepoUtilities.fs" />
   </ItemGroup>
 

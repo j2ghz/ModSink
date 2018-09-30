@@ -12,6 +12,11 @@
   <ItemGroup>
     <PackageReference Include="Argu" Version="5.1.0" />
     <PackageReference Include="Ben.Demystifier" Version="0.1.1" />
+    <PackageReference Include="Microsoft.FSharpLu" Version="0.10.27" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\src\ModSink.Common\ModSink.Common.csproj" />
   </ItemGroup>
 
 </Project>
