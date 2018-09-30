@@ -7,7 +7,7 @@ type HashValue = byte seq
 
 type FileSignature =
     { HashValue : HashValue
-      Length : uint64 }
+      Length : int64 }
 
 type RelativePath = string
 
@@ -17,7 +17,7 @@ type RelativeFile =
 
 type Mod =
     { Name : string
-      Files : RelativeFile seq }
+      Files : RelativeFile list }
 
 type ModEntry =
     { Mod : Mod
@@ -26,10 +26,10 @@ type ModEntry =
 
 type Modpack =
     { Name : string
-      Mods : ModEntry seq
+      Mods : ModEntry list
       Selected : IObservable<bool> }
 
 type Repo =
-    { Modpacks : Modpack seq
-      Files : RelativeFile seq
+    { Modpacks : Modpack list
+      Files : RelativeFile list
       BaseUri : Uri }

@@ -12,7 +12,7 @@ let main argv =
     match argv |> List.ofArray with
     | "create" :: args ->
         match args with
-        | [path] -> RepoUtilities.create path
+        | [path] -> printfn ""//RepoUtilities.create path
         | _ -> printfn "Usage: modsink create [path]"
     | _ ->
         printfn "Usage: modsink <create|dump>"
