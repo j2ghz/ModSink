@@ -15,7 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\src\ModSink.Common\ModSink.Common.csproj" />
+    <ProjectReference Include="..\ModSink.Common\ModSink.Common.fsproj" />
   </ItemGroup>
 
 </Project>
