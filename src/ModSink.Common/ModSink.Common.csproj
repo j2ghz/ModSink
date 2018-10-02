@@ -18,7 +18,7 @@
     <PackageReference Include="Ben.Demystifier" Version="0.1.1" />
     <PackageReference Include="DynamicData" Version="6.5.1.2479" />
     <PackageReference Include="Flurl" Version="2.8.0" />
-    <PackageReference Include="Fody" Version="3.2.4">
+    <PackageReference Include="Fody" Version="3.2.6">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
