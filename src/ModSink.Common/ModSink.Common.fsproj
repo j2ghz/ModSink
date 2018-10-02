@@ -12,8 +12,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="DynamicData.ReactiveUI" Version="6.5.1.2479" />
-    <PackageReference Include="FSharpLint.MSBuild" Version="0.9.0" />
     <PackageReference Include="Microsoft.FSharpLu" Version="0.10.27" />
     <PackageReference Include="System.Data.HashFunction.xxHash" Version="2.0.0" />
   </ItemGroup>
