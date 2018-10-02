@@ -14,7 +14,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Anotar.Serilog.Fody" Version="4.6.2" />
+    <PackageReference Include="Anotar.Serilog.Fody" Version="4.6.6" />
     <PackageReference Include="Ben.Demystifier" Version="0.1.1" />
     <PackageReference Include="DynamicData" Version="6.5.1.2479" />
     <PackageReference Include="Flurl" Version="2.8.0" />
