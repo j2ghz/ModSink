@@ -9,20 +9,24 @@ install:
 
 before_build:
   - ps: gitversion /l console /output buildserver /updateAssemblyInfo
-  - ps: msbuild /t:Restore /v:m
+  - ps: msbuild /t:Restore /v:m /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
 
 build:
   verbosity: minimal
+  
+ after_build:
+  - dotnet publish -f netcoreapp2.1 -c Release
+  - dotnet publish -c Release -r win-x64
+  - dotnet publish -c Release -r osx-x64
+  - dotnet publish -c Release -r linux-x64
 
 artifacts:
-- path: src/ModSink.WPF/bin/Release/net462/ModSink.WPF.exe
+- path: src/ModSink.CLI/bin/Release/*/*/publish
   name: binaries
 
 test_script:
-- cmd: dotnet test "src\ModSink.Common.Tests\ModSink.Common.Tests.csproj" --configuration Release --no-build  /p:CollectCoverage=true /p:CoverletOutputFormat=opencover
-- cmd: codecov -f "src\ModSink.Common.Tests\coverage.opencover.xml" -t 78e056d7-ce59-4f6d-b177-85fa3501d898
-- cmd: dotnet test "src\ModSink.WPF.Tests\ModSink.WPF.Tests.csproj" --configuration Release --no-build  /p:CollectCoverage=true /p:CoverletOutputFormat=opencover
-- cmd: codecov -f "src\ModSink.WPF.Tests\coverage.opencover.xml" -t 78e056d7-ce59-4f6d-b177-85fa3501d898
+- cmd: dotnet test "src\ModSink.Tests\ModSink.Tests.fsproj" --configuration Release /p:CollectCoverage=true /p:CoverletOutputFormat=opencover /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
+- cmd: codecov -f "src\ModSink.Tests\coverage.opencover.xml" -t 78e056d7-ce59-4f6d-b177-85fa3501d898
 
 deploy:
 - provider: GitHub
