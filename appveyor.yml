@@ -14,7 +14,7 @@ before_build:
 build:
   verbosity: minimal
   
- after_build:
+after_build:
   - dotnet publish -f netcoreapp2.1 -c Release
   - dotnet publish -c Release -r win-x64
   - dotnet publish -c Release -r osx-x64
