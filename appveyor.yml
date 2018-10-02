@@ -15,10 +15,10 @@ build:
   verbosity: minimal
   
 after_build:
-  - dotnet publish -f netcoreapp2.1 -c Release
-  - dotnet publish -c Release -r win-x64
-  - dotnet publish -c Release -r osx-x64
-  - dotnet publish -c Release -r linux-x64
+  - dotnet publish -f netcoreapp2.1 -c Release src\ModSink.CLI
+  - dotnet publish -c Release -r win-x64 src\ModSink.CLI
+  - dotnet publish -c Release -r osx-x64 src\ModSink.CLI
+  - dotnet publish -c Release -r linux-x64 src\ModSink.CLI
 
 artifacts:
 - path: src/ModSink.CLI/bin/Release/*/*/publish
