@@ -10,3 +10,11 @@ type OptionalBuilder =
     Some value
 
 let optional = OptionalBuilder()
+
+module Async =
+    let rec sequenceList items =
+        async {
+            let! i = items |> List.head
+            let! is = items |> List.tail |> sequenceList
+            return i :: is
+        }

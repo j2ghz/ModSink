@@ -3,6 +3,7 @@
 open Xunit
 open FsCheck
 open System.IO
+open FsUnit.Xunit
 
 [<Fact>]
 let ``Returns a valid hash``() =
@@ -11,6 +12,6 @@ let ``Returns a valid hash``() =
         let result =
             Hashing.getHash stream
             |> Async.RunSynchronously
-        result.Length = (Array.length arr |> int64)
+        result.Length |> should equal (Array.length arr |> int64)
 
     Check.QuickThrowOnFailure hash

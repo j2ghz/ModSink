@@ -3,25 +3,34 @@ open Microsoft.FSharpLu.File
 open System
 open System.IO
 open System.Collections.Generic
+open Utilities
+open RepoDomainModel
 
 let rec getFiles (dir:DirectoryInfo) =
-    dir.GetFiles() :: (dir.GetDirectories() |> Array.toList |> List.collect getFiles)
+    [
+        yield! (dir.GetFiles() |> Array.toList)
+        yield! (dir.GetDirectories() |> Array.toList |> List.collect getFiles)
+    ]
 
-let hashFiles filePaths =
-        filePaths
-        |> List.map (fun path ->
-            async {
-                use stream = File.OpenRead path
-                let! hash = Hashing.getHash stream
-                return {Signature=hash ;Path=path}
-            })
+let getFilePath (file:FileInfo) = file.FullName
 
-let createMod path =
-    Utilities.optional {
-        let! fullPath = getExistingDir (Environment.CurrentDirectory ++ path)
+let hashFile path =
+    async {
+        use stream = File.OpenRead path
+        let! hash = Hashing.getHash stream
+        return {Signature=hash ;Path=path}
+    }
+
+let createModpack path =
+    async {
+        let fullPath = Environment.CurrentDirectory ++ path
         let dir = new DirectoryInfo(fullPath)
-        let mods =
-            dir.EnumerateDirectories()
-            |> Seq.map (fun d -> d)
-        return 0
+        let! files =
+            dir
+            |> getFiles
+            |> List.map getFilePath
+            |> List.map hashFile
+            |> Async.sequenceList
+
+        return {Name=dir.Name;Files=files}
     }

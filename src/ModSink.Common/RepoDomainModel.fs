@@ -1,4 +1,3 @@
-[<AutoOpen>]
 module RepoDomainModel
 
 open System
