@@ -6,13 +6,15 @@ open System.Collections.Generic
 open Utilities
 open RepoDomainModel
 
-let rec getFiles (dir:DirectoryInfo) =
-    [
-        yield! (dir.GetFiles() |> Array.toList)
-        yield! (dir.GetDirectories() |> Array.toList |> List.collect getFiles)
-    ]
+let rec getFiles dir =
+    seq {
+        yield! (dir |> Directory.EnumerateFiles)
+        yield! (dir |> Directory.EnumerateDirectories |> Seq.collect getFiles)
+    }
 
 let getFilePath (file:FileInfo) = file.FullName
+
+let getDirectoryName path = (new DirectoryInfo(path)).Name
 
 let hashFile path =
     async {
@@ -21,16 +23,30 @@ let hashFile path =
         return {Signature=hash ;Path=path}
     }
 
+let createMod path =
+    async {
+        let! files =
+            path
+            |> getFiles
+            |> Seq.map hashFile
+            |> Seq.asyncSequence
+        let fileList = List.ofSeq files
+
+        return {Name=(getDirectoryName path);Files=fileList}
+    }
+
 let createModpack path =
     async {
-        let fullPath = Environment.CurrentDirectory ++ path
-        let dir = new DirectoryInfo(fullPath)
-        let! files =
-            dir
-            |> getFiles
-            |> List.map getFilePath
-            |> List.map hashFile
-            |> Async.sequenceList
+        let! mods =
+            path
+            |> Directory.EnumerateDirectories
+            |> Seq.map createMod
+            |> Seq.asyncSequence
 
-        return {Name=dir.Name;Files=files}
+        let modEntries =
+            mods
+            |> List.ofSeq
+            |> List.map (function (m) -> {Mod=m; Default=true; Required=true})
+
+        return {Name=(getDirectoryName path);Mods=modEntries}
     }
