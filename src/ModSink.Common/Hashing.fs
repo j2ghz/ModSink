@@ -1,6 +1,7 @@
 ﻿module Hashing
 
 open System.Data.HashFunction.xxHash
+open RepoDomainModel
 
 let xxhash =
     let config = new xxHashConfig(HashSizeInBits = 64)

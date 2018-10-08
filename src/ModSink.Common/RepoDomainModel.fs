@@ -1,4 +1,3 @@
-[<AutoOpen>]
 module RepoDomainModel
 
 open System
@@ -26,8 +25,7 @@ type ModEntry =
 
 type Modpack =
     { Name : string
-      Mods : ModEntry list
-      Selected : IObservable<bool> }
+      Mods : ModEntry list }
 
 type Repo =
     { Modpacks : Modpack list
