@@ -8,7 +8,7 @@ let xxhash =
     xxHashFactory.Instance.Create(config)
 
 let getHash stream =
-    async {
+    async {        
         let! hash = xxhash.ComputeHashAsync stream
                     |> Async.AwaitTask
         return {HashValue=hash.Hash;Length=stream.Length}

@@ -28,6 +28,4 @@ type Modpack =
       Mods : ModEntry list }
 
 type Repo =
-    { Modpacks : Modpack list
-      Files : RelativeFile list
-      BaseUri : Uri }
+    { Modpacks : Modpack list }

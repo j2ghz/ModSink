@@ -1,10 +1,11 @@
-// Learn more about F# at http://fsharp.org
-open System
+﻿open System
 open Argu
 open System.Diagnostics
 open System.Reflection
 open Serilog
 open Serilog.Events
+open Newtonsoft.Json
+open System.IO
 
 type ModSinkArgs =
     | Version
@@ -18,11 +19,11 @@ type ModSinkArgs =
             | Create _ -> "Create a repo"
 
 and CreateArgs =
-    | [<MainCommand; ExactlyOnce; Last>] Modpacks of path : string list
+    | [<MainCommand;ExactlyOnce;Last>] Repo of path: string
     interface IArgParserTemplate with
         member s.Usage =
             match s with
-            | Modpacks _ -> "Paths to all modpacks to include"
+            | Repo _ -> "Paths to folder with all modpacks to include"
 
 [<EntryPoint>]
 let main argv =
@@ -40,10 +41,12 @@ let main argv =
             .WriteTo.Console(level).CreateLogger() :> ILogger)
     match parsed.GetSubCommand() with
     | Create a -> 
-        a.GetResult Modpacks
+        a.GetResult Repo
         |> RepoUtilities.create
         |> Async.RunSynchronously
-        |> printfn "%O"
+        |> JsonConvert.SerializeObject
+        |> fun str -> File.WriteAllText("repo.json",str)
+        do Log.Information("Saved at {path}", Path.GetFullPath("repo.json"))
     | a -> 
         a
         |> sprintf "%O"

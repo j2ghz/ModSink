@@ -8,58 +8,66 @@ open Utilities
 open RepoDomainModel
 open Serilog
 open FSharp.Control
+open Microsoft.FSharpLu
 
 let rec getFiles dir =
-    seq { 
+    seq {
         yield! (dir |> Directory.EnumerateFiles)
         yield! (dir
                 |> Directory.EnumerateDirectories
                 |> Seq.collect getFiles)
     }
 
-let getFilePath (file : FileInfo) = file.FullName
+let getFilePath(file: FileInfo) = file.FullName
 let getDirectoryName path = (new DirectoryInfo(path)).Name
 
-let hashFile path =
-    async { 
+let hashFile root (path: string) =
+    async {
+        do Log.Verbose("Hashing {path}",path)
         use stream = File.OpenRead path
+        let startTime = DateTime.Now
         let! hash = Hashing.getHash stream
-        return { Signature = hash
-                 Path = path }
+        do Log.Information("Hashed {path}",path)
+        return {Signature = hash
+                Path = path.Substring(String.length root)}
     }
 
-let createMod path =
-    async { 
+let createMod root (path: string) =
+    async {
+        do Log.Information("Creating mod at {path}",path)
         let! files = path
                      |> getFiles
-                     |> Seq.map hashFile
-                     |> Seq.asyncSequence
-        let fileList = List.ofSeq files
-        return { Name = (getDirectoryName path)
-                 Files = fileList }
+                     |> AsyncSeq.ofSeq
+                     |> AsyncSeq.mapAsync (hashFile root)
+                     |> AsyncSeq.toListAsync
+        return {Name = (getDirectoryName path)
+                Files = files}
     }
 
-let createModpack (path : string) =
-    async { 
-        do Log.Information("Creating modpack at {path}", path)
-        AsyncSeq
+let createModpack root (path: string) =
+    async {
+        do Log.Information("Creating modpack at {path}",path)
         let! mods = path
                     |> Directory.EnumerateDirectories
-                    |> Seq.map createMod
-                    |> AsyncSeq.
-        let modEntries =
-            mods
-            |> List.ofSeq
-            |> List.map (function 
-                   | (m) -> 
-                       { Mod = m
-                         Default = true
-                         Required = true })
-        return { Name = (getDirectoryName path)
-                 Mods = modEntries }
+                    |> AsyncSeq.ofSeq
+                    |> AsyncSeq.mapAsync (createMod root)
+                    |> AsyncSeq.map(function 
+                           | (m) -> 
+                               {Mod = m
+                                Default = true
+                                Required = true})
+                    |> AsyncSeq.toListAsync
+        return {Name = (getDirectoryName path)
+                Mods = mods}
     }
 
-let create (paths : string list) =
-    paths
-    |> List.map createModpack
-    |> List.asyncSequence
+let create (path: string) =
+    async {
+        let! mp =
+            path
+            |> Directory.EnumerateDirectories
+            |> AsyncSeq.ofSeq
+            |> AsyncSeq.mapAsync (createModpack path)
+            |> AsyncSeq.toListAsync
+        return {Modpacks = mp}
+    }
