@@ -24,6 +24,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
     <PackageReference Include="MahApps.Metro" Version="1.6.5" />
+    <PackageReference Include="ReactiveUI" Version="9.11.1" />
     <PackageReference Include="ReactiveUI.Events.WPF" Version="9.11.1" />
     <PackageReference Include="ReactiveUI.Fody" Version="9.11.1" />
     <PackageReference Include="ReactiveUI.WPF" Version="9.11.1" />

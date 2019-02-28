@@ -121,11 +121,11 @@ namespace ModSink.WPF
                 };
             }
 
-            RxApp.DefaultExceptionHandler = Observer.Create<Exception>(ex =>
-            {
-                if (Debugger.IsAttached) Debugger.Break();
-                RxApp.MainThreadScheduler.Schedule(() => throw ex);
-            });
+            //RxApp.DefaultExceptionHandler = Observer.Create<Exception>(ex =>
+            //{
+            //    if (Debugger.IsAttached) Debugger.Break();
+            //    RxApp.MainThreadScheduler.Schedule(() => throw ex);
+            //});
 
             PresentationTraceSources.Refresh();
             PresentationTraceSources.DataBindingSource.Listeners.Add(new RelayTraceListener(m =>
