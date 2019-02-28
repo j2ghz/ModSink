@@ -1,55 +1,33 @@
-﻿<Project Sdk="Microsoft.NET.Sdk" ToolsVersion="15.0">
+﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+
   <PropertyGroup>
-    <LanguageTargets>$(MSBuildExtensionsPath)\$(VisualStudioVersion)\Bin\Microsoft.CSharp.targets</LanguageTargets>
-    <TargetFramework>net462</TargetFramework>
     <OutputType>WinExe</OutputType>
+    <TargetFramework>netcoreapp3.0</TargetFramework>
+    <UseWPF>true</UseWPF>
     <StartupObject>ModSink.WPF.App</StartupObject>
     <Authors>J2ghz</Authors>
     <Product>ModSink</Product>
     <LangVersion>latest</LangVersion>
-    <DebugType>full</DebugType>
     <DebugSymbols>true</DebugSymbols>
     <ApplicationIcon>modsink_x3S_icon.ico</ApplicationIcon>
     <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-  </PropertyGroup>
-    
+
   <ItemGroup>
-    <!-- App.xaml -->
-    <ApplicationDefinition Include="App.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
-    </ApplicationDefinition>
-    <!-- XAML elements -->
-    <Page Include="**\*.xaml" Exclude="App.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
-    </Page>
-    <Compile Update="**\*.xaml.cs" SubType="Code" DependentUpon="%(Filename)" />
-    <!-- Resources -->
-    <EmbeddedResource Update="Properties\Resources.resx" Generator="ResXFileCodeGenerator" LastGenOutput="Resources.Designer.cs" />
-    <Compile Update="Properties\Resources.Designer.cs" AutoGen="True" DependentUpon="Resources.resx" DesignTime="True" />
-    <!-- Settings -->
-    <None Update="Properties\Settings.settings" Generator="SettingsSingleFileGenerator" LastGenOutput="Settings.Designer.cs" />
-    <Compile Update="Properties\Settings.Designer.cs" AutoGen="True" DependentUpon="Settings.settings" />
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="Anotar.Serilog.Fody" Version="4.6.2" />
-    <PackageReference Include="Ben.Demystifier" Version="0.1.1" />
-    <PackageReference Include="Costura.Fody" Version="3.1.4" />
-    <PackageReference Include="Countly" Version="18.1.0" />
-    <PackageReference Include="DynamicData.ReactiveUI" Version="6.5.1.2479" />
-    <PackageReference Include="Fody" Version="3.2.6">
+    <PackageReference Include="Anotar.Serilog.Fody" Version="4.6.7" />
+    <PackageReference Include="Ben.Demystifier" Version="0.1.4" />
+    <PackageReference Include="Costura.Fody" Version="3.3.2" />
+    <PackageReference Include="Countly" Version="19.2.0" />
+    <PackageReference Include="DynamicData.ReactiveUI" Version="6.8.0.2561" />
+    <PackageReference Include="Fody" Version="4.0.2">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
     <PackageReference Include="MahApps.Metro" Version="1.6.5" />
-    <PackageReference Include="ReactiveUI.Events.WPF" Version="8.7.2" />
-    <PackageReference Include="ReactiveUI.Fody" Version="8.7.2" />
-    <PackageReference Include="ReactiveUI.WPF" Version="8.7.2" />
-    <PackageReference Include="Serilog" Version="2.7.1" />
+    <PackageReference Include="ReactiveUI.Events.WPF" Version="9.11.1" />
+    <PackageReference Include="ReactiveUI.Fody" Version="9.11.1" />
+    <PackageReference Include="ReactiveUI.WPF" Version="9.11.1" />
+    <PackageReference Include="Serilog" Version="2.8.0" />
     <PackageReference Include="Serilog.Enrichers.Demystify" Version="0.1.0-dev-00016" />
     <PackageReference Include="Serilog.Enrichers.Memory" Version="1.0.4" />
     <PackageReference Include="Serilog.Enrichers.Thread" Version="3.0.0" />
@@ -58,17 +36,11 @@
     <PackageReference Include="Serilog.Sinks.Debug" Version="1.0.1" />
     <PackageReference Include="Serilog.Sinks.File" Version="4.0.0" />
     <PackageReference Include="Serilog.Sinks.Trace" Version="2.1.0" />
-    <PackageReference Include="Splat.Serilog" Version="2.0.0" />
-    <PackageReference Include="System.Net.Http" Version="4.3.3" />
-    <PackageReference Include="GitVersionTask" Version="4.0.0-beta*">
+    <PackageReference Include="Splat.Serilog" Version="3.0.0" />
+    <PackageReference Include="System.Net.Http" Version="4.3.4" />
+    <PackageReference Include="GitVersionTask" Version="4.0.0">
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Include="PresentationCore" />
-    <Reference Include="PresentationFramework" />
-    <Reference Include="System.Xaml" />
-    <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ModSink.Common\ModSink.Common.csproj" />

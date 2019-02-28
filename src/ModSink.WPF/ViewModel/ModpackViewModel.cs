@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using System.Reactive;
 using System.Threading.Tasks;
 using Humanizer;
 using Humanizer.Bytes;
@@ -21,7 +22,7 @@ namespace ModSink.WPF.ViewModel
                 outputScheduler: RxApp.TaskpoolScheduler);
         }
 
-        public ReactiveCommand Install { get; }
+        public ReactiveCommand<Unit, bool> Install { get; }
 
         public Modpack Modpack { get; }
 

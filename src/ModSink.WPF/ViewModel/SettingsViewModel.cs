@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Reactive;
 using System.Windows;
 using MahApps.Metro;
 using MahApps.Metro.Controls.Dialogs;
@@ -67,8 +68,8 @@ namespace ModSink.WPF.ViewModel
             }
         }
 
-        public ReactiveCommand AddGroup { get; }
-        public ReactiveCommand RemoveGroup { get; }
+        public ReactiveCommand<Unit, Unit> AddGroup { get; }
+        public ReactiveCommand<Unit, Unit> RemoveGroup { get; }
 
 
         public SettingsModel Settings { get; }

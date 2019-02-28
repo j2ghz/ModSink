@@ -13,7 +13,7 @@ namespace ModSink.WPF.Model
         public SettingsModel(ClientService client)
         {
             Client = client;
-            client.GroupUrls.Connect().ObserveOnDispatcher()
+            client.GroupUrls.Connect().ObserveOn(RxApp.MainThreadScheduler)
                 .Bind(GroupUrls)
                 .Subscribe();
 

@@ -14,23 +14,23 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Anotar.Serilog.Fody" Version="4.6.2" />
-    <PackageReference Include="Ben.Demystifier" Version="0.1.1" />
-    <PackageReference Include="DynamicData" Version="6.5.1.2479" />
-    <PackageReference Include="Flurl" Version="2.8.0" />
-    <PackageReference Include="Fody" Version="3.2.6">
+    <PackageReference Include="Anotar.Serilog.Fody" Version="4.6.7" />
+    <PackageReference Include="Ben.Demystifier" Version="0.1.4" />
+    <PackageReference Include="DynamicData" Version="6.8.0.2561" />
+    <PackageReference Include="Flurl" Version="2.8.1" />
+    <PackageReference Include="Fody" Version="4.0.2">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Humanizer" Version="2.5.1" />
-    <PackageReference Include="JetBrains.Annotations" Version="2018.2.1" />
-    <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
+    <PackageReference Include="Humanizer" Version="2.5.16" />
+    <PackageReference Include="JetBrains.Annotations" Version="2018.3.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.1" />
     <PackageReference Include="Polly.Extensions.Http" Version="2.0.1" />
-    <PackageReference Include="System.Reactive.Compatibility" Version="4.1.1" />
-    <PackageReference Include="System.Reactive" Version="4.1.1" />
+    <PackageReference Include="System.Reactive.Compatibility" Version="4.1.3" />
+    <PackageReference Include="System.Reactive" Version="4.1.3" />
     <PackageReference Include="System.Data.HashFunction.xxHash" Version="2.0.0" />
     <PackageReference Include="System.Runtime.Serialization.Formatters" Version="4.3.0" />
-    <PackageReference Include="System.Net.Http" Version="4.3.3" />
+    <PackageReference Include="System.Net.Http" Version="4.3.4" />
   </ItemGroup>
 
 </Project>
