@@ -38,10 +38,8 @@
     <PackageReference Include="Serilog.Sinks.Trace" Version="2.1.0" />
     <PackageReference Include="Splat.Serilog" Version="3.0.0" />
     <PackageReference Include="System.Net.Http" Version="4.3.4" />
-    <PackageReference Include="GitVersionTask" Version="4.0.0">
-      <PrivateAssets>All</PrivateAssets>
-    </PackageReference>
   </ItemGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\ModSink.Common\ModSink.Common.csproj" />
   </ItemGroup>
