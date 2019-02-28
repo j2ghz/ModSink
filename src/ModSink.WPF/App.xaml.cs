@@ -2,13 +2,10 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Net;
-using System.Reactive;
 using System.Reactive.Concurrency;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Media;
-using Anotar.Serilog;
-using CountlySDK;
 using Humanizer;
 using ModSink.WPF.Helpers;
 using ModSink.WPF.ViewModel;
@@ -40,7 +37,6 @@ namespace ModSink.WPF
         {
             ConsoleManager.Show();
             Log.ForContext(source).Fatal(e, "{exceptionText}", e.ToStringDemystified());
-            Countly.RecordException(e.Message, e.ToStringDemystified(), null, true);
             if (Debugger.IsAttached == false)
             {
                 Console.WriteLine(WPF.Properties.Resources.FatalExceptionPressAnyKeyToContinue);
@@ -54,20 +50,13 @@ namespace ModSink.WPF
             ServicePointManager.DefaultConnectionLimit = 10;
 
             Locator.CurrentMutable.InitializeSplat();
-            Registration.Register(Log.ForContext<ILogger>());
+            Registration.Register(Log.ForContext<ILogger>()); 
             Locator.CurrentMutable.InitializeReactiveUI();
             Locator.CurrentMutable.RegisterViewsForViewModels(typeof(App).Assembly);
 
             Locator.CurrentMutable.RegisterConstant(new AppBootstrapper(), typeof(AppBootstrapper));
 
             //TODO: Load plugins, waiting on https://stackoverflow.com/questions/46351411
-        }
-       
-
-        protected override void OnExit(ExitEventArgs e)
-        {
-            Countly.EndSession().ContinueWith(_ => LogTo.Information("Shutdown finished."));
-            base.OnExit(e);
         }
 
         protected override void OnStartup(StartupEventArgs e)
@@ -106,7 +95,7 @@ namespace ModSink.WPF
                 .Enrich.WithMemoryUsage()
                 .MinimumLevel.Verbose()
                 .CreateLogger();
-            
+
             Log.Information("Log initialized");
             if (!Debugger.IsAttached)
             {
@@ -134,13 +123,7 @@ namespace ModSink.WPF
                 if (Debugger.IsAttached) Debugger.Break();
             }));
             PresentationTraceSources.DataBindingSource.Switch.Level = SourceLevels.Warning | SourceLevels.Error;
-            Countly.UserDetails.Username = Environment.UserName;
-            Countly.UserDetails.Organization = Environment.MachineName;
-            Countly.StartSession("https://countly.j2ghz.com", "54c6bf3a77021fadb7bd5b2a66490b465d4382ac", FullVersion);
-            if (!Debugger.IsAttached)
-            {
-                DispatcherMonitor.Start();
-            }
+            if (!Debugger.IsAttached) DispatcherMonitor.Start();
         }
     }
 }

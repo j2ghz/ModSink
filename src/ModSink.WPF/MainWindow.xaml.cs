@@ -4,7 +4,6 @@ using System.Reflection;
 using System.Windows;
 using System.Windows.Threading;
 using Anotar.Serilog;
-using CountlySDK;
 using Humanizer;
 using MahApps.Metro.Controls;
 using ModSink.WPF.ViewModel;
@@ -58,7 +57,6 @@ namespace ModSink.WPF
                 if (delta > 500.Milliseconds())
                 {
                     LogTo.Information("UI Freeze = {0}", delta);
-                    Countly.RecordEvent("UIFreeze", 1, delta.TotalSeconds);
                 }
             };
 
