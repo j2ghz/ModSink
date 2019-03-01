@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27703.2018
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.28621.142
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModSink.Common", "src\ModSink.Common\ModSink.Common.csproj", "{783848A9-63F2-44D3-B50C-5E1236AAE1CD}"
 EndProject
@@ -11,7 +11,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModSink.CLI", "src\ModSink.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModSink.WPF", "src\ModSink.WPF\ModSink.WPF.csproj", "{09EF7B2D-08FB-4320-A945-F2276D337509}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModSink.WPF.Tests", "src\ModSink.WPF.Tests\ModSink.WPF.Tests.csproj", "{E81DD4A7-D3F1-41E0-B143-FD729E45FA85}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModSink.WPF.Tests", "src\ModSink.WPF.Tests\ModSink.WPF.Tests.csproj", "{E81DD4A7-D3F1-41E0-B143-FD729E45FA85}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModSink.UI", "src\ModSink.UI\ModSink.UI.csproj", "{41AB438B-AEAD-4F81-9958-DCCFA7C2D133}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,6 +41,10 @@ Global
 		{E81DD4A7-D3F1-41E0-B143-FD729E45FA85}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E81DD4A7-D3F1-41E0-B143-FD729E45FA85}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E81DD4A7-D3F1-41E0-B143-FD729E45FA85}.Release|Any CPU.Build.0 = Release|Any CPU
+		{41AB438B-AEAD-4F81-9958-DCCFA7C2D133}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{41AB438B-AEAD-4F81-9958-DCCFA7C2D133}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{41AB438B-AEAD-4F81-9958-DCCFA7C2D133}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{41AB438B-AEAD-4F81-9958-DCCFA7C2D133}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
