@@ -5,20 +5,17 @@ using System.Windows;
 using System.Windows.Threading;
 using Anotar.Serilog;
 using Humanizer;
-using MahApps.Metro.Controls;
 using ModSink.WPF.ViewModel;
 using ReactiveUI;
 using Splat;
 
 namespace ModSink.WPF
 {
-    public partial class MainWindow : MetroWindow, IViewFor<AppBootstrapper>, IEnableLogger
+    public partial class MainWindow : ReactiveWindow<AppBootstrapper>, IEnableLogger
     {
         public MainWindow()
         {
             ViewModel = Locator.Current.GetService<AppBootstrapper>();
-
-            InitializeComponent();
 
             Title =
                 $"ModSink {typeof(App).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion}";
@@ -31,14 +28,6 @@ namespace ModSink.WPF
 
             StartMonitoring();
         }
-
-        object IViewFor.ViewModel
-        {
-            get => ViewModel;
-            set => ViewModel = (AppBootstrapper) value;
-        }
-
-        public AppBootstrapper ViewModel { get; set; }
 
         private void StartMonitoring()
         {

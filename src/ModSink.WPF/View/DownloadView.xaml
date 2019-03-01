@@ -14,7 +14,7 @@
         <StackPanel>
             <TextBlock x:Name="TbState" />
             <TextBlock x:Name="TbStatus" />
-            <mah:MetroProgressBar x:Name="ProgressBar" />
+            <ProgressBar x:Name="ProgressBar" />
         </StackPanel>
     </GroupBox>
 </rx:ReactiveUserControl>

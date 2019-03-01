@@ -22,7 +22,6 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="MahApps.Metro" Version="1.6.5" />
     <PackageReference Include="ReactiveUI" Version="9.11.1" />
     <PackageReference Include="ReactiveUI.Events.WPF" Version="9.11.1" />
     <PackageReference Include="ReactiveUI.Fody" Version="9.11.1" />
@@ -38,6 +37,7 @@
     <PackageReference Include="Serilog.Sinks.Trace" Version="2.1.0" />
     <PackageReference Include="Splat.Serilog" Version="3.0.0" />
     <PackageReference Include="System.Net.Http" Version="4.3.4" />
+    <PackageReference Include="System.Reactive" Version="4.2.0-preview.102" />
     <PackageReference Include="System.Reactive.Compatibility" Version="4.1.3" />
   </ItemGroup>
 

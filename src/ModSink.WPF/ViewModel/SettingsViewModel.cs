@@ -2,8 +2,6 @@
 using System.Linq;
 using System.Reactive;
 using System.Windows;
-using MahApps.Metro;
-using MahApps.Metro.Controls.Dialogs;
 using ModSink.WPF.Model;
 using ReactiveUI;
 
@@ -18,8 +16,7 @@ namespace ModSink.WPF.ViewModel
             Settings = settings;
             AddGroup = ReactiveCommand.CreateFromTask(async () =>
             {
-                var repoUrl = await DialogCoordinator.ShowInputAsync(this, "Add new Group",
-                    "Enter the url for the new Repo you want to add.\nIt usually looks like https://example.com/someFolder/group.bin");
+                var repoUrl = "";//await DialogCoordinator.ShowInputAsync(this, "Add new Group", "Enter the url for the new Repo you want to add.\nIt usually looks like https://example.com/someFolder/group.bin");
                 if (string.IsNullOrWhiteSpace(repoUrl)) return;
                 settings.Client.GroupUrls.Edit(l => l.AddOrUpdate(repoUrl));
             });
@@ -34,38 +31,6 @@ namespace ModSink.WPF.ViewModel
         {
             get => groupSelected;
             set => this.RaiseAndSetIfChanged(ref groupSelected, value);
-        }
-
-
-        public IDialogCoordinator DialogCoordinator { private get; set; }
-
-        public ICollection<Accent> Accents { get; } = ThemeManager.Accents.ToList();
-
-        public Accent AccentSelected
-        {
-            get => ThemeManager.DetectAppStyle(Application.Current).Item2;
-            set
-            {
-                this.RaisePropertyChanging();
-                ThemeManager.ChangeAppStyle(Application.Current, value,
-                    ThemeManager.DetectAppStyle(Application.Current).Item1);
-                this.RaisePropertyChanged();
-            }
-        }
-
-        public ICollection<AppTheme> Themes { get; } = ThemeManager.AppThemes.ToList();
-
-
-        public AppTheme ThemeSelected
-        {
-            get => ThemeManager.DetectAppStyle(Application.Current).Item1;
-            set
-            {
-                this.RaisePropertyChanging();
-                ThemeManager.ChangeAppStyle(Application.Current, ThemeManager.DetectAppStyle(Application.Current).Item2,
-                    value);
-                this.RaisePropertyChanged();
-            }
         }
 
         public ReactiveCommand<Unit, Unit> AddGroup { get; }
