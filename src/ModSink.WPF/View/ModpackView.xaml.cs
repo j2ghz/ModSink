@@ -1,5 +1,6 @@
 ﻿using System.Reactive.Disposables;
 using System.Windows.Controls.Primitives;
+using ModSink.UI.ViewModel;
 using ModSink.WPF.ViewModel;
 using ReactiveUI;
 

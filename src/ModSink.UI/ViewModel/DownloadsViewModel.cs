@@ -7,7 +7,7 @@ using Humanizer;
 using ModSink.Common.Client;
 using ReactiveUI;
 
-namespace ModSink.WPF.ViewModel
+namespace ModSink.UI.ViewModel
 {
     public class DownloadsViewModel : ReactiveObject, IDisposable
     {

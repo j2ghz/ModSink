@@ -1,11 +1,8 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Reactive;
-using System.Windows;
-using ModSink.WPF.Model;
+﻿using System.Reactive;
+using ModSink.UI.Model;
 using ReactiveUI;
 
-namespace ModSink.WPF.ViewModel
+namespace ModSink.UI.ViewModel
 {
     public class SettingsViewModel : ReactiveObject
     {

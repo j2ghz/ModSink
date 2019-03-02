@@ -17,7 +17,7 @@ namespace ModSink.Common.Tests.Models.Repo
 
         public override Faker<Common.Models.Repo.Repo> Faker { get; } = RepoFaker;
 
-        [Fact(Skip = "Repo.Files serialization fails")]
+        [Fact]
         public override void IsSerializeable()
         {
             base.IsSerializeable();

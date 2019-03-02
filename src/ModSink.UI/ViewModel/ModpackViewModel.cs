@@ -6,7 +6,7 @@ using Humanizer.Bytes;
 using ModSink.Common.Models.Repo;
 using ReactiveUI;
 
-namespace ModSink.WPF.ViewModel
+namespace ModSink.UI.ViewModel
 {
     public class ModpackViewModel : ReactiveObject
     {

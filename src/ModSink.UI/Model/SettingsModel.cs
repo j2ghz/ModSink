@@ -6,7 +6,7 @@ using DynamicData.Binding;
 using ModSink.Common.Client;
 using ReactiveUI;
 
-namespace ModSink.WPF.Model
+namespace ModSink.UI.Model
 {
     public class SettingsModel : ReactiveObject
     {

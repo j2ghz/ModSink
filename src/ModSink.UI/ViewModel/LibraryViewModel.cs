@@ -7,7 +7,7 @@ using ModSink.Common.Models.Repo;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
-namespace ModSink.WPF.ViewModel
+namespace ModSink.UI.ViewModel
 {
     public class LibraryViewModel : ReactiveObject
     {

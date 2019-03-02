@@ -2,6 +2,7 @@
 using DynamicData;
 using FluentAssertions;
 using ModSink.Common.Models.Repo;
+using ModSink.UI.ViewModel;
 using ModSink.WPF.ViewModel;
 using Xunit;
 

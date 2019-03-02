@@ -1,7 +1,8 @@
 ﻿using System.Runtime.Serialization.Formatters.Binary;
 using ModSink.Common;
+using ModSink.UI.Model;
+using ModSink.UI.ViewModel;
 using ModSink.WPF.Helpers;
-using ModSink.WPF.Model;
 using ReactiveUI;
 using Splat;
 
