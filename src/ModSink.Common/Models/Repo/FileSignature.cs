@@ -49,7 +49,7 @@ namespace ModSink.Common.Models.Repo
 
         public override string ToString()
         {
-            return $"{Hash.ToString()} - {Length}";
+            return $"{Hash.ToString()} - {Length.ToString().PadLeft(10)}";
         }
 
         public int CompareTo(FileSignature other)
