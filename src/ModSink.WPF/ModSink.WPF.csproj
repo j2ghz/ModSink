@@ -16,7 +16,6 @@
   <ItemGroup>
     <PackageReference Include="Anotar.Serilog.Fody" Version="4.6.7" />
     <PackageReference Include="Ben.Demystifier" Version="0.1.4" />
-    <PackageReference Include="Costura.Fody" Version="3.3.2" />
     <PackageReference Include="DynamicData.ReactiveUI" Version="6.8.0.2561" />
     <PackageReference Include="Fody" Version="4.0.2">
       <PrivateAssets>all</PrivateAssets>
