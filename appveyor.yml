@@ -21,9 +21,9 @@ artifacts:
   name: binaries
 
 test_script:
-- cmd: dotnet test "src\ModSink.Common.Tests\ModSink.Common.Tests.csproj" --configuration Release --no-build /p:AltCover=true
+- cmd: dotnet test "src\ModSink.Common.Tests\ModSink.Common.Tests.csproj" --configuration Release --no-build /p:AltCover=true /p:AltCoverForce=true
 - cmd: codecov -f "src\ModSink.Common.Tests\coverage.xml" -t 78e056d7-ce59-4f6d-b177-85fa3501d898
-- cmd: dotnet test "src\ModSink.UI.Tests\ModSink.UI.Tests.csproj" --configuration Release --no-build /p:AltCover=true
+- cmd: dotnet test "src\ModSink.UI.Tests\ModSink.UI.Tests.csproj" --configuration Release --no-build /p:AltCover=true /p:AltCoverForce=true
 - cmd: codecov -f "src\ModSink.UI.Tests\coverage.xml" -t 78e056d7-ce59-4f6d-b177-85fa3501d898
 
 deploy:
