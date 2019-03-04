@@ -10,7 +10,8 @@ install:
 
 before_build:
   - ps: gitversion /l console /output buildserver /updateAssemblyInfo
-  - ps: msbuild /t:Clean;Restore /v:m
+  - ps: msbuild /t:Clean
+  - ps: msbuild /t:Restore /v:m
 
 build:
   verbosity: minimal
