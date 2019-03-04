@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -13,6 +13,7 @@
     </PackageReference>
     <PackageReference Include="ReactiveUI" Version="9.11.1" />
     <PackageReference Include="ReactiveUI.Fody" Version="9.11.1" />
+    <PackageReference Include="System.Reactive" Version="4.2.0-preview.102" />
   </ItemGroup>
 
   <ItemGroup>
