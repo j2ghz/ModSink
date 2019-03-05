@@ -7,11 +7,5 @@
                           xmlns:vm="clr-namespace:ModSink.UI.ViewModel;assembly=ModSink.UI"
                           mc:Ignorable="d"
                           d:DesignHeight="300" d:DesignWidth="500">
-    <DockPanel LastChildFill="True">
-        <DockPanel LastChildFill="True" DockPanel.Dock="Left">
-            <TextBox DockPanel.Dock="Top" />
-            <ListBox x:Name="LbModpacks" MinWidth="120" DisplayMemberPath="Name" />
-        </DockPanel>
-        <rxui:ViewModelViewHost x:Name="VmvhModpack" DefaultContent="Choose a modpack" />
-    </DockPanel>
+    <ItemsControl x:Name="ModpacksItemsControl" />
 </rxui:ReactiveUserControl>

@@ -13,6 +13,7 @@ using ModSink.WPF.ViewModel;
 using ReactiveUI;
 using Serilog;
 using Serilog.Debugging;
+using Serilog.Events;
 using Serilog.Formatting.Compact;
 using Serilog.Sinks.SystemConsole.Themes;
 using Splat;
@@ -76,6 +77,7 @@ namespace ModSink.WPF
         private void SetupLogging()
         {
             Log.Logger = new LoggerConfiguration()
+                .WriteTo.Trace(LogEventLevel.Information)
                 .WriteTo.File(
                     new CompactJsonFormatter(),
                     Path.Combine(PathProvider.Logs.FullName, "Log.txt"),
