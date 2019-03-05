@@ -4,7 +4,6 @@
                           xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                           xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                           xmlns:rxui="http://reactiveui.net"
-                          xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
                           xmlns:vm="clr-namespace:ModSink.UI.ViewModel;assembly=ModSink.UI"
                           mc:Ignorable="d"
                           d:DesignHeight="300" d:DesignWidth="500">

@@ -18,8 +18,5 @@
         <TabItem Header="Downloads">
             <v:DownloadsView x:Name="DownloadsView" />
         </TabItem>
-        <!-- TabItem Header="Settings">
-            <v:SettingsView DataContext="{Binding SettingsVM}" />
-        </>-->
     </TabControl>
 </rxui:ReactiveWindow>

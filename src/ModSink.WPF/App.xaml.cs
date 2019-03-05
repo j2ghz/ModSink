@@ -2,6 +2,7 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Net;
+using System.Reactive;
 using System.Reactive.Concurrency;
 using System.Reflection;
 using System.Windows;
@@ -75,12 +76,6 @@ namespace ModSink.WPF
         private void SetupLogging()
         {
             Log.Logger = new LoggerConfiguration()
-                .WriteTo.Debug(
-                    outputTemplate: "{Level:u3} [{SourceContext}] {Message:lj}{NewLine}{Exception}")
-                .WriteTo.Trace()
-                .WriteTo.Console(theme: AnsiConsoleTheme.Code,
-                    outputTemplate:
-                    "{Timestamp:HH:mm:ss} {Level:u3} {SourceContext} {ThreadId} {Message:lj}{Properties:j}{NewLine}{Exception}")
                 .WriteTo.File(
                     new CompactJsonFormatter(),
                     Path.Combine(PathProvider.Logs.FullName, "Log.txt"),
@@ -110,11 +105,11 @@ namespace ModSink.WPF
                 };
             }
 
-            //RxApp.DefaultExceptionHandler = Observer.Create<Exception>(ex =>
-            //{
-            //    if (Debugger.IsAttached) Debugger.Break();
-            //    RxApp.MainThreadScheduler.Schedule(() => throw ex);
-            //});
+            RxApp.DefaultExceptionHandler = Observer.Create<Exception>(ex =>
+            {
+                if (Debugger.IsAttached) Debugger.Break();
+                RxApp.MainThreadScheduler.Schedule(() => throw ex);
+            });
 
             PresentationTraceSources.Refresh();
             PresentationTraceSources.DataBindingSource.Listeners.Add(new RelayTraceListener(m =>
