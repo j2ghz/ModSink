@@ -3,11 +3,12 @@ using System.Reactive.Linq;
 using Anotar.Serilog;
 using DynamicData;
 using DynamicData.Binding;
+using ModSink.Common.Client;
 using ModSink.Common.Models.Repo;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
-namespace ModSink.WPF.ViewModel
+namespace ModSink.UI.ViewModel
 {
     public class LibraryViewModel : ReactiveObject
     {
@@ -15,14 +16,13 @@ namespace ModSink.WPF.ViewModel
         {
             modpacks.Connect()
                 .ObserveOn(RxApp.MainThreadScheduler)
+                .Transform(m=>new ModpackViewModel(m))
                 .Bind(Modpacks)
                 .Subscribe();
             LogTo.Verbose("Library initialized");
         }
 
-        public ObservableCollectionExtended<Modpack> Modpacks { get; } =
-            new ObservableCollectionExtended<Modpack>();
-
-        [Reactive] public Modpack SelectedModpack { get; set; }
+        public ObservableCollectionExtended<ModpackViewModel> Modpacks { get; } =
+            new ObservableCollectionExtended<ModpackViewModel>();
     }
 }

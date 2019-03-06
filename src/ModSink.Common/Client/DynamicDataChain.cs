@@ -27,26 +27,5 @@ namespace ModSink.Common.Client
             return repos
                 .TransformMany(r => r.Modpacks, m => m.Id);
         }
-
-        public static IObservable<IChangeSet<OnlineFile, FileSignature>> GetOnlineFileFromRepos(
-            IObservable<IChangeSet<Repo, Uri>> repos)
-        {
-            return repos
-                .TransformMany(
-                    repo => repo.Files.Select(kvp => new OnlineFile(kvp.Key, repo.CombineBaseUri(kvp.Value))),
-                    of => of.FileSignature);
-        }
-
-        public static IObservable<IChangeSet<Repo, Uri>> GetReposFromGroups(
-            IObservable<IChangeSet<string, string>> groups,
-            Func<Uri, Task<Group>> loadGroup, Func<Uri, Task<Repo>> loadRepo)
-        {
-            return groups
-                .Transform(g => new Uri(g))
-                .TransformAsync(loadGroup)
-                .TransformMany(g => g.RepoInfos.Select(r => g.CombineBaseUri(r.Uri)), repoUri => repoUri)
-                .TransformAsync(loadRepo)
-                .OnItemUpdated((repo, _) => LogTo.Information("Repo from {url} has been loaded", repo.BaseUri));
-        }
     }
 }

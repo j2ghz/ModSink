@@ -333,7 +333,7 @@ namespace ModSink.CLI
             Console.WriteLine($"Repo at {repo.BaseUri}");
             Console.WriteLine("Files:");
             foreach (var file in repo.Files.OrderBy(f => f.Key))
-                Console.WriteLine($"\t{file.Key} at {repo.CombineBaseUri(file.Value)}");
+                Console.WriteLine($"\t{file.Key.ToString()} at {repo.CombineBaseUri(file.Value)}");
 
             Console.WriteLine("ModPacks:");
             foreach (var modpack in repo.Modpacks.OrderBy(m => m.Name))

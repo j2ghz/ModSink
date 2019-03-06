@@ -1,6 +1,7 @@
 ﻿using System.Reactive.Disposables;
 using Humanizer;
 using ModSink.Common.Client;
+using ModSink.UI.ViewModel;
 using ModSink.WPF.ViewModel;
 using ReactiveUI;
 

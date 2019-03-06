@@ -5,18 +5,16 @@
                           xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                           xmlns:local="clr-namespace:ModSink.WPF.View"
                           xmlns:rxui="http://reactiveui.net"
-                          xmlns:vm="clr-namespace:ModSink.WPF.ViewModel"
-                          xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+                          xmlns:vm="clr-namespace:ModSink.UI.ViewModel;assembly=ModSink.UI"
                           mc:Ignorable="d"
                           d:DesignHeight="450" d:DesignWidth="800">
-    <DockPanel LastChildFill="True" Margin="5">
-        <TextBlock x:Name="TbName" FontSize="32" DockPanel.Dock="Top" Padding="5" />
-        <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" Margin="2">
-            <TextBlock x:Name="TbSize" />
-            <ToggleButton 
-                x:Name="ChkInstall"
-                Content="Download"/>
+    <StackPanel Orientation="Horizontal">
+        <StackPanel Orientation="Vertical">
+            <TextBlock x:Name="TbName" FontSize="32" DockPanel.Dock="Top" />
+            <ToggleButton
+                    x:Name="ChkInstall"
+                    Content="Download" />
         </StackPanel>
-        <ListBox x:Name="LbMods" />
-    </DockPanel>
+        <TextBlock x:Name="BytesTextBox" />
+    </StackPanel>
 </rxui:ReactiveUserControl>

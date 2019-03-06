@@ -1,12 +1,11 @@
-﻿<rx:ReactiveUserControl x:TypeArguments="viewModel:DownloadViewModel" x:Class="ModSink.WPF.View.DownloadView"
+﻿<rx:ReactiveUserControl x:TypeArguments="vm:DownloadViewModel" x:Class="ModSink.WPF.View.DownloadView"
                         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                         xmlns:local="clr-namespace:ModSink.WPF.View"
                         xmlns:rx="http://reactiveui.net"
-                        xmlns:viewModel="clr-namespace:ModSink.WPF.ViewModel"
-                        xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+                        xmlns:vm="clr-namespace:ModSink.UI.ViewModel;assembly=ModSink.UI"
                         mc:Ignorable="d"
                         Width="500"
                         Margin="5">
@@ -14,7 +13,7 @@
         <StackPanel>
             <TextBlock x:Name="TbState" />
             <TextBlock x:Name="TbStatus" />
-            <mah:MetroProgressBar x:Name="ProgressBar" />
+            <ProgressBar x:Name="ProgressBar" />
         </StackPanel>
     </GroupBox>
 </rx:ReactiveUserControl>

@@ -35,9 +35,18 @@ namespace ModSink.Common.Client
             this.serializationFormatter = serializationFormatter;
             filesAvailable.Edit(l => { l.AddOrUpdate(fileAccessService.FilesAvailable()); });
             LogTo.Warning("Creating pipeline");
-            Repos = DynamicDataChain.GetReposFromGroups(GroupUrls.Connect(),Load<Group>,Load<Repo>).AsObservableCache();
+            Repos = GroupUrls.Connect()
+                .Transform(g => new Uri(g))
+                .TransformAsync(Load<Group>)
+                .TransformMany(g => g.RepoInfos.Select(r => g.CombineBaseUri(r.Uri)), repoUri => repoUri)
+                .TransformAsync(Load<Repo>)
+                .OnItemUpdated((repo, _) => LogTo.Information("Repo from {url} has been loaded", repo.BaseUri))
+                .AsObservableCache();
             d.Add(Repos);
-            OnlineFiles = DynamicDataChain.GetOnlineFileFromRepos(Repos.Connect()).AsObservableCache();
+            OnlineFiles = Repos.Connect()
+                .TransformMany(
+                    repo => repo.Files.Select(kvp => new OnlineFile(kvp.Key, repo.CombineBaseUri(kvp.Value))),
+                    of => of.FileSignature).AsObservableCache();
             d.Add(OnlineFiles);
             Modpacks = DynamicDataChain.GetModpacksFromRepos(Repos.Connect()).AsObservableCache();
             d.Add(Modpacks);

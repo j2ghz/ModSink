@@ -4,22 +4,18 @@ using System.Reflection;
 using System.Windows;
 using System.Windows.Threading;
 using Anotar.Serilog;
-using CountlySDK;
 using Humanizer;
-using MahApps.Metro.Controls;
 using ModSink.WPF.ViewModel;
 using ReactiveUI;
 using Splat;
 
 namespace ModSink.WPF
 {
-    public partial class MainWindow : MetroWindow, IViewFor<AppBootstrapper>, IEnableLogger
+    public partial class MainWindow : ReactiveWindow<AppBootstrapper>, IEnableLogger
     {
         public MainWindow()
         {
             ViewModel = Locator.Current.GetService<AppBootstrapper>();
-
-            InitializeComponent();
 
             Title =
                 $"ModSink {typeof(App).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion}";
@@ -32,14 +28,6 @@ namespace ModSink.WPF
 
             StartMonitoring();
         }
-
-        object IViewFor.ViewModel
-        {
-            get => ViewModel;
-            set => ViewModel = (AppBootstrapper) value;
-        }
-
-        public AppBootstrapper ViewModel { get; set; }
 
         private void StartMonitoring()
         {
@@ -58,7 +46,6 @@ namespace ModSink.WPF
                 if (delta > 500.Milliseconds())
                 {
                     LogTo.Information("UI Freeze = {0}", delta);
-                    Countly.RecordEvent("UIFreeze", 1, delta.TotalSeconds);
                 }
             };
 
