@@ -21,7 +21,7 @@ namespace ModSink.WPF.ViewModel
             Locator.CurrentMutable.RegisterConstant(modsink);
             var cs = modsink.Client;
             DownloadsVM = new DownloadsViewModel(cs);
-            LibraryVM = new LibraryViewModel(cs);
+            LibraryVM = new LibraryViewModel(cs.Modpacks);
             SettingsVM = new SettingsViewModel(new SettingsModel(cs));
         }
 

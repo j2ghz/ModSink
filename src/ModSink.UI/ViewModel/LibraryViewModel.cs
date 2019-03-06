@@ -12,9 +12,9 @@ namespace ModSink.UI.ViewModel
 {
     public class LibraryViewModel : ReactiveObject
     {
-        public LibraryViewModel(ClientService clientService)
+        public LibraryViewModel(IConnectableCache<Modpack, Guid> modpacks)
         {
-            clientService.Modpacks.Connect()
+            modpacks.Connect()
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Transform(m=>new ModpackViewModel(m))
                 .Bind(Modpacks)
