@@ -6,7 +6,7 @@ using Bogus;
 using DynamicData;
 using FluentAssertions;
 using ModSink.Common.Client;
-using ModSink.Common.Models.Repo;
+using ModSink.Common.Models.DTO.Repo;
 using ReactiveUI.Testing;
 using Xunit;
 

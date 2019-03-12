@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using DynamicData;
 using ModSink.Common.Client;
-using ModSink.Common.Models.Repo;
+using ModSink.Common.Models.DTO.Repo;
 
 namespace ModSink.Common.Services
 {

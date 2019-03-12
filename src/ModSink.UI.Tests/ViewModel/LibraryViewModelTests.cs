@@ -3,7 +3,7 @@ using System.Data;
 using DynamicData;
 using FluentAssertions;
 using Microsoft.Reactive.Testing;
-using ModSink.Common.Models.Repo;
+using ModSink.Common.Models.DTO.Repo;
 using ModSink.UI.ViewModel;
 using Xunit;
 

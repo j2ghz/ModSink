@@ -1,7 +1,7 @@
 ﻿using Bogus;
 using FluentAssertions;
 using FluentAssertions.Primitives;
-using ModSink.Common.Models.Repo;
+using ModSink.Common.Models.DTO.Repo;
 using Xunit;
 
 namespace ModSink.Common.Tests.Models.Repo

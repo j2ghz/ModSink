@@ -2,7 +2,7 @@
 using System.Diagnostics;
 using System.IO;
 
-namespace ModSink.Common.Models.Repo
+namespace ModSink.Common.Models.DTO.Repo
 {
     [Serializable]
     [DebuggerDisplay("{Hash} | {Length}")]

@@ -4,7 +4,7 @@ using Anotar.Serilog;
 using DynamicData;
 using DynamicData.Binding;
 using ModSink.Common.Client;
-using ModSink.Common.Models.Repo;
+using ModSink.Common.Models.DTO.Repo;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 

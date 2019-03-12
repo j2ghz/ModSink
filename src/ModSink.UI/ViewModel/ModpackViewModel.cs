@@ -3,7 +3,7 @@ using System.Reactive;
 using System.Threading.Tasks;
 using Humanizer;
 using Humanizer.Bytes;
-using ModSink.Common.Models.Repo;
+using ModSink.Common.Models.DTO.Repo;
 using ReactiveUI;
 
 namespace ModSink.UI.ViewModel

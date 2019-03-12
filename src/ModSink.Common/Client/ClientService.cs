@@ -12,8 +12,8 @@ using DynamicData.Kernel;
 using Humanizer;
 using ModSink.Common.Models;
 using ModSink.Common.Models.Client;
-using ModSink.Common.Models.Group;
-using ModSink.Common.Models.Repo;
+using ModSink.Common.Models.DTO.Group;
+using ModSink.Common.Models.DTO.Repo;
 
 namespace ModSink.Common.Client
 {

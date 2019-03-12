@@ -4,8 +4,7 @@ using System.Threading.Tasks;
 using Anotar.Serilog;
 using DynamicData;
 using ModSink.Common.Models.Client;
-using ModSink.Common.Models.Group;
-using ModSink.Common.Models.Repo;
+using ModSink.Common.Models.DTO.Repo;
 
 namespace ModSink.Common.Client
 {

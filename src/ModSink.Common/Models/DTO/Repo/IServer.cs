@@ -1,4 +1,4 @@
-﻿namespace ModSink.Common.Models.Repo
+﻿namespace ModSink.Common.Models.DTO.Repo
 {
     public interface IServer
     {

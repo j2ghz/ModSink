@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace ModSink.Common.Models.Repo
+namespace ModSink.Common.Models.DTO.Repo
 {
     [Serializable]
     public struct HashValue : IEquatable<HashValue>, IComparable<HashValue>

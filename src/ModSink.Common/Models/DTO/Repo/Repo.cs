@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace ModSink.Common.Models.Repo
+namespace ModSink.Common.Models.DTO.Repo
 {
     [Serializable]
     public class Repo : WithBaseUri

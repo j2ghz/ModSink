@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
-namespace ModSink.Common.Models.Repo
+namespace ModSink.Common.Models.DTO.Repo
 {
     [Serializable]
     public class Modpack : INotifyPropertyChanged

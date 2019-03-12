@@ -5,7 +5,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using Anotar.Serilog;
 using Humanizer;
-using ModSink.Common.Models.Repo;
+using ModSink.Common.Models.DTO.Repo;
 using Polly;
 
 namespace ModSink.Common.Client
