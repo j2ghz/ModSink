@@ -62,7 +62,8 @@ namespace ModSink.Common.Client
                 .AsObservableCache();
             d.Add(QueuedDownloads);
             ActiveDownloads = QueuedDownloads.Connect()
-                .Sort(Comparer<QueuedDownload>.Create((_, __) => 0))
+                .Sort(Comparer<QueuedDownload>.Create(
+                    (a, b) => a.FileSignature.Length.CompareTo(b.FileSignature.Length)))
                 .Top(5)
                 .LogVerbose("activeDownloadsSimple")
                 .Transform(qd =>
