@@ -17,20 +17,20 @@ build:
   verbosity: minimal
 
 artifacts:
-- path: src/ModSink.WPF/bin/Release/net462/ModSink.WPF.exe
-  name: binaries
+- path: src/ModSink.WPF/bin/Release/netcoreapp3.0/**/*
+  name: ModSink.WPF
 
 test_script:
 - cmd: dotnet test "src\ModSink.Common.Tests\ModSink.Common.Tests.csproj" --configuration Release --no-build /p:AltCover=true /p:AltCoverForce=true
-- cmd: codecov -f "src\ModSink.Common.Tests\coverage.xml" -t 78e056d7-ce59-4f6d-b177-85fa3501d898
+- cmd: codecov -f "src\ModSink.Common.Tests\coverage.xml"
 - cmd: dotnet test "src\ModSink.UI.Tests\ModSink.UI.Tests.csproj" --configuration Release --no-build /p:AltCover=true /p:AltCoverForce=true
-- cmd: codecov -f "src\ModSink.UI.Tests\coverage.xml" -t 78e056d7-ce59-4f6d-b177-85fa3501d898
+- cmd: codecov -f "src\ModSink.UI.Tests\coverage.xml"
 
 deploy:
 - provider: GitHub
   auth_token:
     secure: TLChfAMJcjhyw7dQ6WNllA/sc420Hq4fk9V9/VUD1kFOm4ZJpfiBlwaqdVRPbQeP
-  artifact: binaries
+  artifact: ModSink.WPF
   prerelease: true
   on:
     branch: master
