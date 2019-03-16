@@ -1,4 +1,4 @@
-FROM microsoft/dotnet:3.0-sdk-alpine AS build
+FROM microsoft/dotnet:3.0-sdk AS build
 COPY ["src/ModSink.CLI/ModSink.CLI.csproj", "src/ModSink.CLI/"]
 RUN dotnet restore "src/ModSink.CLI/ModSink.CLI.csproj"
 COPY . .
