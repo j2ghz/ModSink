@@ -16,7 +16,7 @@ namespace ModSink.UI.Tests.ViewModel
         {
             ReactiveUI.Testing.TestUtils.With(new TestScheduler(), scheduler =>
             {
-                var cache = new SourceCache<Modpack,Guid>(m=>m.Id);
+                var cache = new SourceCache<Modpack,Guid>(_=> Guid.NewGuid());
                 var vm = new LibraryViewModel(cache);
                 vm.Modpacks.Should().BeEmpty();
                 cache.AddOrUpdate(new Modpack());
