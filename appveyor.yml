@@ -9,7 +9,7 @@ install:
   - choco install codecov
 
 before_build:
-  - ps: gitversion /l console /output buildserver /updateAssemblyInfo
+  - ps: gitversion /l console /output buildserver /updateAssemblyInfo /diag
   - ps: msbuild /t:Clean
   - ps: msbuild /t:Restore /v:m
 
