@@ -5,4 +5,9 @@ branches:
     increment: Patch
   dependabot:
     regex: dependabot
+    source-branches:
+    - develop
+    - master
     is-release-branch: false
+ignore:
+  sha: []
