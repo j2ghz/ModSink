@@ -9,5 +9,4 @@ branches:
     - develop
     - master
     is-release-branch: false
-ignore:
-  sha: []
+    track-merge-target: false
