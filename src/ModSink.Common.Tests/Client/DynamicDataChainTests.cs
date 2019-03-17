@@ -54,7 +54,8 @@ namespace ModSink.Common.Tests.Client
             {
                 var faker = new Faker();
                 var repos = new SourceCache<Repo, Uri>(r => r.BaseUri);
-                var modpacks = DynamicDataChain.GetModpacksFromRepos(repos.Connect()).AsObservableCache();
+                var modpacks = ((IObservable<IChangeSet<Modpack, Guid>>) repos.Connect()
+                    .TransformMany(r => r.Modpacks, m => m.Id)).AsObservableCache();
                 modpacks.Count.Should().Be(0);
                 repos.AddOrUpdate(
                     new Repo

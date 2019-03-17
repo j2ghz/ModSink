@@ -7,12 +7,13 @@ using ModSink.Common.Client;
 using ModSink.Common.Models.DTO.Repo;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
+using Modpack = ModSink.Common.Models.Client.Modpack;
 
 namespace ModSink.UI.ViewModel
 {
     public class LibraryViewModel : ReactiveObject
     {
-        public LibraryViewModel(IConnectableCache<Modpack, Guid> modpacks)
+        public LibraryViewModel(IObservableCache<Modpack, Guid> modpacks)
         {
             modpacks.Connect()
                 .ObserveOn(RxApp.MainThreadScheduler)
