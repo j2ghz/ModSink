@@ -4,7 +4,7 @@ image: Visual Studio 2019 Preview
 configuration: Release
 
 install:
-  - git tag | foreach-object -process { git tag -d $_ } 
+  - ps: git tag | foreach-object -process { git tag -d $_ } 
   - git tag
   - git fetch --all
   - git tag
