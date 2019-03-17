@@ -3,6 +3,9 @@ skip_tags: true
 image: Visual Studio 2019 Preview
 configuration: Release
 
+init:
+- pwsh: Remove-Item –path .git –recurse
+
 install:
   - dotnet --info
   - choco install gitversion.portable -pre -y
