@@ -1,5 +1,10 @@
 assembly-versioning-scheme: MajorMinorPatchTag
 mode: ContinuousDeployment
-branches: {}
+branches:
+  master:
+    increment: Patch
+  dependabot:
+    regex: dependabot
+    is-release-branch: false
 ignore:
   sha: []
