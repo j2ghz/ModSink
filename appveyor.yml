@@ -3,10 +3,10 @@ skip_tags: true
 image: Visual Studio 2019 Preview
 configuration: Release
 
-init:
-- pwsh: ls
-
 install:
+  - git tag | foreach-object -process { git tag -d $_ } 
+  - git tag
+  - git fetch --all
   - git tag
   - dotnet --info
   - choco install gitversion.portable -pre -y
