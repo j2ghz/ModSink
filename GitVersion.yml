@@ -1,5 +1,14 @@
 assembly-versioning-scheme: MajorMinorPatchTag
-mode: ContinuousDeployment
-branches: {}
+mode: Mainline
+branches:
+  master:
+    increment: Patch
+  dependabot:
+    regex: dependabot
+    source-branches:
+    - develop
+    - master
+    is-release-branch: false
+    track-merge-target: false
 ignore:
-  sha: []
+  sha: ['d979e3239f81843d583c81ac3b1370231dd43e45', 'e0f5d779c409b49b2e192e57be93cb4f19804dd3', '938179d7de817f61c2ebdc32dce6e5b08b841006', '73196267fd72a600bd1d84f35c4814ee910e37d1']
