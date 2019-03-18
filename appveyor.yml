@@ -4,17 +4,13 @@ image: Visual Studio 2019 Preview
 configuration: Release
 
 install:
-  - ps: git tag | foreach-object -process { git tag -d $_ } 
-  - git tag
-  - git fetch --all
-  - git tag
-  - dotnet --info
-  - choco install gitversion.portable -pre -y
-  - choco install codecov
+  - ps: dotnet --info
+  - ps: choco install gitversion.portable -pre -y
+  - ps: choco install codecov
 
 before_build:
   - ps: gitversion /l console /output buildserver /updateAssemblyInfo /diag
-  - ps: msbuild /t:Clean
+  - ps: msbuild /t:Clean /v:m
   - ps: msbuild /t:Restore /v:m
 
 build:
