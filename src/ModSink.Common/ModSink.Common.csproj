@@ -14,11 +14,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Anotar.Serilog.Fody" Version="4.6.7" />
+    <PackageReference Include="Anotar.Serilog.Fody" Version="4.8.1" />
     <PackageReference Include="Ben.Demystifier" Version="0.1.4" />
     <PackageReference Include="DynamicData" Version="6.8.0.2561" />
     <PackageReference Include="Flurl" Version="2.8.1" />
-    <PackageReference Include="Fody" Version="4.0.2">
+    <PackageReference Include="Fody" Version="4.2.1">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
