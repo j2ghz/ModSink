@@ -16,21 +16,26 @@ before_build:
 build:
   verbosity: minimal
 
+after_build:
+  - ps: dotnet publish -c Release -o ./singleExe .\src\ModSink.WPF\ModSink.WPF.csproj
+
 artifacts:
-- path: src/ModSink.WPF/bin/Release/netcoreapp3.0
-  name: ModSink.WPF
+  - path: src/ModSink.WPF/bin/Release/netcoreapp3.0
+    name: ModSink.WPF
+  - path: singleExe/ModSink.WPF.exe
+    name: ModSink.WPF.exe
 
 test_script:
-- cmd: dotnet test "src\ModSink.Common.Tests\ModSink.Common.Tests.csproj" --configuration Release --no-build /p:AltCover=true /p:AltCoverForce=true
-- cmd: codecov -f "src\ModSink.Common.Tests\coverage.xml"
-- cmd: dotnet test "src\ModSink.UI.Tests\ModSink.UI.Tests.csproj" --configuration Release --no-build /p:AltCover=true /p:AltCoverForce=true
-- cmd: codecov -f "src\ModSink.UI.Tests\coverage.xml"
+  - cmd: dotnet test "src\ModSink.Common.Tests\ModSink.Common.Tests.csproj" --configuration Release --no-build /p:AltCover=true /p:AltCoverForce=true
+  - cmd: codecov -f "src\ModSink.Common.Tests\coverage.xml"
+  - cmd: dotnet test "src\ModSink.UI.Tests\ModSink.UI.Tests.csproj" --configuration Release --no-build /p:AltCover=true /p:AltCoverForce=true
+  - cmd: codecov -f "src\ModSink.UI.Tests\coverage.xml"
 
 deploy:
-- provider: GitHub
-  auth_token:
-    secure: TLChfAMJcjhyw7dQ6WNllA/sc420Hq4fk9V9/VUD1kFOm4ZJpfiBlwaqdVRPbQeP
-  artifact: ModSink.WPF
-  prerelease: true
-  on:
-    branch: master
+  - provider: GitHub
+    auth_token:
+      secure: TLChfAMJcjhyw7dQ6WNllA/sc420Hq4fk9V9/VUD1kFOm4ZJpfiBlwaqdVRPbQeP
+    artifact: ModSink.WPF
+    prerelease: true
+    on:
+      branch: master
