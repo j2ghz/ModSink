@@ -26,9 +26,9 @@ artifacts:
     name: ModSink.WPF.exe
 
 test_script:
-  - dotnet test "src\ModSink.Common.Tests\ModSink.Common.Tests.csproj" --configuration Release --no-build /p:AltCover=true /p:AltCoverForce=true
+  - dotnet test "src\ModSink.Common.Tests\ModSink.Common.Tests.csproj" --configuration Release /p:AltCover=true /p:AltCoverForce=true
   - codecov -f "src\ModSink.Common.Tests\coverage.xml"
-  - dotnet test "src\ModSink.UI.Tests\ModSink.UI.Tests.csproj" --configuration Release --no-build /p:AltCover=true /p:AltCoverForce=true
+  - dotnet test "src\ModSink.UI.Tests\ModSink.UI.Tests.csproj" --configuration Release /p:AltCover=true /p:AltCoverForce=true
   - codecov -f "src\ModSink.UI.Tests\coverage.xml"
 
 deploy:
