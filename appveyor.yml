@@ -4,20 +4,20 @@ image: Visual Studio 2019 Preview
 configuration: Release
 
 install:
-  - ps: dotnet --info
-  - ps: choco install gitversion.portable -pre -y
-  - ps: choco install codecov
+  - dotnet --info
+  - choco install gitversion.portable -pre -y
+  - choco install codecov
 
 before_build:
-  - ps: gitversion /l console /output buildserver /updateAssemblyInfo /diag
-  - ps: msbuild /t:Clean /v:m
-  - ps: msbuild /t:Restore /v:m
+  - gitversion /l console /output buildserver /updateAssemblyInfo /diag
+  - msbuild /t:Clean /v:m
+  - msbuild /t:Restore /v:m
 
 build:
   verbosity: minimal
 
 after_build:
-  - ps: dotnet publish -c Release -o ./singleExe .\src\ModSink.WPF\ModSink.WPF.csproj
+  - dotnet publish -c Release -o ./singleExe .\src\ModSink.WPF\ModSink.WPF.csproj
 
 artifacts:
   - path: src/ModSink.WPF/bin/Release/netcoreapp3.0
@@ -26,10 +26,10 @@ artifacts:
     name: ModSink.WPF.exe
 
 test_script:
-  - cmd: dotnet test "src\ModSink.Common.Tests\ModSink.Common.Tests.csproj" --configuration Release --no-build /p:AltCover=true /p:AltCoverForce=true
-  - cmd: codecov -f "src\ModSink.Common.Tests\coverage.xml"
-  - cmd: dotnet test "src\ModSink.UI.Tests\ModSink.UI.Tests.csproj" --configuration Release --no-build /p:AltCover=true /p:AltCoverForce=true
-  - cmd: codecov -f "src\ModSink.UI.Tests\coverage.xml"
+  - dotnet test "src\ModSink.Common.Tests\ModSink.Common.Tests.csproj" --configuration Release --no-build /p:AltCover=true /p:AltCoverForce=true
+  - codecov -f "src\ModSink.Common.Tests\coverage.xml"
+  - dotnet test "src\ModSink.UI.Tests\ModSink.UI.Tests.csproj" --configuration Release --no-build /p:AltCover=true /p:AltCoverForce=true
+  - codecov -f "src\ModSink.UI.Tests\coverage.xml"
 
 deploy:
   - provider: GitHub
