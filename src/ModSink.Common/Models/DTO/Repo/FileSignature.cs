@@ -27,7 +27,6 @@ namespace ModSink.Common.Models.DTO.Repo
         /// </summary>
         public ulong Length { get; set; }
 
-
         public bool Equals(FileSignature other)
         {
             return Hash.Equals(other.Hash) && Length == other.Length;

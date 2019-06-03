@@ -12,7 +12,6 @@ namespace ModSink.Common.Services
 
         private readonly IFileAccessService fileAccessService;
 
-
         public FileStorageService(IFileAccessService fileAccessService)
         {
             this.fileAccessService = fileAccessService;
