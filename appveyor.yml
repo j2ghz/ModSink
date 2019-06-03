@@ -35,7 +35,7 @@ deploy:
   - provider: GitHub
     auth_token:
       secure: TLChfAMJcjhyw7dQ6WNllA/sc420Hq4fk9V9/VUD1kFOm4ZJpfiBlwaqdVRPbQeP
-    artifact: ModSink.WPF
+    artifact: ModSink.WPF,ModSink.WPF.exe
     prerelease: true
     on:
       branch: master
