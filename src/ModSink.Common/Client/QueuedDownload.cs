@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using Anotar.Serilog;
-using ModSink.Common.Models.Repo;
+using ModSink.Common.Models.DTO.Repo;
 
 namespace ModSink.Common.Client
 {

@@ -20,7 +20,7 @@ namespace ModSink.WPF.ViewModel
                 .Build();
             Locator.CurrentMutable.RegisterConstant(modsink);
             var cs = modsink.Client;
-            DownloadsVM = new DownloadsViewModel(cs);
+            //DownloadsVM = new DownloadsViewModel(cs);
             LibraryVM = new LibraryViewModel(cs.Modpacks);
             SettingsVM = new SettingsViewModel(new SettingsModel(cs));
         }

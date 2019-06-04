@@ -1,5 +1,5 @@
 ﻿using Bogus;
-using ModSink.Common.Models.Repo;
+using ModSink.Common.Models.DTO.Repo;
 
 namespace ModSink.Common.Tests.Models.Repo
 {

@@ -1,6 +1,6 @@
 ﻿using System;
 using Bogus;
-using ModSink.Common.Models.Group;
+using ModSink.Common.Models.DTO.Group;
 
 namespace ModSink.Common.Tests.Models.Group
 {

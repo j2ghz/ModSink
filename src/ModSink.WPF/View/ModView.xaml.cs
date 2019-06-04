@@ -1,5 +1,5 @@
 ﻿using System.Reactive.Disposables;
-using ModSink.Common.Models.Repo;
+using ModSink.Common.Models.DTO.Repo;
 using ReactiveUI;
 
 namespace ModSink.WPF.View

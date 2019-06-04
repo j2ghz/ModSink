@@ -5,7 +5,7 @@
                           xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                           xmlns:local="clr-namespace:ModSink.WPF.View"
                           xmlns:rxui="http://reactiveui.net"
-                          xmlns:repo="clr-namespace:ModSink.Common.Models.Repo;assembly=ModSink.Common"
+                          xmlns:repo="clr-namespace:ModSink.Common.Models.DTO.Repo;assembly=ModSink.Common"
                           mc:Ignorable="d"
                           d:DesignHeight="450" d:DesignWidth="800">
     <StackPanel Orientation="Horizontal">

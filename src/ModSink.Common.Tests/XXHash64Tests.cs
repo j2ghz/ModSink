@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using ModSink.Common.Models.Repo;
+using ModSink.Common.Models.DTO.Repo;
 using Xunit;
 
 namespace ModSink.Common.Tests

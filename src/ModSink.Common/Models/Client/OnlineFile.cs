@@ -1,5 +1,5 @@
 ﻿using System;
-using ModSink.Common.Models.Repo;
+using ModSink.Common.Models.DTO.Repo;
 
 namespace ModSink.Common.Models.Client
 {

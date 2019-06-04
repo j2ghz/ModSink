@@ -1,10 +1,10 @@
 using System;
-using System.Data;
 using DynamicData;
 using FluentAssertions;
 using Microsoft.Reactive.Testing;
-using ModSink.Common.Models.Repo;
+using ModSink.Common.Models.Client;
 using ModSink.UI.ViewModel;
+using ReactiveUI.Testing;
 using Xunit;
 
 namespace ModSink.UI.Tests.ViewModel
@@ -14,12 +14,12 @@ namespace ModSink.UI.Tests.ViewModel
         [Fact(Skip = "Outdated")]
         public void AddModpack()
         {
-            ReactiveUI.Testing.TestUtils.With(new TestScheduler(), scheduler =>
+            new TestScheduler().With(scheduler =>
             {
-                var cache = new SourceCache<Modpack,Guid>(m=>m.Id);
+                var cache = new SourceCache<Modpack, Guid>(_ => Guid.NewGuid());
                 var vm = new LibraryViewModel(cache);
                 vm.Modpacks.Should().BeEmpty();
-                cache.AddOrUpdate(new Modpack());
+                cache.AddOrUpdate(new Modpack(new Common.Models.DTO.Repo.Modpack()));
                 scheduler.AdvanceBy(1);
                 vm.Modpacks.Should().HaveCount(1);
             });

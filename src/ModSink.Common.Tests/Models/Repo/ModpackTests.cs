@@ -1,5 +1,5 @@
 ﻿using Bogus;
-using ModSink.Common.Models.Repo;
+using ModSink.Common.Models.DTO.Repo;
 
 namespace ModSink.Common.Tests.Models.Repo
 {
@@ -7,8 +7,7 @@ namespace ModSink.Common.Tests.Models.Repo
     {
         public static readonly Faker<Modpack> ModpackFaker = new Faker<Modpack>().StrictMode(true)
             .RuleFor(m => m.Name, f => f.Company.CompanyName())
-            .RuleFor(m => m.Mods, ModEntryTests.ModEntryFaker.Generate(3))
-            .RuleFor(m => m.Selected, f => f.Random.Bool());
+            .RuleFor(m => m.Mods, ModEntryTests.ModEntryFaker.Generate(3));
 
         public override Faker<Modpack> Faker { get; } = ModpackFaker;
     }

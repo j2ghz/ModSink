@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reactive.Disposables;
@@ -8,12 +7,13 @@ using System.Runtime.Serialization;
 using System.Threading.Tasks;
 using Anotar.Serilog;
 using DynamicData;
-using DynamicData.Kernel;
 using Humanizer;
 using ModSink.Common.Models;
 using ModSink.Common.Models.Client;
-using ModSink.Common.Models.Group;
-using ModSink.Common.Models.Repo;
+using ModSink.Common.Models.DTO.Repo;
+using Group = ModSink.Common.Models.DTO.Group.Group;
+using Modpack = ModSink.Common.Models.Client.Modpack;
+using Repo = ModSink.Common.Models.DTO.Repo.Repo;
 
 namespace ModSink.Common.Client
 {
@@ -48,39 +48,9 @@ namespace ModSink.Common.Client
                     repo => repo.Files.Select(kvp => new OnlineFile(kvp.Key, repo.CombineBaseUri(kvp.Value))),
                     of => of.FileSignature).AsObservableCache();
             d.Add(OnlineFiles);
-            Modpacks = DynamicDataChain.GetModpacksFromRepos(Repos.Connect()).AsObservableCache();
+            Modpacks = Repos.Connect()
+                .TransformMany(r => r.Modpacks.Select(m => new Modpack(m)), m => m.Id).AsObservableCache();
             d.Add(Modpacks);
-            QueuedDownloads = DynamicDataChain.GetDownloadsFromModpacks(Modpacks.Connect())
-                .LeftJoin(filesAvailable.Connect(), f => f,
-                    (required, available) => !available.HasValue
-                        ? Optional<FileSignature>.Create(required)
-                        : Optional<FileSignature>.None)
-                .Filter(opt => opt.HasValue)
-                .Transform(opt => opt.Value)
-                .InnerJoin(OnlineFiles.Connect(), of => of.FileSignature,
-                    (fs, of) => new QueuedDownload(fs, of.Uri))
-                .AsObservableCache();
-            d.Add(QueuedDownloads);
-            ActiveDownloads = QueuedDownloads.Connect()
-                .Sort(Comparer<QueuedDownload>.Create((_, __) => 0))
-                .Top(5)
-                .LogVerbose("activeDownloadsSimple")
-                .Transform(qd =>
-                {
-                    var destination = new Lazy<Stream>(() => GetTemporaryFileStream(qd.FileSignature));
-                    return new ActiveDownload(
-                        downloader.Download(qd.Source, destination,
-                            qd.FileSignature.Length),
-                        () =>
-                        {
-                            destination.Value.Dispose();
-                            LogTo.Verbose("ActiveDownload {name} finished", qd.FileSignature.Hash);
-                            AddNewFile(qd.FileSignature);
-                        }, qd.FileSignature.ToString());
-                })
-                .LogVerbose("activeDownloads")
-                .AsObservableCache();
-            d.Add(ActiveDownloads);
         }
 
         public IObservableCache<ActiveDownload, FileSignature> ActiveDownloads { get; }

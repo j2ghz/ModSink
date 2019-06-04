@@ -1,7 +1,7 @@
 ﻿using Bogus;
 using FluentAssertions;
 using FluentAssertions.Primitives;
-using ModSink.Common.Models.Repo;
+using ModSink.Common.Models.DTO.Repo;
 using Xunit;
 
 namespace ModSink.Common.Tests.Models.Repo
@@ -22,8 +22,7 @@ namespace ModSink.Common.Tests.Models.Repo
         {
             var a = new FileSignature(new HashValue(new byte[] {0x99, 0xE9, 0xD8, 0x51, 0x37, 0xDB, 0x46, 0xEF}), 355);
             var b = new FileSignature(new HashValue(new byte[] {0x99, 0xE9, 0xD8, 0x51, 0x37, 0xDB, 0x46, 0xEF}), 355);
-            a.Equals(b).Should().BeTrue("FileSignature with same properties should be equal")
-                ;
+            a.Equals(b).Should().BeTrue("FileSignature with same properties should be equal");
         }
     }
 }

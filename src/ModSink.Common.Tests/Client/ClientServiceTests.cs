@@ -10,8 +10,8 @@ using Anotar.Serilog;
 using DynamicData;
 using FluentAssertions;
 using ModSink.Common.Client;
-using ModSink.Common.Models.Group;
-using ModSink.Common.Models.Repo;
+using ModSink.Common.Models.DTO.Group;
+using ModSink.Common.Models.DTO.Repo;
 using ReactiveUI.Testing;
 using Serilog;
 using Xunit;
@@ -117,9 +117,9 @@ namespace ModSink.Common.Tests.Client
             client.GroupUrls.Items.Should().HaveCount(1);
             client.Repos.Items.Should().HaveCount(1);
             client.QueuedDownloads.Items.Should().HaveCount(0);
-            foreach (var r in client.Repos.Items)
-            foreach (var modpack in r.Modpacks)
-                modpack.Selected = true;
+            //foreach (var r in client.Repos.Items)
+            //foreach (var modpack in r.Modpacks)
+            //    modpack.Selected = true;
 
             client.QueuedDownloads.Items.Should().HaveCount(1);
             client.ActiveDownloads.Items.Should().HaveCount(1);

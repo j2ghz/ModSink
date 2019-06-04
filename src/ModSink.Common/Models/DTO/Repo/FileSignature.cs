@@ -2,7 +2,7 @@
 using System.Diagnostics;
 using System.IO;
 
-namespace ModSink.Common.Models.Repo
+namespace ModSink.Common.Models.DTO.Repo
 {
     [Serializable]
     [DebuggerDisplay("{Hash} | {Length}")]
@@ -26,7 +26,6 @@ namespace ModSink.Common.Models.Repo
         ///     The length of the file taken from <see cref="FileInfo" />, in bytes.
         /// </summary>
         public ulong Length { get; set; }
-
 
         public bool Equals(FileSignature other)
         {
