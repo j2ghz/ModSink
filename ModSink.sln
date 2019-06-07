@@ -15,7 +15,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModSink.UI", "src\ModSink.U
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModSink.UI.Tests", "src\ModSink.UI.Tests\ModSink.UI.Tests.csproj", "{E36BE37E-9B81-4C1F-9B09-9614B8A401BD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModSink.Domain", "src\ModSink.Domain\ModSink.Domain.csproj", "{657B5757-2FBD-46D6-B2B4-493589FFDD6B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModSink.Domain", "src\ModSink.Domain\ModSink.Domain.csproj", "{657B5757-2FBD-46D6-B2B4-493589FFDD6B}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Domain", "Domain", "{6370BC28-0E04-4D34-B6FA-83EFADBB086A}"
 EndProject
@@ -23,13 +23,15 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Test", "Test", "{AC3FC6CE-7
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "UI", "UI", "{B38F5199-34B7-49C4-8F39-7579CBC4C4AA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModSink.Application", "src\ModSink.Application\ModSink.Application.csproj", "{CCE94980-A68E-436A-A398-BA594756D3AE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModSink.Application", "src\ModSink.Application\ModSink.Application.csproj", "{CCE94980-A68E-436A-A398-BA594756D3AE}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Infrastructure", "Infrastructure", "{199A3EB4-DFFE-426B-BA5C-926A6068CE36}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{954C990F-34BA-45EE-9A16-7B0571DDAE1A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModSink.Infrastructure", "src\ModSink.Infrastructure\ModSink.Infrastructure.csproj", "{96E81284-48B0-4F76-BF4C-D2F8B594D6A4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModSink.Infrastructure", "src\ModSink.Infrastructure\ModSink.Infrastructure.csproj", "{96E81284-48B0-4F76-BF4C-D2F8B594D6A4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModSink.Domain.Tests", "src\ModSink.Domain.Tests\ModSink.Domain.Tests.csproj", "{786F70DB-196A-4D43-A300-4C3B589CD4D5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -73,6 +75,10 @@ Global
 		{96E81284-48B0-4F76-BF4C-D2F8B594D6A4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{96E81284-48B0-4F76-BF4C-D2F8B594D6A4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{96E81284-48B0-4F76-BF4C-D2F8B594D6A4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{786F70DB-196A-4D43-A300-4C3B589CD4D5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{786F70DB-196A-4D43-A300-4C3B589CD4D5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{786F70DB-196A-4D43-A300-4C3B589CD4D5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{786F70DB-196A-4D43-A300-4C3B589CD4D5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -89,6 +95,7 @@ Global
 		{CCE94980-A68E-436A-A398-BA594756D3AE} = {6370BC28-0E04-4D34-B6FA-83EFADBB086A}
 		{199A3EB4-DFFE-426B-BA5C-926A6068CE36} = {954C990F-34BA-45EE-9A16-7B0571DDAE1A}
 		{96E81284-48B0-4F76-BF4C-D2F8B594D6A4} = {199A3EB4-DFFE-426B-BA5C-926A6068CE36}
+		{786F70DB-196A-4D43-A300-4C3B589CD4D5} = {AC3FC6CE-7228-419F-A577-32E963128FF4}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {8A162A5F-03F2-428E-8951-FD2FBE565EA5}

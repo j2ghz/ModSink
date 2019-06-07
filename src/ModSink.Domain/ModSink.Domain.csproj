@@ -1,7 +1,15 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <LangVersion>8.0</LangVersion>
+    <NullableContextOptions>enable</NullableContextOptions>
   </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Multiformats.Address" Version="1.1.1" />
+    <PackageReference Include="Multiformats.Base" Version="2.0.1" />
+    <PackageReference Include="Multiformats.Hash" Version="1.4.0" />
+  </ItemGroup>
 
 </Project>
