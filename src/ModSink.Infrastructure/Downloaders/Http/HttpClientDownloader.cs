@@ -8,7 +8,6 @@ using Humanizer;
 using Humanizer.Bytes;
 using ModSink.Application;
 using ModSink.Domain.Entities;
-using Multiformats.Hash;
 
 namespace ModSink.Infrastructure.Downloaders.Http
 {
