@@ -12,6 +12,7 @@ install:
 
 before_build:
   - gitversion /l console /output buildserver /updateAssemblyInfo
+  - dotnet restore
 
 build:
   verbosity: minimal
