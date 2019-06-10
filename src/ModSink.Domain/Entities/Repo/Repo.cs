@@ -6,6 +6,6 @@ namespace ModSink.Domain.Entities.Repo
 {
     public class Repo
     {
-        public IDictionary<Multihash, Uri> Files { get; }
+        public IEnumerable<OnlineFile> Files { get; private set; }
     }
 }

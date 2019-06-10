@@ -2,10 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace ModSink.Domain.Tests
+namespace ModSink.Application
 {
-    public class MultiAddressTests
+    class DownloadManager
     {
-        
     }
 }

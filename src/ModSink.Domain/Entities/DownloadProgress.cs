@@ -2,16 +2,20 @@
 using Humanizer;
 using Humanizer.Bytes;
 
-namespace ModSink.Common.Client
+namespace ModSink.Domain.Entities
 {
-    public struct DownloadProgress
+    public readonly struct DownloadProgress
     {
         public readonly ByteSize Downloaded;
         public readonly ByteSize Size;
         public readonly TransferState State;
-        public readonly DateTime Timestamp;
+        public readonly DateTimeOffset Timestamp;
 
-        public DownloadProgress(ByteSize size, ByteSize downloaded, TransferState state)
+
+        /// <param name="state">Current state of the download</param>
+        /// <param name="size">Size of the download, zero if not specified</param>
+        /// <param name="downloaded">Size of the downloaded part, zero if not specified</param>
+        public DownloadProgress(TransferState state, ByteSize size = default, ByteSize downloaded = default)
         {
             Size = size;
             Downloaded = downloaded;
