@@ -9,33 +9,12 @@ install:
   - choco install codecov
 
 before_build:
-  - gitversion /l console /output buildserver /updateAssemblyInfo /diag
+  - gitversion /l console /output buildserver /updateAssemblyInfo
   - msbuild /t:Clean /v:m
   - msbuild /t:Restore /v:m
 
 build:
   verbosity: minimal
 
-after_build:
-  - dotnet publish -c Release -o ./singleExe .\src\ModSink.WPF\ModSink.WPF.csproj
-
-artifacts:
-  - path: src/ModSink.WPF/bin/Release/netcoreapp3.0
-    name: ModSink.WPF
-  - path: singleExe/ModSink.WPF.exe
-    name: ModSink.WPF.exe
-
 test_script:
-  - dotnet test "src\ModSink.Common.Tests\ModSink.Common.Tests.csproj" --configuration Release /p:AltCover=true /p:AltCoverForce=true
-  - codecov -f "src\ModSink.Common.Tests\coverage.xml"
-  - dotnet test "src\ModSink.UI.Tests\ModSink.UI.Tests.csproj" --configuration Release /p:AltCover=true /p:AltCoverForce=true
-  - codecov -f "src\ModSink.UI.Tests\coverage.xml"
-
-deploy:
-  - provider: GitHub
-    auth_token:
-      secure: TLChfAMJcjhyw7dQ6WNllA/sc420Hq4fk9V9/VUD1kFOm4ZJpfiBlwaqdVRPbQeP
-    artifact: ModSink.WPF,ModSink.WPF.exe
-    prerelease: true
-    on:
-      branch: master
+  - FOR /D /r %%G in ("src/*.Tests") DO dotnet test "src\%%~nxG\%%~nxG.csproj" --configuration Release /p:AltCover=true /p:AltCoverForce=true && codecov -f "src\%%~nxG\coverage.xml"
