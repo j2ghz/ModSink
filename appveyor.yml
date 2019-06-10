@@ -4,10 +4,11 @@ image: Visual Studio 2019 Preview
 configuration: Release
 
 install:
+  - choco install dotnetcore-sdk -y
   - choco install dotnetcore-sdk --pre -y
   - dotnet --info
   - choco install gitversion.portable -pre -y
-  - choco install codecov
+  - choco install codecov -y
 
 before_build:
   - gitversion /l console /output buildserver /updateAssemblyInfo
