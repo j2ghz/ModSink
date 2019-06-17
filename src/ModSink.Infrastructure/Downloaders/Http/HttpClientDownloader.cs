@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Humanizer;
 using Humanizer.Bytes;
 using ModSink.Application;
+using ModSink.Application.Download;
 using ModSink.Domain.Entities;
 
 namespace ModSink.Infrastructure.Downloaders.Http
