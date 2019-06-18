@@ -13,13 +13,13 @@ namespace ModSink.Infrastructure.Hashing
 {
     public class HashingService : IHashingService, IDisposable
     {
-        private readonly IHashFunction _hashFunction;
         private readonly IFileOpener _fileOpener;
+        private readonly IHashFunction _hashFunction;
         private readonly SemaphoreSlim _semaphore;
 
         public HashingService(IHashFunction hashFunction, IOptions<Options> options, IFileOpener fileOpener)
         {
-            this._hashFunction = hashFunction;
+            _hashFunction = hashFunction;
             _fileOpener = fileOpener;
             _semaphore = new SemaphoreSlim(0, options.Value.Parallelism);
         }

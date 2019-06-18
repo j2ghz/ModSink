@@ -1,35 +1,27 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO.Abstractions;
-using System.Linq;
-using System.Text;
 using ModSink.Application;
+using ModSink.Application.Hashing;
 using ModSink.Domain.Entities.Repo;
 
 namespace ModSink.Infrastructure.RepoBuilders
 {
     public class ModsInRepoRootBuilder : IRepoBuilder
     {
-        public ModsInRepoRootBuilder()
+        private readonly IHashingService _hashingService;
+
+        public ModsInRepoRootBuilder(IHashingService hashingService)
         {
-            
+            _hashingService = hashingService;
         }
 
         public Repo Build(IDirectoryInfo root)
         {
-            var repo = new Repo();
-            var modpacks = root.EnumerateDirectories()
-                .Select(BuildMod);
-
-        }
-
-        private Mod BuildMod(IDirectoryInfo root)
-        {
-            var mod = new Mod()
-            {
-                Name=root.Name,
-                Files = { }
-            };
+            //Read config
+            //hash requested mods
+            //build modpacks
+            //build repo
+            throw new NotImplementedException();
         }
     }
 }
