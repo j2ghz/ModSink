@@ -13,8 +13,8 @@ before_build:
   - gitversion /l console /output buildserver /updateAssemblyInfo
   - dotnet restore
 
-build:
-  verbosity: minimal
+build_script:
+  - dotnet msbuild ModSink.sln /verbosity:minimal /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
 
 test_script:
   - FOR /D /r %%G in ("src/*.Tests") DO dotnet test "src\%%~nxG\%%~nxG.csproj" --configuration Release /p:AltCover=true /p:AltCoverForce=true && codecov -f "src\%%~nxG\coverage.xml"
