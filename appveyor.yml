@@ -14,7 +14,7 @@ before_build:
   - dotnet restore
 
 build_script:
-  - dotnet msbuild ModSink.sln /verbosity:minimal /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
+  - dotnet msbuild ModSink.sln /verbosity:minimal
 
 test_script:
   - FOR /D /r %%G in ("src/*.Tests") DO dotnet test "src\%%~nxG\%%~nxG.csproj" --configuration Release /p:AltCover=true /p:AltCoverForce=true && codecov -f "src\%%~nxG\coverage.xml"
