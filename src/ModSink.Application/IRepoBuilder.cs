@@ -9,4 +9,9 @@ namespace ModSink.Application
     {
         Repo Build(System.IO.Abstractions.IDirectoryInfo root);
     }
+
+    public interface IRepoBuilder<TConfig> : IRepoBuilder
+    {
+        Repo Build(System.IO.Abstractions.IDirectoryInfo root, TConfig config);
+    }
 }
