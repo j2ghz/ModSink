@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Abstractions;
-using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using ModSink.Application.Hashing;
 using ModSink.Domain.Entities.File;
+using ModSink.Domain.Entities.Repo;
 
 namespace ModSink.Infrastructure.Hashing
 {
@@ -29,21 +29,28 @@ namespace ModSink.Infrastructure.Hashing
             _semaphore?.Dispose();
         }
 
-        public IObservable<Hash> GetFileHashes(IDirectoryInfo directory)
+        public async IAsyncEnumerable<RelativeUriFile> GetFileHashes(IDirectoryInfo directory, CancellationToken token)
         {
-            return Observable.Create<Task<Hash>>(async (obs, token) =>
-                {
-                    foreach (var file in GetFiles(directory))
-                    {
-                        token.ThrowIfCancellationRequested();
-                        var hash = RunASyncWaitSemaphore(GetFileHash(file, token), _semaphore, token);
-                        obs.OnNext(hash);
-                    }
+            var baseUri = new Uri(directory.FullName);
+            foreach (var file in GetFiles(directory))
+            {
+                token.ThrowIfCancellationRequested();
+                var uri = new Uri(file.FullName);
 
-                    obs.OnCompleted();
-                }).SelectMany(x => x)
-                .Replay()
-                .RefCount();
+                var hashTask = Task.Run(async () =>
+                {
+                    var fileHash = await GetFileHash(file, token);
+                    return new RelativeUriFile
+                    {
+                        Signature = new FileSignature(fileHash, file.Length),
+                        RelativeUri = RelativeUri.FromAbsolute(baseUri, uri)
+                    };
+                }, token);
+
+                var hash = RunASyncWaitSemaphore(hashTask, _semaphore, token);
+
+                yield return await hash;
+            }
         }
 
         public async Task<Hash> GetFileHash(IFileInfo file, CancellationToken cancel)
@@ -51,6 +58,11 @@ namespace ModSink.Infrastructure.Hashing
             if (file.Length <= 0) return _hashFunction.HashOfEmpty;
             await using var stream = _fileOpener.OpenRead(file);
             return await _hashFunction.ComputeHashAsync(stream, cancel);
+        }
+
+        public async Task<FileSignature> GetFileSignature(IFileInfo file, CancellationToken cancel)
+        {
+            return new FileSignature(await GetFileHash(file, cancel), file.Length);
         }
 
         public async Task<Hash> GetFileHash(Stream stream, CancellationToken cancel)

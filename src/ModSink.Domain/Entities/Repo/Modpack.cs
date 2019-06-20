@@ -6,7 +6,7 @@ namespace ModSink.Domain.Entities.Repo
 {
     public class Modpack
     {
-        public string Name { get; private set; }
-        public ICollection<Mod> Mods { get; private set; }
+        public string Name { get;  set; }
+        public ICollection<Mod> Mods { get;  set; }
     }
 }

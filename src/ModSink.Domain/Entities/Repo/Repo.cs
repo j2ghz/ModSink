@@ -5,8 +5,8 @@ namespace ModSink.Domain.Entities.Repo
 {
     public class Repo
     {
-        public string Name { get; private set; }
-        public ICollection<RelativeUriFile> Files { get; private set; }
-        public ICollection<Modpack> Modpacks { get; private set; }
+        public string Name { get; set; }
+        public ICollection<RelativeUriFile> Files { get;  set; }
+        public ICollection<Modpack> Modpacks { get;  set; }
     }
 }
