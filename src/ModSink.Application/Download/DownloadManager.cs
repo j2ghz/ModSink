@@ -2,5 +2,9 @@
 {
     class DownloadManager
     {
+        public DownloadManager()
+        {
+            
+        }
     }
 }
