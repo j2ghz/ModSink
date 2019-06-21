@@ -30,9 +30,13 @@ namespace ModSink.Infrastructure.Tests.Hashing
                 new FileStreamOpener(Options.Create(new FileStreamOpener.Options()),
                     new MockFileStreamFactory(fs)));
 
-            await foreach (var relativeUriFile in hashingService.GetFileHashes(
+            foreach (var relativeUriFile in hashingService.GetFileHashes(
                 fs.DirectoryInfo.FromDirectoryName(@"/repo/"), CancellationToken.None))
-                relativeUriFile.Should().NotBeNull();
+            {
+                var file = await relativeUriFile;
+                file.Should().NotBeNull();
+            }
+                
         }
     }
 }

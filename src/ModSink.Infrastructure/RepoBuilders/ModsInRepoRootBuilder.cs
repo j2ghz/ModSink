@@ -45,14 +45,16 @@ namespace ModSink.Infrastructure.RepoBuilders
             foreach (var modName in allModNames)
             {
                 var modDir = modDirs.First(d => d.Name == modName);
-                var modFiles = new List<RelativeUriFile>();
-                await foreach (var modFile in _hashingService.GetFileHashes(modDir, token))
+
+                var modFiles = _hashingService.GetFileHashes(modDir, token).ToList();
+                await Task.WhenAll(modFiles);
+                foreach (var modFileTask in modFiles)
                 {
-                    modFiles.Add(modFile);
+                    var modFile = await modFileTask;
                     repoFiles.Add(modFile.Signature, modFile);
                 }
 
-                builtMods.Add(new Mod {Files = modFiles, Name = modName});
+                builtMods.Add(new Mod {Files = modFiles.Select(t=>t.Result).ToList(), Name = modName});
             }
 
             var modpacks = config.Modpacks.Select(modpack => new Modpack

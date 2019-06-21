@@ -29,7 +29,7 @@ namespace ModSink.Infrastructure.Hashing
             _semaphore?.Dispose();
         }
 
-        public async IAsyncEnumerable<RelativeUriFile> GetFileHashes(IDirectoryInfo directory, CancellationToken token)
+        public IEnumerable<Task<RelativeUriFile>> GetFileHashes(IDirectoryInfo directory, CancellationToken token)
         {
             var baseUri = new Uri(directory.FullName);
             foreach (var file in GetFiles(directory))
@@ -49,14 +49,14 @@ namespace ModSink.Infrastructure.Hashing
 
                 var hash = RunASyncWaitSemaphore(hashTask, _semaphore, token);
 
-                yield return await hash;
+                yield return hash;
             }
         }
 
         public async Task<Hash> GetFileHash(IFileInfo file, CancellationToken cancel)
         {
             if (file.Length <= 0) return _hashFunction.HashOfEmpty;
-            await using var stream = _fileOpener.OpenRead(file);
+            using var stream = _fileOpener.OpenRead(file);
             return await _hashFunction.ComputeHashAsync(stream, cancel);
         }
 
