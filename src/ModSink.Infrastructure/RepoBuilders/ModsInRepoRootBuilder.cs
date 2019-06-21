@@ -32,10 +32,11 @@ namespace ModSink.Infrastructure.RepoBuilders
                 {
                     Name = root.Name,
                     Modpacks =
-                    {
-                        new ModsInRepoRootBuilderConfig.Modpack
-                            {Name = "Default", Mods = root.GetDirectories().Select(d => d.Name).ToList()}
-                    }
+                        new List<ModsInRepoRootBuilderConfig.Modpack>
+                        {
+                            new ModsInRepoRootBuilderConfig.Modpack
+                                {Name = "Default", Mods = root.GetDirectories().Select(d => d.Name).ToList()}
+                        }
                 };
 
             var repoFiles = new Dictionary<FileSignature, RelativeUriFile>();
@@ -54,7 +55,7 @@ namespace ModSink.Infrastructure.RepoBuilders
                     repoFiles.Add(modFile.Signature, modFile);
                 }
 
-                builtMods.Add(new Mod {Files = modFiles.Select(t=>t.Result).ToList(), Name = modName});
+                builtMods.Add(new Mod {Files = modFiles.Select(t => t.Result).ToList(), Name = modName});
             }
 
             var modpacks = config.Modpacks.Select(modpack => new Modpack
