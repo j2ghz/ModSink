@@ -21,7 +21,7 @@ namespace ModSink.Infrastructure.Hashing
         {
             _hashFunction = hashFunction;
             _fileOpener = fileOpener;
-            _semaphore = new SemaphoreSlim(0, options.Value.Parallelism);
+            _semaphore = new SemaphoreSlim(options.Value.Parallelism);
         }
 
         public void Dispose()
@@ -37,7 +37,7 @@ namespace ModSink.Infrastructure.Hashing
                 token.ThrowIfCancellationRequested();
                 var uri = new Uri(file.FullName);
 
-                var hashTask = Task.Run(async () =>
+                var hash = RunASyncWaitSemaphore(async () =>
                 {
                     var fileHash = await GetFileHash(file, token);
                     return new RelativeUriFile
@@ -45,9 +45,7 @@ namespace ModSink.Infrastructure.Hashing
                         Signature = new FileSignature(fileHash, file.Length),
                         RelativeUri = RelativeUri.FromAbsolute(baseUri, uri)
                     };
-                }, token);
-
-                var hash = RunASyncWaitSemaphore(hashTask, _semaphore, token);
+                }, _semaphore, token);
 
                 yield return hash;
             }
@@ -70,7 +68,7 @@ namespace ModSink.Infrastructure.Hashing
             return await _hashFunction.ComputeHashAsync(stream, cancel);
         }
 
-        public IEnumerable<IFileInfo> GetFiles(IDirectoryInfo directory)
+        private static IEnumerable<IFileInfo> GetFiles(IDirectoryInfo directory)
         {
             var directoryStack = new Stack<IDirectoryInfo>();
             directoryStack.Push(directory);
@@ -83,14 +81,14 @@ namespace ModSink.Infrastructure.Hashing
             }
         }
 
-        public async Task<T> RunASyncWaitSemaphore<T>(Task<T> task, SemaphoreSlim semaphoreSlim,
+        private static async Task<T> RunASyncWaitSemaphore<T>(Func<Task<T>> action, SemaphoreSlim semaphoreSlim,
             CancellationToken token)
         {
             await semaphoreSlim.WaitAsync(token);
             T result;
             try
             {
-                result = await task;
+                result = await action();
             }
             finally
             {
