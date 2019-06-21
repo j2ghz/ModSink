@@ -102,7 +102,7 @@ namespace ModSink.Infrastructure.Hashing
 
         public class Options
         {
-            public int Parallelism { get; set; }
+            public int Parallelism { get; set; } = 2;
         }
     }
 }
