@@ -1,10 +1,12 @@
-﻿namespace ModSink.Application.Download
+﻿using System;
+
+namespace ModSink.Application.Download
 {
-    class DownloadManager
+    public class DownloadManager
     {
         public DownloadManager()
         {
-            
+            throw new NotImplementedException();
         }
     }
 }

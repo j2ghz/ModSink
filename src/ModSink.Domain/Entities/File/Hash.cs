@@ -2,7 +2,7 @@
 
 namespace ModSink.Domain.Entities.File
 {
-    public class Hash :  IEquatable<Hash>
+    public class Hash : IEquatable<Hash>
     {
         public Hash(byte[] value, string hashId)
         {
@@ -27,8 +27,8 @@ namespace ModSink.Domain.Entities.File
         {
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
-            return Equals((Hash)obj);
+            if (obj.GetType() != GetType()) return false;
+            return Equals((Hash) obj);
         }
 
         public override int GetHashCode()
@@ -50,6 +50,5 @@ namespace ModSink.Domain.Entities.File
         }
 
         #endregion
-
     }
 }

@@ -1,24 +1,15 @@
 ﻿using System;
 using System.IO;
-using System.Net;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using Humanizer;
-using Humanizer.Bytes;
-using ModSink.Application;
 using ModSink.Application.Download;
-using ModSink.Domain.Entities;
 
 namespace ModSink.Infrastructure.Downloaders.Http
 {
     public class HttpClientDownloader : IDownloader
     {
         private readonly HttpClient _client = new HttpClient();
-
-        public HttpClientDownloader()
-        {
-        }
 
         public bool CanDownload(Uri uri)
         {
@@ -30,6 +21,7 @@ namespace ModSink.Infrastructure.Downloaders.Http
                 else
                     return false;
             }
+
             //Check for HTTP
             return uri.Scheme == "http" || uri.Scheme == "https";
         }
@@ -42,6 +34,5 @@ namespace ModSink.Infrastructure.Downloaders.Http
             var stream = await response.Content.ReadAsStreamAsync();
             return stream;
         }
-        
     }
 }

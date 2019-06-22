@@ -36,7 +36,6 @@ namespace ModSink.Infrastructure.Tests.Hashing
                 var file = await relativeUriFile;
                 file.Should().NotBeNull();
             }
-                
         }
     }
 }
