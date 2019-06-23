@@ -21,3 +21,6 @@ test_script:
 
 after_test:
   - FOR /D /r %%G in ("src/*.Tests") DO codecov -f "src\%%~nxG\coverage.xml"
+
+on_failure:
+  - FOR /D /r %%G in ("src/*.Tests") DO codecov -f "src\%%~nxG\coverage.xml"
