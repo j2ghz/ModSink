@@ -17,4 +17,10 @@ build_script:
   - dotnet msbuild ModSink.sln /verbosity:minimal
 
 test_script:
-  - FOR /D /r %%G in ("src/*.Tests") DO dotnet test "src\%%~nxG\%%~nxG.csproj" --configuration Release /p:AltCover=true /p:AltCoverForce=true && codecov -f "src\%%~nxG\coverage.xml"
+  - dotnet test --configuration Release /p:AltCover=true /p:AltCoverForce=true"
+
+after_test:
+  - FOR /D /r %%G in ("src/*.Tests") DO codecov -f "src\%%~nxG\coverage.xml"
+
+on_failure:
+  - FOR /D /r %%G in ("src/*.Tests") DO codecov -f "src\%%~nxG\coverage.xml"
