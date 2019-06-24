@@ -13,8 +13,8 @@ before_build:
   - gitversion /l console /output buildserver /updateAssemblyInfo
   - dotnet restore
 
-build_script:
-  - dotnet msbuild ModSink.sln /verbosity:minimal
+build:
+  verbosity: minimal
 
 test_script:
   - dotnet test --configuration Release /p:AltCover=true /p:AltCoverForce=true"
