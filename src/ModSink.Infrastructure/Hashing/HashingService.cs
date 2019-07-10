@@ -31,7 +31,7 @@ namespace ModSink.Infrastructure.Hashing
 
         public IEnumerable<Task<RelativeUriFile>> GetFileHashes(IDirectoryInfo directory, CancellationToken token)
         {
-            var baseUri = new Uri(directory.FullName);
+            var baseUri = new Uri(directory.FullName + "/"); //HACK: folder uris should end with / to get proper relative support
             foreach (var file in GetFiles(directory))
             {
                 token.ThrowIfCancellationRequested();

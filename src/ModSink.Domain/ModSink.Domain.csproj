@@ -8,7 +8,6 @@
 
   <ItemGroup>
     <PackageReference Include="Humanizer.Core" Version="2.6.2" />
-    <PackageReference Include="StyleCop.Analyzers" Version="1.1.118" />
   </ItemGroup>
 
 </Project>

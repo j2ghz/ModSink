@@ -2,15 +2,14 @@
 
 namespace ModSink.Domain.Entities.File
 {
-    public class Hash : IEquatable<Hash>
+    public abstract class Hash : IEquatable<Hash>
     {
-        public Hash(byte[] value, string hashId)
+        protected Hash(byte[] value)
         {
             Value = value;
-            HashId = hashId;
         }
 
-        public string HashId { get; }
+        public abstract string HashId { get; }
 
         public byte[] Value { get; }
 

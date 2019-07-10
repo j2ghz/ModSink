@@ -52,7 +52,8 @@ namespace ModSink.Infrastructure.RepoBuilders
                 foreach (var modFileTask in modFiles)
                 {
                     var modFile = await modFileTask;
-                    repoFiles[modFile.Signature] = modFile;
+                    var repoFile = modFile.InDirectory(modDir.Name);
+                    repoFiles[modFile.Signature] = repoFile;
                 }
 
                 builtMods.Add(new Mod {Files = modFiles.Select(t => t.Result).ToList(), Name = modName});

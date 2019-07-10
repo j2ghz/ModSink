@@ -23,9 +23,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModSink.Domain.Tests", "src
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModSink.CLI", "src\ModSink.CLI\ModSink.CLI.csproj", "{EF70A097-5787-43F0-B25F-CB22361A8EFE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModSink.Infrastructure.Tests", "src\ModSink.Infrastructure.Tests\ModSink.Infrastructure.Tests.csproj", "{4F315D45-898C-4CF1-B0B5-53D3F57EE58F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModSink.Infrastructure.Tests", "src\ModSink.Infrastructure.Tests\ModSink.Infrastructure.Tests.csproj", "{4F315D45-898C-4CF1-B0B5-53D3F57EE58F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModSink.Application.Tests", "src\ModSink.Application.Tests\ModSink.Application.Tests.csproj", "{590FE0EA-A769-4BF7-A58F-20F02668EBDB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModSink.Application.Tests", "src\ModSink.Application.Tests\ModSink.Application.Tests.csproj", "{590FE0EA-A769-4BF7-A58F-20F02668EBDB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

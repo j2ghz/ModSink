@@ -1,4 +1,6 @@
 ﻿using System;
+using System.IO;
+using System.Linq;
 
 namespace ModSink.Domain.Entities.Repo
 {
@@ -10,8 +12,13 @@ namespace ModSink.Domain.Entities.Repo
 
         public static RelativeUri FromAbsolute(Uri root, Uri target)
         {
-            var relative = target.MakeRelativeUri(root);
+            var relative = root.MakeRelativeUri(target);
             return new RelativeUri(relative.ToString());
+        }
+
+        public RelativeUri InDirectory(params string[] dir)
+        {
+            return new RelativeUri(Path.Combine(dir.Concat(new[] {ToString()}).ToArray()));
         }
     }
 }
