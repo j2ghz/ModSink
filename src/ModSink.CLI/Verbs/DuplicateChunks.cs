@@ -38,13 +38,13 @@ namespace ModSink.CLI.Verbs
             }
         }
 
-        [Verb("chunk", HelpText = "Reports chunk sizes for a specified file")]
+        [Verb("dupl", HelpText = "Report duplicate chunk count, size")]
         public class Options
         {
             [Option('b', "buffer", Default = 10 * 1024 * 1024)]
             public int FileStreamBuffer { get; set; }
 
-            [Value(0, HelpText = "Path to file to check", Required = true)]
+            [Value(0, HelpText = "Path to file or directory to check", Required = true)]
             public string Path { get; set; }
         }
     }
