@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Security.Cryptography;
 using CommandLine;
 using Humanizer;
@@ -17,9 +15,8 @@ namespace ModSink.CLI.Verbs
                 new FileStream(opts.Path, FileMode.Open, FileAccess.Read, FileShare.Read, opts.FileStreamBuffer);
             var segments = new StreamBreaker().GetSegments(fileStream, fileStream.Length, xxHash64.Create());
             foreach (var segment in segments)
-            {
-                Console.WriteLine($"{BitConverter.ToString(segment.Hash)}\t{segment.Offset}\t{segment.Length}");
-            }
+                Console.WriteLine(
+                    $"{BitConverter.ToString(segment.Hash)}\t{segment.Offset.Bytes().Humanize("G03")}\t{segment.Length.Bytes().Humanize("G03")}");
 
             return 0;
         }
@@ -30,12 +27,8 @@ namespace ModSink.CLI.Verbs
             [Option('b', "buffer", Default = 10 * 1024 * 1024)]
             public int FileStreamBuffer { get; set; }
 
-            [Value(0, HelpText = "Path to file to check")]
+            [Value(0, HelpText = "Path to file to check", Required = true)]
             public string Path { get; set; }
-
-            [Option('n', "zeroes", Default = 13, HelpText = "Amount of zeroes for chunk boundary", Min = 1,
-                Max = byte.MaxValue)]
-            public int Zeroes { get; set; }
         }
     }
 }
