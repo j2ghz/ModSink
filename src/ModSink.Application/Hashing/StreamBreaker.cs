@@ -82,7 +82,7 @@ namespace ModSink.Application.Hashing
             /// <summary>How far into the strem we found the chunk</summary>
             public readonly long Offset;
 
-            /// <summary>How long the chunk is</summary>
+            /// <summary>How long the chunk is in bytes</summary>
             public readonly long Length;
 
             /// <summary>Strong hash for the chunk</summary>

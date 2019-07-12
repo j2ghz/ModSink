@@ -1,4 +1,5 @@
 ﻿using CommandLine;
+using Humanizer;
 using ModSink.CLI.Verbs;
 
 namespace ModSink.CLI
@@ -13,7 +14,7 @@ namespace ModSink.CLI
             //        errs => 1
             //    );
             Chunk.Run(new Chunk.Options()
-                {Path = @"G:\417addons\@cup_terrains_core\addons\cup_terrains_ca_roads_e.pbo", Zeroes = 20});
+                {Path = @"E:\SteamLibrary\steamapps\common\HITMAN2\Runtime\dlc4patch1.rpkg", FileStreamBuffer = 10*1024*1024});
         }
     }
 }
