@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 
 namespace ModSink.Domain.Entities.File
 {
@@ -19,7 +20,7 @@ namespace ModSink.Domain.Entities.File
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
-            return string.Equals(HashId, other.HashId) && Equals(Value, other.Value);
+            return string.Equals(HashId, other.HashId) && Value.SequenceEqual(other.Value);
         }
 
         public override bool Equals(object obj)

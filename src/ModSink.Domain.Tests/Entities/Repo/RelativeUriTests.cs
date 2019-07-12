@@ -66,5 +66,11 @@ namespace ModSink.Domain.Tests.Entities.Repo
             var correctUri = RelativeUri.FromAbsolute(new Uri(d.FullName+"/"), new Uri(d.GetFiles().Single().FullName));
             correctUri.ToString().Should().Be("a.txt");
         }
+
+        [Fact]
+        public void EqualsSame()
+        {
+            new RelativeUri("mod1/a.txt").Should().Be(new RelativeUri("mod1/a.txt"));
+        }
     }
 }
