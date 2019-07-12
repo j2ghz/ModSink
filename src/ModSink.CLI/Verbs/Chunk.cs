@@ -7,11 +7,11 @@ using ModSink.Application.Hashing;
 
 namespace ModSink.CLI.Verbs
 {
-    public class Chunk
+    public class Chunk : BaseVerb<Chunk.Options>
     {
-        public static int Run(Options opts)
+        public override int Run(Options opts)
         {
-            var fileStream =
+            using var fileStream =
                 new FileStream(opts.Path, FileMode.Open, FileAccess.Read, FileShare.Read, opts.FileStreamBuffer);
             var segments = new StreamBreaker().GetSegments(fileStream, fileStream.Length, xxHash64.Create());
             foreach (var segment in segments)

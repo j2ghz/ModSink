@@ -7,9 +7,10 @@ namespace ModSink.CLI
     {
         public static void Main(string[] args)
         {
-            Parser.Default.ParseArguments<Chunk.Options>(args)
+            Parser.Default.ParseArguments<Chunk.Options,DuplicateChunks.Options>(args)
                 .MapResult(
-                    Chunk.Run,
+                    new Chunk().Run,
+                    new DuplicateChunks().Run,
                     errs => 1
                 );
         }
