@@ -20,8 +20,9 @@ namespace ModSink.CLI.Verbs
             else if (fileSystem.Directory.Exists(options.Path))
                 files.AddRange(GetFiles(fileSystem.DirectoryInfo.FromDirectoryName(options.Path)));
 
-            var hashset = new HashSet<byte[]>();
+            var hashset = new HashSet<byte[]>(new ByteArrayComparer());
             var duplicateSize = 0L;
+
             foreach (var file in files)
             {
                 var stream = file.Open(FileMode.Open, FileAccess.Read, FileShare.Read);
@@ -30,14 +31,12 @@ namespace ModSink.CLI.Verbs
                 {
                     var added = hashset.Add(segment.Hash);
                     if (!added)
-                    {
                         duplicateSize += segment.Length;
-                        Console.WriteLine(
-                            $"{duplicateSize.Bytes().Humanize("G03")}\tDuplicate {BitConverter.ToString(segment.Hash)}\tin {file.FullName}");
-                    }
+                    //Console.WriteLine($"Unique chunks: {hashset.Count}\tDuplicate size: {duplicateSize.Bytes().Humanize("G03")}\tDuplicate {BitConverter.ToString(segment.Hash)}\tin {file.FullName}@{segment.Offset} {segment.Length.Bytes().Humanize("G03")}");
                 }
 
-                Console.WriteLine($"{duplicateSize.Bytes().Humanize("G03")}\tProcessed file {file.FullName}");
+                Console.WriteLine(
+                    $"Unique chunks: {hashset.Count}\tDuplicate size: {duplicateSize.Bytes().Humanize("G03")}\tProcessed file {file.FullName}");
             }
 
             Console.WriteLine(
@@ -66,6 +65,26 @@ namespace ModSink.CLI.Verbs
 
             [Value(0, HelpText = "Path to file or directory to check", Required = true)]
             public string Path { get; set; }
+        }
+
+        public class ByteArrayComparer : IEqualityComparer<byte[]>
+        {
+            public bool Equals(byte[] a, byte[] b)
+            {
+                if (a.Length != b.Length) return false;
+                for (var i = 0; i < a.Length; i++)
+                    if (a[i] != b[i])
+                        return false;
+                return true;
+            }
+
+            public int GetHashCode(byte[] a)
+            {
+                uint b = 0;
+                for (var i = 0; i < a.Length; i++)
+                    b = ((b << 23) | (b >> 9)) ^ a[i];
+                return unchecked((int) b);
+            }
         }
     }
 }
