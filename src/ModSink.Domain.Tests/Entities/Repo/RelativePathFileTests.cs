@@ -6,7 +6,7 @@ using Xunit;
 
 namespace ModSink.Domain.Tests.Entities.Repo
 {
-    public class RelativeUriFileTests
+    public class RelativePathFileTests
     {
         [Fact]
         public void SameEquals()
