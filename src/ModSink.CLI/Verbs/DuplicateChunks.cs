@@ -2,7 +2,10 @@
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Abstractions;
+using System.Security.Cryptography;
 using CommandLine;
+using Humanizer;
+using ModSink.Application.Hashing;
 
 namespace ModSink.CLI.Verbs
 {
@@ -11,18 +14,35 @@ namespace ModSink.CLI.Verbs
         public override int Run(Options options)
         {
             var files = new List<IFileInfo>();
-            if (File.Exists(options.Path))
-                files.Add(new FileSystem().FileInfo.FromFileName(options.Path));
-            else if (Directory.Exists(options.Path))
-                files.AddRange(GetFiles(new FileSystem().DirectoryInfo.FromDirectoryName(options.Path)));
+            var fileSystem = new FileSystem();
+            if (fileSystem.File.Exists(options.Path))
+                files.Add(fileSystem.FileInfo.FromFileName(options.Path));
+            else if (fileSystem.Directory.Exists(options.Path))
+                files.AddRange(GetFiles(fileSystem.DirectoryInfo.FromDirectoryName(options.Path)));
 
-            //Get chunks from files
-            //  add chunks to hashset
-            //  count duplicate chunks + sizes
-            //  print statistics
+            var hashset = new HashSet<byte[]>();
+            var duplicateSize = 0L;
+            foreach (var file in files)
+            {
+                var stream = file.Open(FileMode.Open, FileAccess.Read, FileShare.Read);
+                var segments = new StreamBreaker().GetSegments(stream, stream.Length, xxHash64.Create());
+                foreach (var segment in segments)
+                {
+                    var added = hashset.Add(segment.Hash);
+                    if (!added)
+                    {
+                        duplicateSize += segment.Length;
+                        Console.WriteLine(
+                            $"{duplicateSize.Bytes().Humanize("G03")}\tDuplicate {BitConverter.ToString(segment.Hash)}\tin {file.FullName}");
+                    }
+                }
 
+                Console.WriteLine($"{duplicateSize.Bytes().Humanize("G03")}\tProcessed file {file.FullName}");
+            }
 
-            throw new NotImplementedException();
+            Console.WriteLine(
+                $"Unique chunks: {hashset.Count}\tDuplicate size: {duplicateSize.Bytes().Humanize("G03")}");
+            return 0;
         }
 
         private static IEnumerable<IFileInfo> GetFiles(IDirectoryInfo directory)
