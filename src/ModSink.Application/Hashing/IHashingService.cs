@@ -8,6 +8,6 @@ namespace ModSink.Application.Hashing
 {
     public interface IHashingService
     {
-        IEnumerable<Task<RelativeUriFile>> GetFileHashes(IDirectoryInfo directory, CancellationToken token);
+        IEnumerable<Task<RelativePathFile>> GetFileHashes(IDirectoryInfo directory, CancellationToken token);
     }
 }

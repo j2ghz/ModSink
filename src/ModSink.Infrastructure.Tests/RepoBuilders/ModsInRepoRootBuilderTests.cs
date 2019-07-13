@@ -38,7 +38,7 @@ namespace ModSink.Infrastructure.Tests.RepoBuilders
 
             repo.Name.Should().Be("repo");
             repo.Files.Should().HaveCount(3);
-            repo.Files.Should().Equal(new RelativeUriFile
+            repo.Files.Should().Equal(new RelativePathFile
             {
                 RelativePath = PurePath.Create("mod1\\a.txt"),
                 Signature = new FileSignature(
@@ -49,7 +49,7 @@ namespace ModSink.Infrastructure.Tests.RepoBuilders
                         0x48, 0xBB
                     }),
                     1UL)
-            }, new RelativeUriFile
+            }, new RelativePathFile
             {
                 RelativePath = PurePath.Create("mod1\\b.txt"),
                 Signature = new FileSignature(
@@ -61,7 +61,7 @@ namespace ModSink.Infrastructure.Tests.RepoBuilders
                         }
                     ),
                     1UL)
-            }, new RelativeUriFile
+            }, new RelativePathFile
             {
                 RelativePath = PurePath.Create("mod2\\c.txt"),
                 Signature = new FileSignature(

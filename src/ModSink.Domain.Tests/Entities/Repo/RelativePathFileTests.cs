@@ -11,7 +11,7 @@ namespace ModSink.Domain.Tests.Entities.Repo
         [Fact]
         public void SameEquals()
         {
-            var ruf1 = new RelativeUriFile
+            var ruf1 = new RelativePathFile
             {
                 RelativePath = PurePath.Create("mod1\\a.txt"),
                 Signature = new FileSignature(
@@ -24,7 +24,7 @@ namespace ModSink.Domain.Tests.Entities.Repo
                     1UL)
             };
 
-            var ruf2 = new RelativeUriFile
+            var ruf2 = new RelativePathFile
             {
                 RelativePath = PurePath.Create("mod1\\a.txt"),
                 Signature = new FileSignature(

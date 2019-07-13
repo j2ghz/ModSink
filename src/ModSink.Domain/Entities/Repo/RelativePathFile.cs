@@ -4,19 +4,19 @@ using PathLib;
 
 namespace ModSink.Domain.Entities.Repo
 {
-    public class RelativeUriFile : IEquatable<RelativeUriFile>
+    public class RelativePathFile : IEquatable<RelativePathFile>
     {
         public FileSignature Signature { get; set; }
         public IPurePath RelativePath { get; set; }
 
-        public RelativeUriFile InDirectory( IPurePath dir)
+        public RelativePathFile InDirectory( IPurePath dir)
         {
-            return new RelativeUriFile(){Signature = Signature,RelativePath = dir.Join(RelativePath)};
+            return new RelativePathFile(){Signature = Signature,RelativePath = dir.Join(RelativePath)};
         }
 
         #region Generated equality
 
-        public bool Equals(RelativeUriFile other)
+        public bool Equals(RelativePathFile other)
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
@@ -28,7 +28,7 @@ namespace ModSink.Domain.Entities.Repo
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
             if (obj.GetType() != this.GetType()) return false;
-            return Equals((RelativeUriFile)obj);
+            return Equals((RelativePathFile)obj);
         }
 
         public override int GetHashCode()
@@ -39,12 +39,12 @@ namespace ModSink.Domain.Entities.Repo
             }
         }
 
-        public static bool operator ==(RelativeUriFile left, RelativeUriFile right)
+        public static bool operator ==(RelativePathFile left, RelativePathFile right)
         {
             return Equals(left, right);
         }
 
-        public static bool operator !=(RelativeUriFile left, RelativeUriFile right)
+        public static bool operator !=(RelativePathFile left, RelativePathFile right)
         {
             return !Equals(left, right);
         }

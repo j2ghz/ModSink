@@ -30,7 +30,7 @@ namespace ModSink.Infrastructure.Hashing
             _semaphore?.Dispose();
         }
 
-        public IEnumerable<Task<RelativeUriFile>> GetFileHashes(IDirectoryInfo directory, CancellationToken token)
+        public IEnumerable<Task<RelativePathFile>> GetFileHashes(IDirectoryInfo directory, CancellationToken token)
         {
             var root = PurePath.Create(directory.FullName);
             foreach (var file in GetFiles(directory))
@@ -41,7 +41,7 @@ namespace ModSink.Infrastructure.Hashing
                 var hash = RunASyncWaitSemaphore(async () =>
                 {
                     var fileHash = await GetFileHash(file, token);
-                    return new RelativeUriFile
+                    return new RelativePathFile
                     {
                         Signature = new FileSignature(fileHash, file.Length),
                         RelativePath = filePath.RelativeTo(root)
