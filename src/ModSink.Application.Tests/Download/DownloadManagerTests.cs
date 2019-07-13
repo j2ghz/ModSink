@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Security.Cryptography;
 using System.Threading;
 using System.Threading.Tasks;
 using ModSink.Application.Download;
@@ -26,6 +27,7 @@ namespace ModSink.Application.Tests.Download
         [Fact(Skip = "WIP")]
         public async Task Start()
         {
+            
         }
     }
 }

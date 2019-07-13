@@ -19,25 +19,21 @@ namespace ModSink.Infrastructure.RepoBuilders
             _hashingService = hashingService;
         }
 
-        public async Task<Repo> Build(IDirectoryInfo root, CancellationToken token)
+        public Task<Repo> Build(IDirectoryInfo root, CancellationToken token)
         {
-            return await Build(root,
+            return Build(root,
                 null, token);
         }
 
-        public async Task<Repo> Build(IDirectoryInfo root, ModsInRepoRootBuilderConfig config, CancellationToken token)
+        public async Task<Repo> Build(IDirectoryInfo root, ModsInRepoRootBuilderConfig? config, CancellationToken token)
         {
             if (config == null)
-                config = new ModsInRepoRootBuilderConfig
-                {
-                    Name = root.Name,
-                    Modpacks =
-                        new List<ModsInRepoRootBuilderConfig.Modpack>
-                        {
-                            new ModsInRepoRootBuilderConfig.Modpack
-                                {Name = "Default", Mods = root.GetDirectories().Select(d => d.Name).ToList()}
-                        }
-                };
+                config = new ModsInRepoRootBuilderConfig(root.Name,
+                    new List<ModsInRepoRootBuilderConfig.Modpack>
+                    {
+                        new ModsInRepoRootBuilderConfig.Modpack("Default",
+                            root.GetDirectories().Select(d => d.Name).ToList())
+                    });
 
             var repoFiles = new Dictionary<FileSignature, RelativeUriFile>();
             var allModNames = config.Modpacks.SelectMany(m => m.Mods).Distinct();
@@ -72,13 +68,25 @@ namespace ModSink.Infrastructure.RepoBuilders
 
     public class ModsInRepoRootBuilderConfig
     {
-        public string Name { get; set; }
-        public ICollection<Modpack> Modpacks { get; set; }
+        public ModsInRepoRootBuilderConfig(string name, IEnumerable<Modpack> modpacks)
+        {
+            Name = name;
+            Modpacks = modpacks.ToList();
+        }
+
+        public string Name { get; }
+        public ICollection<Modpack> Modpacks { get; }
 
         public class Modpack
         {
-            public string Name { get; set; }
-            public ICollection<string> Mods { get; set; }
+            public Modpack(string name, IEnumerable<string> mods)
+            {
+                Name = name;
+                Mods = mods.ToList();
+            }
+
+            public string Name { get; }
+            public ICollection<string> Mods { get; }
         }
     }
 }

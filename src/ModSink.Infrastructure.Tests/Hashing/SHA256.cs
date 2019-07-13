@@ -20,7 +20,7 @@ namespace ModSink.Infrastructure.Tests.Hashing
             return Task.FromResult((Hash) new SHA256Hash(bytes));
         }
 
-        public Hash HashOfEmpty { get; }
+        public Hash HashOfEmpty => throw new NotImplementedException();
         public int HashSize { get; } = 256;
 
         public class SHA256Hash : Hash
