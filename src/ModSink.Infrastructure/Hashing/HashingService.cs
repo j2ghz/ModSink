@@ -8,6 +8,7 @@ using Microsoft.Extensions.Options;
 using ModSink.Application.Hashing;
 using ModSink.Domain.Entities.File;
 using ModSink.Domain.Entities.Repo;
+using PathLib;
 
 namespace ModSink.Infrastructure.Hashing
 {
@@ -31,11 +32,11 @@ namespace ModSink.Infrastructure.Hashing
 
         public IEnumerable<Task<RelativeUriFile>> GetFileHashes(IDirectoryInfo directory, CancellationToken token)
         {
-            var baseUri = new Uri(directory.FullName + "/"); //HACK: folder uris should end with / to get proper relative support
+            var root = PurePath.Create(directory.FullName);
             foreach (var file in GetFiles(directory))
             {
                 token.ThrowIfCancellationRequested();
-                var uri = new Uri(file.FullName);
+                var filePath = PurePath.Create(file.FullName);
 
                 var hash = RunASyncWaitSemaphore(async () =>
                 {
@@ -43,7 +44,7 @@ namespace ModSink.Infrastructure.Hashing
                     return new RelativeUriFile
                     {
                         Signature = new FileSignature(fileHash, file.Length),
-                        RelativeUri = RelativeUri.FromAbsolute(baseUri, uri)
+                        RelativePath = filePath.RelativeTo(root)
                     };
                 }, _semaphore, token);
 

@@ -1,16 +1,17 @@
 ﻿using System;
 using ModSink.Domain.Entities.File;
+using PathLib;
 
 namespace ModSink.Domain.Entities.Repo
 {
     public class RelativeUriFile : IEquatable<RelativeUriFile>
     {
         public FileSignature Signature { get; set; }
-        public RelativeUri RelativeUri { get; set; }
+        public IPurePath RelativePath { get; set; }
 
-        public RelativeUriFile InDirectory(params string[] dir)
+        public RelativeUriFile InDirectory( IPurePath dir)
         {
-            return new RelativeUriFile(){Signature = Signature,RelativeUri = RelativeUri.InDirectory(dir)};
+            return new RelativeUriFile(){Signature = Signature,RelativePath = dir.Join(RelativePath)};
         }
 
         #region Generated equality
@@ -19,7 +20,7 @@ namespace ModSink.Domain.Entities.Repo
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
-            return Signature.Equals(other.Signature) && Equals(RelativeUri, other.RelativeUri);
+            return Signature.Equals(other.Signature) && Equals(RelativePath, other.RelativePath);
         }
 
         public override bool Equals(object obj)
@@ -34,7 +35,7 @@ namespace ModSink.Domain.Entities.Repo
         {
             unchecked
             {
-                return (Signature.GetHashCode() * 397) ^ (RelativeUri != null ? RelativeUri.GetHashCode() : 0);
+                return (Signature.GetHashCode() * 397) ^ (RelativePath != null ? RelativePath.GetHashCode() : 0);
             }
         }
 

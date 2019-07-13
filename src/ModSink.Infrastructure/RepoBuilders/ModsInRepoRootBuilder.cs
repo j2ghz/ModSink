@@ -7,6 +7,7 @@ using ModSink.Application;
 using ModSink.Application.Hashing;
 using ModSink.Domain.Entities.File;
 using ModSink.Domain.Entities.Repo;
+using PathLib;
 
 namespace ModSink.Infrastructure.RepoBuilders
 {
@@ -48,7 +49,7 @@ namespace ModSink.Infrastructure.RepoBuilders
                 foreach (var modFileTask in modFiles)
                 {
                     var modFile = await modFileTask;
-                    var repoFile = modFile.InDirectory(modDir.Name);
+                    var repoFile = modFile.InDirectory(PurePath.Create(modDir.Name));
                     repoFiles[modFile.Signature] = repoFile;
                 }
 

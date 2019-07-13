@@ -10,6 +10,7 @@ using ModSink.Domain.Entities.Repo;
 using ModSink.Infrastructure.Hashing;
 using ModSink.Infrastructure.RepoBuilders;
 using ModSink.Infrastructure.Tests.Hashing;
+using PathLib;
 using Xunit;
 
 namespace ModSink.Infrastructure.Tests.RepoBuilders
@@ -39,7 +40,7 @@ namespace ModSink.Infrastructure.Tests.RepoBuilders
             repo.Files.Should().HaveCount(3);
             repo.Files.Should().Equal(new RelativeUriFile
             {
-                RelativeUri = new RelativeUri("mod1\\a.txt"),
+                RelativePath = PurePath.Create("mod1\\a.txt"),
                 Signature = new FileSignature(
                     new SHA256.SHA256Hash(new byte[]
                     {
@@ -50,7 +51,7 @@ namespace ModSink.Infrastructure.Tests.RepoBuilders
                     1UL)
             }, new RelativeUriFile
             {
-                RelativeUri = new RelativeUri("mod1\\b.txt"),
+                RelativePath = PurePath.Create("mod1\\b.txt"),
                 Signature = new FileSignature(
                     new SHA256.SHA256Hash(new byte[]
                         {
@@ -62,7 +63,7 @@ namespace ModSink.Infrastructure.Tests.RepoBuilders
                     1UL)
             }, new RelativeUriFile
             {
-                RelativeUri = new RelativeUri("mod2\\c.txt"),
+                RelativePath = PurePath.Create("mod2\\c.txt"),
                 Signature = new FileSignature(
                     new SHA256.SHA256Hash(new byte[]
                         {
