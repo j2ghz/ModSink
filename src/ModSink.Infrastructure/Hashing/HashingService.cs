@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.IO.Abstractions;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
@@ -15,13 +17,15 @@ namespace ModSink.Infrastructure.Hashing
     public class HashingService : IHashingService, IDisposable
     {
         private readonly IFileOpener _fileOpener;
+        private readonly StreamBreaker _streamBreaker;
         private readonly IHashFunction _hashFunction;
         private readonly SemaphoreSlim _semaphore;
 
-        public HashingService(IHashFunction hashFunction, IOptions<Options> options, IFileOpener fileOpener)
+        public HashingService(IHashFunction hashFunction, IOptions<Options> options, IFileOpener fileOpener, StreamBreaker streamBreaker)
         {
             _hashFunction = hashFunction;
             _fileOpener = fileOpener;
+            _streamBreaker = streamBreaker;
             _semaphore = new SemaphoreSlim(options.Value.Parallelism);
         }
 
@@ -30,7 +34,8 @@ namespace ModSink.Infrastructure.Hashing
             _semaphore?.Dispose();
         }
 
-        public IEnumerable<Task<RelativePathFile>> GetFileHashes(IDirectoryInfo directory, CancellationToken token)
+        public IEnumerable<Task<(RelativePathFile File, List<FileChunk> Chunks)>> GetFileHashes(IDirectoryInfo directory,
+            CancellationToken token)
         {
             var root = PurePath.Create(directory.FullName);
             foreach (var file in GetFiles(directory))
@@ -40,28 +45,41 @@ namespace ModSink.Infrastructure.Hashing
 
                 var hash = RunASyncWaitSemaphore(async () =>
                 {
-                    var fileHash = await GetFileHash(file, token);
-                    return new RelativePathFile
+                    var (fileSignature, fileChunks) = await GetFileHash(file, token);
+                    return (new RelativePathFile
                     {
-                        Signature = new FileSignature(fileHash, file.Length),
+                        Signature = fileSignature,
                         RelativePath = filePath.RelativeTo(root)
-                    };
+                    },fileChunks);
                 }, _semaphore, token);
 
                 yield return hash;
             }
         }
 
-        public async Task<Hash> GetFileHash(IFileInfo file, CancellationToken cancel)
+        public async Task<(FileSignature fileSignature, List<FileChunk> fileChunks)> GetFileHash(IFileInfo file, CancellationToken cancel)
         {
-            if (file.Length <= 0) return _hashFunction.HashOfEmpty;
             using var stream = _fileOpener.OpenRead(file);
-            return await _hashFunction.ComputeHashAsync(stream, cancel);
+            var chunks = _streamBreaker.GetSegments(stream, file.Length).ToList();
+            var chunkHashesStream = new MemoryStream(CombineByteArrays(chunks.Select(c=>c.Hash.RawForHashing()).ToArray()));
+            var fileHash = await _hashFunction.ComputeHashAsync(chunkHashesStream, cancel);
+            var fileSig = new FileSignature(fileHash,file.Length);
+            var fileChunks = chunks.Select(c => new FileChunk()
+                {File = fileSig, Chunk = new Chunk(){Signature = new ChunkSignature() { Hash = c.Hash, Length = c.Length }, Position = c.Offset}}).ToList();
+            return (fileSig,fileChunks);
         }
 
-        public async Task<FileSignature> GetFileSignature(IFileInfo file, CancellationToken cancel)
+        private byte[] CombineByteArrays(params byte[][] arrays)
         {
-            return new FileSignature(await GetFileHash(file, cancel), file.Length);
+            var result = new byte[arrays.Sum(a => a.Length)];
+            var i = 0;
+            foreach (var array in arrays)
+            {
+                System.Buffer.BlockCopy(array,0,result,i,array.Length);
+                i += array.Length;
+            }
+
+            return result;
         }
 
         public async Task<Hash> GetFileHash(Stream stream, CancellationToken cancel)

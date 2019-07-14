@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace ModSink.Domain.Entities.File
@@ -50,5 +51,12 @@ namespace ModSink.Domain.Entities.File
         }
 
         #endregion
+
+        public byte[] RawForHashing()
+        {
+            var result = HashId.Aggregate(new byte[0].AsEnumerable(), (current, t) => current.Append((byte) t));
+            result = Value.Aggregate(result, (current, b) => current.Append(b));
+            return result.ToArray();
+        }
     }
 }

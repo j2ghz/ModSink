@@ -4,6 +4,7 @@ using System.Security.Cryptography;
 using CommandLine;
 using Humanizer;
 using ModSink.Application.Hashing;
+using ModSink.Infrastructure.Hashing;
 
 namespace ModSink.CLI.Verbs
 {
@@ -13,10 +14,10 @@ namespace ModSink.CLI.Verbs
         {
             using var fileStream =
                 new FileStream(opts.Path, FileMode.Open, FileAccess.Read, FileShare.Read, opts.FileStreamBuffer);
-            var segments = new StreamBreaker().GetSegments(fileStream, fileStream.Length, xxHash64.Create());
+            var segments = new StreamBreaker(new XXHash64()).GetSegments(fileStream, fileStream.Length);
             foreach (var segment in segments)
                 Console.WriteLine(
-                    $"{BitConverter.ToString(segment.Hash)}\t{segment.Offset.Bytes().Humanize("G03")}\t{segment.Length.Bytes().Humanize("G03")}");
+                    $"{BitConverter.ToString(segment.Hash.Value)}\t{segment.Offset.Bytes().Humanize("G03")}\t{segment.Length.Bytes().Humanize("G03")}");
 
             return 0;
         }

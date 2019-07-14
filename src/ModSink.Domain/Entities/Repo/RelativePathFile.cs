@@ -4,6 +4,10 @@ using PathLib;
 
 namespace ModSink.Domain.Entities.Repo
 {
+
+    /// <summary>
+    /// <see cref="FileSignature"/> with <see cref="IPurePath"/> to the file
+    /// </summary>
     public class RelativePathFile : IEquatable<RelativePathFile>
     {
         public FileSignature Signature { get; set; }

@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.Extensions.Options;
+using ModSink.Application.Hashing;
 using ModSink.Domain.Entities.File;
 using ModSink.Domain.Entities.Repo;
 using ModSink.Infrastructure.Hashing;
@@ -30,15 +31,15 @@ namespace ModSink.Infrastructure.Tests.RepoBuilders
             var hashingService = new HashingService(hf, Options.Create(new HashingService.Options()),
                 new FileStreamOpener(
                     Options.Create(new FileStreamOpener.Options()),
-                    new MockFileStreamFactory(fileSystem)));
+                    new MockFileStreamFactory(fileSystem)),new StreamBreaker(hf));
             var builder = new ModsInRepoRootBuilder(hashingService);
             var root = fileSystem.DirectoryInfo.FromDirectoryName(@"/repo/");
 
             var repo = await builder.Build(root, CancellationToken.None);
 
             repo.Name.Should().Be("repo");
-            repo.Files.Should().HaveCount(3);
-            repo.Files.Should().Equal(new RelativePathFile
+            repo.SourceFiles.Should().HaveCount(3);
+            repo.SourceFiles.Should().Equal(new RelativePathFile
             {
                 RelativePath = PurePath.Create("mod1\\a.txt"),
                 Signature = new FileSignature(

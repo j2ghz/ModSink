@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Security.Cryptography;
 using System.Threading;
 using System.Threading.Tasks;
 using ModSink.Application.Hashing;
@@ -9,15 +10,28 @@ namespace ModSink.Infrastructure.Tests.Hashing
 {
     public class SHA256 : IHashFunction
     {
+        public Hash CreateHash(byte[] rawBytes)
+        {
+            return new SHA256Hash(rawBytes);
+        }
+
         public Hash ComputeHash(Stream data, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            cancellationToken.ThrowIfCancellationRequested();
+            var bytes = System.Security.Cryptography.SHA256.Create().ComputeHash(data);
+            return new SHA256Hash(bytes);
         }
 
         public Task<Hash> ComputeHashAsync(Stream data, CancellationToken cancellationToken)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             var bytes = System.Security.Cryptography.SHA256.Create().ComputeHash(data);
             return Task.FromResult((Hash) new SHA256Hash(bytes));
+        }
+
+        public HashAlgorithm AsHashAlgorithm()
+        {
+            return System.Security.Cryptography.SHA256.Create();
         }
 
         public Hash HashOfEmpty => throw new NotImplementedException();

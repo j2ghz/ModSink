@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Abstractions;
-using System.Security.Cryptography;
 using CommandLine;
 using Humanizer;
 using ModSink.Application.Hashing;
+using ModSink.Infrastructure.Hashing;
 
 namespace ModSink.CLI.Verbs
 {
@@ -26,13 +26,12 @@ namespace ModSink.CLI.Verbs
             foreach (var file in files)
             {
                 var stream = file.Open(FileMode.Open, FileAccess.Read, FileShare.Read);
-                var segments = new StreamBreaker().GetSegments(stream, stream.Length, xxHash64.Create());
+                var segments = new StreamBreaker(new XXHash64()).GetSegments(stream, stream.Length);
                 foreach (var segment in segments)
                 {
-                    var added = hashset.Add(segment.Hash);
+                    var added = hashset.Add(segment.Hash.Value);
                     if (!added)
                         duplicateSize += segment.Length;
-                    //Console.WriteLine($"Unique chunks: {hashset.Count}\tDuplicate size: {duplicateSize.Bytes().Humanize("G03")}\tDuplicate {BitConverter.ToString(segment.Hash)}\tin {file.FullName}@{segment.Offset} {segment.Length.Bytes().Humanize("G03")}");
                 }
 
                 Console.WriteLine(

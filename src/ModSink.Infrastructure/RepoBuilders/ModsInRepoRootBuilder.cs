@@ -36,7 +36,8 @@ namespace ModSink.Infrastructure.RepoBuilders
                             root.GetDirectories().Select(d => d.Name).ToList())
                     });
 
-            var repoFiles = new Dictionary<FileSignature, RelativePathFile>();
+            var repoFiles = new Dictionary<FileSignature, IPurePath>();
+            var repoChunks = new HashSet<FileChunk>();
             var allModNames = config.Modpacks.SelectMany(m => m.Mods).Distinct();
             var builtMods = new List<Mod>();
             var modDirs = root.GetDirectories();
@@ -48,12 +49,13 @@ namespace ModSink.Infrastructure.RepoBuilders
                 await Task.WhenAll(modFiles);
                 foreach (var modFileTask in modFiles)
                 {
-                    var modFile = await modFileTask;
-                    var repoFile = modFile.InDirectory(PurePath.Create(modDir.Name));
-                    repoFiles[modFile.Signature] = repoFile;
+                    var (file, chunks) = await modFileTask;
+                    var repoFile = file.InDirectory(PurePath.Create(modDir.Name));
+                    repoFiles[file.Signature] = repoFile.RelativePath;
+                    repoChunks.UnionWith(chunks);
                 }
 
-                builtMods.Add(new Mod {Files = modFiles.Select(t => t.Result).ToList(), Name = modName});
+                builtMods.Add(new Mod {Files = modFiles.Select(t => t.Result.File).ToList(), Name = modName});
             }
 
             var modpacks = config.Modpacks.Select(modpack => new Modpack
@@ -62,7 +64,7 @@ namespace ModSink.Infrastructure.RepoBuilders
                 Mods = modpack.Mods.Select(modName => builtMods.First(mod => mod.Name == modName)).ToList()
             });
 
-            var repo = new Repo {Name = config.Name, Modpacks = modpacks.ToList(), Files = repoFiles.Values};
+            var repo = new Repo {Name = config.Name, Modpacks = modpacks.ToList(), SourceFiles = repoFiles, FileChunks = repoChunks };
             return repo;
         }
     }
