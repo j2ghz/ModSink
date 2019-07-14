@@ -10,8 +10,8 @@ namespace ModSink.Application
         Task<Repo> Build(IDirectoryInfo root, CancellationToken token);
     }
 
-    public interface IRepoBuilder<TConfig> : IRepoBuilder where TConfig : class
+    public interface IRepoBuilder<TConfig> : IRepoBuilder
     {
-        Task<Repo> Build(IDirectoryInfo root, TConfig? config, CancellationToken token);
+        Task<Repo> Build(IDirectoryInfo root, TConfig config, CancellationToken token);
     }
 }

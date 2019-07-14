@@ -26,7 +26,7 @@ namespace ModSink.Infrastructure.RepoBuilders
                 null, token);
         }
 
-        public async Task<Repo> Build(IDirectoryInfo root, ModsInRepoRootBuilderConfig? config, CancellationToken token)
+        public async Task<Repo> Build(IDirectoryInfo root, ModsInRepoRootBuilderConfig config, CancellationToken token)
         {
             if (config == null)
                 config = new ModsInRepoRootBuilderConfig(root.Name,
