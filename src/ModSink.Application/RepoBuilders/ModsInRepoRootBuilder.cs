@@ -3,13 +3,12 @@ using System.IO.Abstractions;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using ModSink.Application;
 using ModSink.Application.Hashing;
 using ModSink.Domain.Entities.File;
 using ModSink.Domain.Entities.Repo;
 using PathLib;
 
-namespace ModSink.Infrastructure.RepoBuilders
+namespace ModSink.Application.RepoBuilders
 {
     public class ModsInRepoRootBuilder : IRepoBuilder<ModsInRepoRootBuilderConfig>
     {

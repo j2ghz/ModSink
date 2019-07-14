@@ -9,7 +9,7 @@ using ModSink.Application.Hashing;
 using ModSink.Domain.Entities.File;
 using ModSink.Domain.Entities.Repo;
 using ModSink.Infrastructure.Hashing;
-using ModSink.Infrastructure.RepoBuilders;
+using ModSink.Application.RepoBuilders;
 using ModSink.Infrastructure.Tests.Hashing;
 using PathLib;
 using Xunit;

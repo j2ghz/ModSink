@@ -29,6 +29,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ModSink.Application\ModSink.Application.csproj" />
+    <ProjectReference Include="..\ModSink.Infrastructure\ModSink.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>
