@@ -8,16 +8,18 @@ namespace ModSink.Application.Hashing
     public class StreamBreaker
     {
         private const int bufferSize = 64 * 1024;
-        private const long mask = (1 << 16) - 1; //--> a hash seive: 16 gets you ~64k chunks
+        private readonly long mask; //--> a hash seive: 16 gets you ~64k chunks
         private const long seed = 2273; //--> a our hash seed
         private const int width = 64; //--> the # of bytes in the window
         private static object sync = new object();
         private readonly IHashFunction _hashFunction;
 
 
-        public StreamBreaker(IHashFunction hashFunction)
+        /// <param name="sieveSize">16 gives ~64k chunks</param>
+        public StreamBreaker(IHashFunction hashFunction, byte sieveSize = 9)
         {
             _hashFunction = hashFunction;
+            mask = (1 << sieveSize) - 1;
         }
 
         /// <summary>
