@@ -4,7 +4,6 @@ using System.IO;
 
 namespace ModSink.Domain.Entities.File
 {
-    [DebuggerDisplay("{Hash} | {Length}")]
     public struct FileSignature : IEquatable<FileSignature>
     {
         public FileSignature(Hash hash, ulong length)

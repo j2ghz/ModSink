@@ -1,4 +1,9 @@
-﻿using FluentAssertions;
+﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using FluentAssertions;
+using ModSink.Domain.Entities.File;
+using ModSink.Domain.Entities.Repo;
+using PathLib;
 using Xunit;
 
 namespace ModSink.Domain.Tests.Entities.Repo
@@ -8,8 +13,8 @@ namespace ModSink.Domain.Tests.Entities.Repo
         [Fact]
         public void RepoEquals()
         {
-            var repo = new Domain.Entities.Repo.Repo();
-            var clone = new Domain.Entities.Repo.Repo();
+            var repo = new Domain.Entities.Repo.Repo("",new List<Modpack>(),new Dictionary<FileSignature, IPurePath>(), new FileChunk[0]  );
+            var clone = new Domain.Entities.Repo.Repo("", new List<Modpack>(), new Dictionary<FileSignature, IPurePath>(), new FileChunk[0]);
             repo.Should().Be(clone);
             repo.Should().BeEquivalentTo(clone);
         }

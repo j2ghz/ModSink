@@ -63,7 +63,7 @@ namespace ModSink.Application.RepoBuilders
                 Mods = modpack.Mods.Select(modName => builtMods.First(mod => mod.Name == modName)).ToList()
             });
 
-            var repo = new Repo {Name = config.Name, Modpacks = modpacks.ToList(), SourceFiles = repoFiles, FileChunks = repoChunks };
+            var repo = new Repo(config.Name, modpacks.ToList(), repoFiles, repoChunks);
             return repo;
         }
     }
@@ -76,8 +76,9 @@ namespace ModSink.Application.RepoBuilders
             Modpacks = modpacks.ToList();
         }
 
-        public string Name { get; }
         public ICollection<Modpack> Modpacks { get; }
+
+        public string Name { get; }
 
         public class Modpack
         {
@@ -87,8 +88,9 @@ namespace ModSink.Application.RepoBuilders
                 Mods = mods.ToList();
             }
 
-            public string Name { get; }
             public ICollection<string> Mods { get; }
+
+            public string Name { get; }
         }
     }
 }
