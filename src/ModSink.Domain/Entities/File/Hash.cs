@@ -4,14 +4,19 @@ using System.Linq;
 
 namespace ModSink.Domain.Entities.File
 {
-    public abstract class Hash : IEquatable<Hash>
+    public  class Hash : IEquatable<Hash>
     {
+        [Obsolete]
+        public Hash()
+        {
+            
+        }
         protected Hash(byte[] value)
         {
             Value = value;
         }
 
-        public abstract string HashId { get; }
+        public virtual string HashId { get; }
 
         public byte[] Value { get; }
 
