@@ -19,13 +19,13 @@ namespace ModSink.Application.RepoBuilders
             _hashingService = hashingService;
         }
 
-        public Task<Repo> Build(IDirectoryInfo root, CancellationToken token)
+        public Task<RepoWithFileChunks> Build(IDirectoryInfo root, CancellationToken token)
         {
             return Build(root,
                 null, token);
         }
 
-        public async Task<Repo> Build(IDirectoryInfo root, ModsInRepoRootBuilderConfig config, CancellationToken token)
+        public async Task<RepoWithFileChunks> Build(IDirectoryInfo root, ModsInRepoRootBuilderConfig? config, CancellationToken token)
         {
             if (config == null)
                 config = new ModsInRepoRootBuilderConfig(root.Name,
@@ -36,7 +36,7 @@ namespace ModSink.Application.RepoBuilders
                     });
 
             var repoFiles = new Dictionary<FileSignature, IPurePath>();
-            var repoChunks = new HashSet<FileChunk>();
+            var repoChunks = new HashSet<FileChunks>();
             var allModNames = config.Modpacks.SelectMany(m => m.Mods).Distinct();
             var builtMods = new List<Mod>();
             var modDirs = root.GetDirectories();
@@ -51,7 +51,7 @@ namespace ModSink.Application.RepoBuilders
                     var (file, chunks) = await modFileTask;
                     var repoFile = file.InDirectory(PurePath.Create(modDir.Name));
                     repoFiles[file.Signature] = repoFile.RelativePath;
-                    repoChunks.UnionWith(chunks);
+                    repoChunks.Add(new FileChunks(file.Signature, chunks));
                 }
 
                 builtMods.Add(new Mod {Files = modFiles.Select(t => t.Result.File).ToList(), Name = modName});
@@ -63,8 +63,8 @@ namespace ModSink.Application.RepoBuilders
                 Mods = modpack.Mods.Select(modName => builtMods.First(mod => mod.Name == modName)).ToList()
             });
 
-            var repo = new Repo(config.Name, modpacks.ToList(), repoFiles, repoChunks);
-            return repo;
+            var repo = new Repo(config.Name, modpacks.ToList(), repoFiles);
+            return new RepoWithFileChunks(repo,repoChunks);
         }
     }
 

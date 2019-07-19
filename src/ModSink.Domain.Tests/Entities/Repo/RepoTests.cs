@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using FluentAssertions;
 using ModSink.Domain.Entities.File;
 using ModSink.Domain.Entities.Repo;
@@ -13,8 +12,10 @@ namespace ModSink.Domain.Tests.Entities.Repo
         [Fact]
         public void RepoEquals()
         {
-            var repo = new Domain.Entities.Repo.Repo("",new List<Modpack>(),new Dictionary<FileSignature, IPurePath>(), new FileChunk[0]  );
-            var clone = new Domain.Entities.Repo.Repo("", new List<Modpack>(), new Dictionary<FileSignature, IPurePath>(), new FileChunk[0]);
+            var repo = new Domain.Entities.Repo.Repo("", new List<Modpack>(),
+                new Dictionary<FileSignature, IPurePath>());
+            var clone = new Domain.Entities.Repo.Repo("", new List<Modpack>(),
+                new Dictionary<FileSignature, IPurePath>());
             repo.Should().Be(clone);
             repo.Should().BeEquivalentTo(clone);
         }

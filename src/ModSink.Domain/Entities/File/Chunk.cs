@@ -4,6 +4,7 @@ using System.Text;
 
 namespace ModSink.Domain.Entities.File
 {
+    [Equals]
     public struct Chunk
     {
         public ChunkSignature Signature { get; set; }

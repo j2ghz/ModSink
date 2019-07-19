@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.IO.Abstractions;
 using System.Linq;
@@ -17,11 +16,12 @@ namespace ModSink.Infrastructure.Hashing
     public class HashingService : IHashingService, IDisposable
     {
         private readonly IFileOpener _fileOpener;
-        private readonly StreamBreaker _streamBreaker;
         private readonly IHashFunction _hashFunction;
         private readonly SemaphoreSlim _semaphore;
+        private readonly StreamBreaker _streamBreaker;
 
-        public HashingService(IHashFunction hashFunction, IOptions<Options> options, IFileOpener fileOpener, StreamBreaker streamBreaker)
+        public HashingService(IHashFunction hashFunction, IOptions<Options> options, IFileOpener fileOpener,
+            StreamBreaker streamBreaker)
         {
             _hashFunction = hashFunction;
             _fileOpener = fileOpener;
@@ -34,7 +34,7 @@ namespace ModSink.Infrastructure.Hashing
             _semaphore?.Dispose();
         }
 
-        public IEnumerable<Task<(RelativePathFile File, List<FileChunk> Chunks)>> GetFileHashes(IDirectoryInfo directory,
+        public IEnumerable<Task<(RelativePathFile File, List<Chunk> Chunks)>> GetFileHashes(IDirectoryInfo directory,
             CancellationToken token)
         {
             var root = PurePath.Create(directory.FullName);
@@ -50,23 +50,25 @@ namespace ModSink.Infrastructure.Hashing
                     {
                         Signature = fileSignature,
                         RelativePath = filePath.RelativeTo(root)
-                    },fileChunks);
+                    }, fileChunks);
                 }, _semaphore, token);
 
                 yield return hash;
             }
         }
 
-        public async Task<(FileSignature fileSignature, List<FileChunk> fileChunks)> GetFileHash(IFileInfo file, CancellationToken cancel)
+        public async Task<(FileSignature fileSignature, List<Chunk> fileChunks)> GetFileHash(IFileInfo file,
+            CancellationToken cancel)
         {
             using var stream = _fileOpener.OpenRead(file);
             var chunks = _streamBreaker.GetSegments(stream, file.Length).ToList();
-            var chunkHashesStream = new MemoryStream(CombineByteArrays(chunks.Select(c=>c.Hash.RawForHashing()).ToArray()));
+            var chunkHashesStream =
+                new MemoryStream(CombineByteArrays(chunks.Select(c => c.Hash.RawForHashing()).ToArray()));
             var fileHash = await _hashFunction.ComputeHashAsync(chunkHashesStream, cancel);
-            var fileSig = new FileSignature(fileHash,file.Length);
-            var fileChunks = chunks.Select(c => new FileChunk()
-                {File = fileSig, Chunk = new Chunk(){Signature = new ChunkSignature() { Hash = c.Hash, Length = c.Length }, Position = c.Offset}}).ToList();
-            return (fileSig,fileChunks);
+            var fileSig = new FileSignature(fileHash, file.Length);
+            var fileChunks = chunks.Select(c => new Chunk
+                {Signature = new ChunkSignature(c.Hash, c.Length), Position = c.Offset}).ToList();
+            return (fileSig, fileChunks);
         }
 
         private byte[] CombineByteArrays(params byte[][] arrays)
@@ -75,7 +77,7 @@ namespace ModSink.Infrastructure.Hashing
             var i = 0;
             foreach (var array in arrays)
             {
-                System.Buffer.BlockCopy(array,0,result,i,array.Length);
+                Buffer.BlockCopy(array, 0, result, i, array.Length);
                 i += array.Length;
             }
 

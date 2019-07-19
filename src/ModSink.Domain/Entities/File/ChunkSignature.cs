@@ -1,12 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace ModSink.Domain.Entities.File
+﻿namespace ModSink.Domain.Entities.File
 {
-    public struct ChunkSignature
+    [Equals]
+    public class ChunkSignature
     {
-        public Hash Hash { get; set; }
-        public long Length { get; set; }
+        public ChunkSignature(Hash hash, long length)
+        {
+            Hash = hash;
+            Length = length;
+        }
+
+        public Hash Hash { get; }
+        public long Length { get; }
     }
 }

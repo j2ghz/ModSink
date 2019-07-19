@@ -8,11 +8,11 @@ namespace ModSink.Application.Hashing
     public class StreamBreaker
     {
         private const int bufferSize = 64 * 1024;
-        private readonly long mask; //--> a hash seive: 16 gets you ~64k chunks
         private const long seed = 2273; //--> a our hash seed
         private const int width = 64; //--> the # of bytes in the window
         private static object sync = new object();
         private readonly IHashFunction _hashFunction;
+        private readonly long mask; //--> a hash seive: 16 gets you ~64k chunks
 
 
         /// <param name="sieveSize">16 gives ~64k chunks</param>
@@ -107,7 +107,7 @@ namespace ModSink.Application.Hashing
 
             public Chunk ToChunk()
             {
-                return new Chunk {Position = Offset, Signature = new ChunkSignature {Hash = Hash, Length = Length}}
+                return new Chunk {Position = Offset, Signature = new ChunkSignature(Hash, Length)}
                     ;
             }
         }
