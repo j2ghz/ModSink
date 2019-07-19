@@ -23,6 +23,7 @@ namespace ModSink.Domain.Entities.File
         /// <summary>
         ///     The length of the file taken from <see cref="FileInfo" />, in bytes.
         /// </summary>
+        [Obsolete]
         public ulong Length { get; }
 
         #region Generated

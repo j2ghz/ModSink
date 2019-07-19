@@ -4,10 +4,10 @@ using System.Linq;
 
 namespace ModSink.Domain.Entities.File
 {
-    public  class Hash : IEquatable<Hash>
+    public class Hash : IEquatable<Hash>
     {
-        [Obsolete]
-        public Hash()
+        //TODO: Should be abstract
+        private Hash()
         {
             
         }
