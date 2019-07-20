@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using ModSink.Application.Hashing;
 using ModSink.Domain.Entities.File;
 
-namespace ModSink.Infrastructure.Tests.Hashing
+namespace ModSink.Infrastructure.Hashing
 {
     public class SHA256 : IHashFunction
     {

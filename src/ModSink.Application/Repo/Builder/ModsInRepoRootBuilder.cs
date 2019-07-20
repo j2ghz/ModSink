@@ -8,7 +8,7 @@ using ModSink.Domain.Entities.File;
 using ModSink.Domain.Entities.Repo;
 using PathLib;
 
-namespace ModSink.Application.RepoBuilders
+namespace ModSink.Application.Repo.Builder
 {
     public class ModsInRepoRootBuilder : IRepoBuilder<ModsInRepoRootBuilderConfig>
     {
@@ -63,7 +63,7 @@ namespace ModSink.Application.RepoBuilders
                 Mods = modpack.Mods.Select(modName => builtMods.First(mod => mod.Name == modName)).ToList()
             });
 
-            var repo = new Repo(config.Name, modpacks.ToList(), repoFiles);
+            var repo = new Domain.Entities.Repo.Repo(config.Name, modpacks.ToList(), repoFiles);
             return new RepoWithFileChunks(repo,repoChunks);
         }
     }

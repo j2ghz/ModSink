@@ -1,18 +1,17 @@
 ﻿using System.Collections.Generic;
 using ModSink.Domain.Entities.File;
-using ModSink.Domain.Entities.Repo;
 
-namespace ModSink.Application.RepoBuilders
+namespace ModSink.Application.Repo.Builder
 {
     public class RepoWithFileChunks
     {
-        public RepoWithFileChunks(Repo repo, IReadOnlyCollection<FileChunks> fileChunks)
+        public RepoWithFileChunks(Domain.Entities.Repo.Repo repo, IReadOnlyCollection<FileChunks> fileChunks)
         {
             Repo = repo;
             FileChunks = fileChunks;
         }
 
-        public Repo Repo { get; }
+        public Domain.Entities.Repo.Repo Repo { get; }
         public IReadOnlyCollection<FileChunks> FileChunks { get; }
     }
 }

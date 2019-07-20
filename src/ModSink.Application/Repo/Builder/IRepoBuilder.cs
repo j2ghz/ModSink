@@ -1,10 +1,8 @@
 ﻿using System.IO.Abstractions;
 using System.Threading;
 using System.Threading.Tasks;
-using ModSink.Application.RepoBuilders;
-using ModSink.Domain.Entities.Repo;
 
-namespace ModSink.Application
+namespace ModSink.Application.Repo.Builder
 {
     public interface IRepoBuilder
     {

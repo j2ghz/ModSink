@@ -6,11 +6,10 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.Extensions.Options;
 using ModSink.Application.Hashing;
-using ModSink.Application.RepoBuilders;
+using ModSink.Application.Repo.Builder;
 using ModSink.Domain.Entities.File;
 using ModSink.Domain.Entities.Repo;
 using ModSink.Infrastructure.Hashing;
-using ModSink.Infrastructure.Tests.Hashing;
 using Newtonsoft.Json;
 using PathLib;
 using Xunit;
@@ -64,7 +63,7 @@ namespace ModSink.Application.Tests.RepoBuilders
                     }
                 ),
                 1UL);
-            var expected = new RepoWithFileChunks(new Repo("repo",
+            var expected = new RepoWithFileChunks(new Domain.Entities.Repo.Repo("repo",
                     new List<Modpack>
                     {
                         new Modpack
