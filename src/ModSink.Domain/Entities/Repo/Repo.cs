@@ -4,7 +4,6 @@ using PathLib;
 
 namespace ModSink.Domain.Entities.Repo
 {
-    [Equals]
     public class Repo
     {
         public Repo(string name, IReadOnlyCollection<Modpack> modpacks, IReadOnlyDictionary<FileSignature, IPurePath> sourceFiles)

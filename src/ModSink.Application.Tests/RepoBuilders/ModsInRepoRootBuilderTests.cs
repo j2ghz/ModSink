@@ -37,7 +37,7 @@ namespace ModSink.Application.Tests.RepoBuilders
             var builder = new ModsInRepoRootBuilder(hashingService);
             var root = fileSystem.DirectoryInfo.FromDirectoryName(@"/repo/");
             //Build
-            var repo = await builder.Build(root, CancellationToken.None);
+            var actual = await builder.Build(root, CancellationToken.None);
             //Manual repo to compare
             var fileA = new FileSignature(
                 new SHA256.SHA256Hash(new byte[]
@@ -178,10 +178,7 @@ namespace ModSink.Application.Tests.RepoBuilders
                             }
                         })
                 });
-            var a = JsonConvert.SerializeObject(repo.Repo.Modpacks.Select(m => m.Mods));
-            expected.Should().BeEquivalentTo(repo, options => options.WithoutStrictOrdering());
-            repo.Should().Be(expected);
-            repo.Should().BeEquivalentTo(expected);
+            actual.Should().BeEquivalentTo(expected);
         }
     }
 }

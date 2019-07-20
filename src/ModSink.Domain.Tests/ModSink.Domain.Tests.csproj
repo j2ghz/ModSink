@@ -9,6 +9,7 @@
 
   <ItemGroup>
     <PackageReference Include="AltCover" Version="5.3.675" />
+    <PackageReference Include="AutoFixture.Xunit2" Version="4.11.0" />
     <PackageReference Include="FluentAssertions" Version="5.7.0" />
     <PackageReference Include="FluentAssertions.Analyzers" Version="0.11.4" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.2.0" />
