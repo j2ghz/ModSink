@@ -1,4 +1,5 @@
-﻿using FluentAssertions;
+﻿using System;
+using FluentAssertions;
 using FsCheck;
 using FsCheck.Xunit;
 using ModSink.Application.Serialization;
@@ -10,25 +11,33 @@ namespace ModSink.Application.Tests.Serialization
     {
         protected abstract IFormatter formatter { get; }
 
-        [Theory]
-        [InlineData("a")]
-        [InlineData(1)]
-        public void Roundtrip(object o)
+
+        [Property]
+        public void CanDeserialize(string ext)
         {
-            var stream = formatter.Serialize(o);
-            formatter.Deserialize<object>(stream).Should().BeEquivalentTo(o);
+            try
+            {
+                formatter.CanDeserialize(ext);
+            }
+            catch (ArgumentNullException) when (ext==null)
+            {
+               //Exception expected
+            }
+            
         }
 
-        [Fact]
-        public void RoundtripFsCheck()
+        [Property]
+        public void RoundTripString(string o)
         {
-            Prop.ForAll<object>(o =>
-            {
-                var stream = formatter.Serialize(o);
-                formatter.Deserialize<object>(stream).Should().BeEquivalentTo(o);
-                return true;
-            }).QuickCheckThrowOnFailure();
-            
+            var stream = formatter.Serialize(o);
+            formatter.Deserialize<string>(stream).Should().BeEquivalentTo(o);
+        }
+
+        [Property]
+        public void RoundTripRepo(Domain.Entities.Repo.Repo o)
+        {
+            var stream = formatter.Serialize(o);
+            formatter.Deserialize<Domain.Entities.Repo.Repo>(stream).Should().BeEquivalentTo(o);
         }
     }
 }

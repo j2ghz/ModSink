@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Text;
 using ModSink.Application.Serialization;
 using Newtonsoft.Json;
@@ -31,6 +32,7 @@ namespace ModSink.Infrastructure.Serialization
 
         public bool CanDeserialize(string extension)
         {
+            if (extension == null) throw new ArgumentNullException(nameof(extension));
             return extension.EndsWith("json");
         }
     }
