@@ -15,8 +15,6 @@ before_build:
 
 build:
   verbosity: minimal
-  publish_nuget: true
-  publish_nuget_symbols: true
 
 test_script:
   - dotnet test --configuration Release /p:AltCover=true /p:AltCoverForce=true"
@@ -27,7 +25,13 @@ after_test:
 on_failure:
   - FOR /D /r %%G in ("src/*.Tests") DO codecov -f "src\%%~nxG\coverage.xml"
 
+before_package:
+  - dotnet pack
 
+artifacts:
+  - path: 'src/**/*.nupkg'
+    name: NuGet
+    type: NuGetPackage
 
 deploy:
   provider: NuGet
