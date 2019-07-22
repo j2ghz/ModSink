@@ -7,6 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="GitVersionTask" Version="5.0.0-beta5.44">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="Microsoft.Extensions.Options" Version="3.0.0-preview6.19304.6" />
     <PackageReference Include="System.IO.Abstractions" Version="6.0.7" />
     <PackageReference Include="System.Reactive" Version="4.1.5" />
