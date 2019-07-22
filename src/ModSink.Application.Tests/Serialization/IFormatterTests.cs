@@ -7,7 +7,6 @@ using FsCheck.Xunit;
 using FSharpx;
 using ModSink.Application.Serialization;
 using ModSink.Domain.Entities.File;
-using ModSink.Domain.Entities.Repo;
 
 namespace ModSink.Application.Tests.Serialization
 {
@@ -36,7 +35,7 @@ namespace ModSink.Application.Tests.Serialization
             formatter.Deserialize<string>(stream).Should().BeEquivalentTo(o);
         }
 
-        [Property(Arbitrary = new[] {typeof(RepoGenerators)})]
+        [Property(Arbitrary = new[] {typeof(RepoGenerators)}, Skip = "Unfinished")]
         public void RoundTripRepo(Domain.Entities.Repo.Repo o)
         {
             var stream = formatter.Serialize(o);
@@ -62,13 +61,12 @@ namespace ModSink.Application.Tests.Serialization
 
             public class TestHash : Hash
             {
-                public override string HashId { get; }
-
                 public TestHash(string id, byte[] value) : base(value)
                 {
-                    this.HashId = id;
-
+                    HashId = id;
                 }
+
+                public override string HashId { get; }
             }
         }
     }
