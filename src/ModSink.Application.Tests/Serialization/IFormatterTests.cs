@@ -1,9 +1,13 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using FluentAssertions;
 using FsCheck;
 using FsCheck.Xunit;
+using FSharpx;
 using ModSink.Application.Serialization;
-using Xunit;
+using ModSink.Domain.Entities.File;
+using ModSink.Domain.Entities.Repo;
 
 namespace ModSink.Application.Tests.Serialization
 {
@@ -19,11 +23,10 @@ namespace ModSink.Application.Tests.Serialization
             {
                 formatter.CanDeserialize(ext);
             }
-            catch (ArgumentNullException) when (ext==null)
+            catch (ArgumentNullException) when (ext == null)
             {
-               //Exception expected
+                //Exception expected
             }
-            
         }
 
         [Property]
@@ -33,11 +36,40 @@ namespace ModSink.Application.Tests.Serialization
             formatter.Deserialize<string>(stream).Should().BeEquivalentTo(o);
         }
 
-        [Property]
+        [Property(Arbitrary = new[] {typeof(RepoGenerators)})]
         public void RoundTripRepo(Domain.Entities.Repo.Repo o)
         {
             var stream = formatter.Serialize(o);
             formatter.Deserialize<Domain.Entities.Repo.Repo>(stream).Should().BeEquivalentTo(o);
+        }
+
+        public static class RepoGenerators
+        {
+            public static Arbitrary<IReadOnlyCollection<T>> IReadOnlyCollection<T>()
+            {
+                return Arb.Convert(FSharpFunc.FromFunc((ICollection<T> c) => (IReadOnlyCollection<T>) c),
+                    FSharpFunc.FromFunc((IReadOnlyCollection<T> c) => (ICollection<T>) c.ToList()),
+                    Arb.Default.ICollection<T>());
+            }
+
+            public static Gen<FileSignature> FileSignature()
+            {
+                return from hashId in Arb.Default.String().Generator
+                    from value in Arb.Default.Array<byte>().Generator
+                    from length in Arb.Default.Int64().Generator
+                    select new FileSignature(new TestHash(hashId, value), length);
+            }
+
+            public class TestHash : Hash
+            {
+                public override string HashId { get; }
+
+                public TestHash(string id, byte[] value) : base(value)
+                {
+                    this.HashId = id;
+
+                }
+            }
         }
     }
 }
