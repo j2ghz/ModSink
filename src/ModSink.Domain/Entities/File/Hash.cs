@@ -7,7 +7,7 @@ namespace ModSink.Domain.Entities.File
     public class Hash : IEquatable<Hash>
     {
         //TODO: Should be abstract
-        private Hash()
+        public Hash()
         {
             
         }
