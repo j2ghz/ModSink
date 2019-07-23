@@ -4,7 +4,6 @@ using System.IO;
 
 namespace ModSink.Domain.Entities.File
 {
-    [DebuggerDisplay("{Hash} | {Length}")]
     public struct FileSignature : IEquatable<FileSignature>
     {
         public FileSignature(Hash hash, ulong length)
@@ -24,6 +23,7 @@ namespace ModSink.Domain.Entities.File
         /// <summary>
         ///     The length of the file taken from <see cref="FileInfo" />, in bytes.
         /// </summary>
+        [Obsolete]
         public ulong Length { get; }
 
         #region Generated

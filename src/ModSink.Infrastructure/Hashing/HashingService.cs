@@ -2,12 +2,14 @@
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Abstractions;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using ModSink.Application.Hashing;
 using ModSink.Domain.Entities.File;
 using ModSink.Domain.Entities.Repo;
+using PathLib;
 
 namespace ModSink.Infrastructure.Hashing
 {
@@ -16,11 +18,14 @@ namespace ModSink.Infrastructure.Hashing
         private readonly IFileOpener _fileOpener;
         private readonly IHashFunction _hashFunction;
         private readonly SemaphoreSlim _semaphore;
+        private readonly StreamBreaker _streamBreaker;
 
-        public HashingService(IHashFunction hashFunction, IOptions<Options> options, IFileOpener fileOpener)
+        public HashingService(IHashFunction hashFunction, IOptions<Options> options, IFileOpener fileOpener,
+            StreamBreaker streamBreaker)
         {
             _hashFunction = hashFunction;
             _fileOpener = fileOpener;
+            _streamBreaker = streamBreaker;
             _semaphore = new SemaphoreSlim(options.Value.Parallelism);
         }
 
@@ -29,38 +34,54 @@ namespace ModSink.Infrastructure.Hashing
             _semaphore?.Dispose();
         }
 
-        public IEnumerable<Task<RelativeUriFile>> GetFileHashes(IDirectoryInfo directory, CancellationToken token)
+        public IEnumerable<Task<(RelativePathFile File, List<Chunk> Chunks)>> GetFileHashes(IDirectoryInfo directory,
+            CancellationToken token)
         {
-            var baseUri = new Uri(directory.FullName + "/"); //HACK: folder uris should end with / to get proper relative support
+            var root = PurePath.Create(directory.FullName);
             foreach (var file in GetFiles(directory))
             {
                 token.ThrowIfCancellationRequested();
-                var uri = new Uri(file.FullName);
+                var filePath = PurePath.Create(file.FullName);
 
                 var hash = RunASyncWaitSemaphore(async () =>
                 {
-                    var fileHash = await GetFileHash(file, token);
-                    return new RelativeUriFile
+                    var (fileSignature, fileChunks) = await GetFileHash(file, token);
+                    return (new RelativePathFile
                     {
-                        Signature = new FileSignature(fileHash, file.Length),
-                        RelativeUri = RelativeUri.FromAbsolute(baseUri, uri)
-                    };
+                        Signature = fileSignature,
+                        RelativePath = filePath.RelativeTo(root)
+                    }, fileChunks);
                 }, _semaphore, token);
 
                 yield return hash;
             }
         }
 
-        public async Task<Hash> GetFileHash(IFileInfo file, CancellationToken cancel)
+        public async Task<(FileSignature fileSignature, List<Chunk> fileChunks)> GetFileHash(IFileInfo file,
+            CancellationToken cancel)
         {
-            if (file.Length <= 0) return _hashFunction.HashOfEmpty;
             using var stream = _fileOpener.OpenRead(file);
-            return await _hashFunction.ComputeHashAsync(stream, cancel);
+            var chunks = _streamBreaker.GetSegments(stream, file.Length).ToList();
+            var chunkHashesStream =
+                new MemoryStream(CombineByteArrays(chunks.Select(c => c.Hash.RawForHashing()).ToArray()));
+            var fileHash = await _hashFunction.ComputeHashAsync(chunkHashesStream, cancel);
+            var fileSig = new FileSignature(fileHash, file.Length);
+            var fileChunks = chunks.Select(c => new Chunk
+                {Signature = new ChunkSignature(c.Hash, c.Length), Position = c.Offset}).ToList();
+            return (fileSig, fileChunks);
         }
 
-        public async Task<FileSignature> GetFileSignature(IFileInfo file, CancellationToken cancel)
+        private byte[] CombineByteArrays(params byte[][] arrays)
         {
-            return new FileSignature(await GetFileHash(file, cancel), file.Length);
+            var result = new byte[arrays.Sum(a => a.Length)];
+            var i = 0;
+            foreach (var array in arrays)
+            {
+                Buffer.BlockCopy(array, 0, result, i, array.Length);
+                i += array.Length;
+            }
+
+            return result;
         }
 
         public async Task<Hash> GetFileHash(Stream stream, CancellationToken cancel)

@@ -1,18 +1,19 @@
 ﻿using FluentAssertions;
 using ModSink.Domain.Entities.File;
 using ModSink.Domain.Entities.Repo;
+using PathLib;
 using Xunit;
 
 namespace ModSink.Domain.Tests.Entities.Repo
 {
-    public class RelativeUriFileTests
+    public class RelativePathFileTests
     {
         [Fact]
         public void SameEquals()
         {
-            var ruf1 = new RelativeUriFile
+            var ruf1 = new RelativePathFile
             {
-                RelativeUri = new RelativeUri("mod1\\a.txt"),
+                RelativePath = PurePath.Create("mod1\\a.txt"),
                 Signature = new FileSignature(
                     new TestHash(new byte[]
                     {
@@ -23,9 +24,9 @@ namespace ModSink.Domain.Tests.Entities.Repo
                     1UL)
             };
 
-            var ruf2 = new RelativeUriFile
+            var ruf2 = new RelativePathFile
             {
-                RelativeUri = new RelativeUri("mod1\\a.txt"),
+                RelativePath = PurePath.Create("mod1\\a.txt"),
                 Signature = new FileSignature(
                     new TestHash(new byte[]
                     {

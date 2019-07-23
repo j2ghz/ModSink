@@ -7,13 +7,12 @@ namespace ModSink.CLI
     {
         public static void Main(string[] args)
         {
-            //Parser.Default.ParseArguments<Chunk.Options>(args)
-            //    .MapResult(
-            //        Chunk.Run,
-            //        errs => 1
-            //    );
-            Chunk.Run(new Chunk.Options()
-                {Path = @"G:\417addons\@cup_terrains_core\addons\cup_terrains_ca_roads_e.pbo", Zeroes = 20});
+            Parser.Default.ParseArguments<Chunk.Options, DuplicateChunks.Options>(args)
+                .MapResult(
+                    (Chunk.Options o) => new Chunk().Run(o),
+                    (DuplicateChunks.Options o) => new DuplicateChunks().Run(o),
+                    errs => 1
+                );
         }
     }
 }
