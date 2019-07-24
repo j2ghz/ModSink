@@ -53,7 +53,7 @@ namespace ModSink.Application.Tests.RepoBuilders
                         0xC4, 0x93, 0x2A, 0x7B
                     }
                 ),
-                1UL);
+                1L);
             var fileC = new FileSignature(
                 new SHA256.SHA256Hash(new byte[]
                     {
@@ -62,7 +62,7 @@ namespace ModSink.Application.Tests.RepoBuilders
                         0xA9, 0x1A, 0x80, 0xA9
                     }
                 ),
-                1UL);
+                1L);
             var expected = new RepoWithFileChunks(new Domain.Entities.Repo.Repo("repo",
                     new List<Modpack>
                     {

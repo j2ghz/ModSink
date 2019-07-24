@@ -21,7 +21,7 @@ namespace ModSink.Domain.Tests.Entities.Repo
                         0x4D, 0xA7, 0x86, 0xEF, 0xF8, 0x14, 0x7C, 0x4E, 0x72, 0xB9, 0x80, 0x77, 0x85, 0xAF, 0xEE,
                         0x48, 0xBB
                     }),
-                    1UL)
+                    1L)
             };
 
             var ruf2 = new RelativePathFile
@@ -34,7 +34,7 @@ namespace ModSink.Domain.Tests.Entities.Repo
                         0x4D, 0xA7, 0x86, 0xEF, 0xF8, 0x14, 0x7C, 0x4E, 0x72, 0xB9, 0x80, 0x77, 0x85, 0xAF, 0xEE,
                         0x48, 0xBB
                     }),
-                    1UL)
+                    1L)
             };
 
             ruf1.Should().Be(ruf2);

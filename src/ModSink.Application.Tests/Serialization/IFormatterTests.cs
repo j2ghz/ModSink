@@ -7,6 +7,7 @@ using FsCheck.Xunit;
 using FSharpx;
 using ModSink.Application.Serialization;
 using ModSink.Domain.Entities.File;
+using PathLib;
 
 namespace ModSink.Application.Tests.Serialization
 {
@@ -35,11 +36,18 @@ namespace ModSink.Application.Tests.Serialization
             formatter.Deserialize<string>(stream).Should().BeEquivalentTo(o);
         }
 
-        [Property(Arbitrary = new[] {typeof(RepoGenerators)}, Skip = "Unfinished")]
+        [Property(Arbitrary = new[] {typeof(RepoGenerators)})]
         public void RoundTripRepo(Domain.Entities.Repo.Repo o)
         {
             var stream = formatter.Serialize(o);
             formatter.Deserialize<Domain.Entities.Repo.Repo>(stream).Should().BeEquivalentTo(o);
+        }
+
+        [Property(Arbitrary = new[] {typeof(RepoGenerators)})]
+        public void RoundTripFS(FileSignature o)
+        {
+            var stream = formatter.Serialize(o);
+            formatter.Deserialize<FileSignature>(stream).Should().BeEquivalentTo(o);
         }
 
         public static class RepoGenerators
@@ -51,13 +59,22 @@ namespace ModSink.Application.Tests.Serialization
                     Arb.Default.ICollection<T>());
             }
 
-            public static Gen<FileSignature> FileSignature()
+            public static Arbitrary<IReadOnlyDictionary<TKey, TValue>> IReadOnlyDictionary<TKey, TValue>()
             {
-                return from hashId in Arb.Default.String().Generator
-                    from value in Arb.Default.Array<byte>().Generator
-                    from length in Arb.Default.Int64().Generator
-                    select new FileSignature(new TestHash(hashId, value), length);
+                return Arb.Convert(
+                    FSharpFunc.FromFunc((IDictionary<TKey, TValue> c) => (IReadOnlyDictionary<TKey, TValue>) c),
+                    FSharpFunc.FromFunc((IReadOnlyDictionary<TKey, TValue> c) =>
+                        (IDictionary<TKey, TValue>) c.ToList()),
+                    Arb.Default.IDictionary<TKey, TValue>());
             }
+
+            public static Arbitrary<IPurePath> IPurePath()
+            {
+                return Arb.Filter(FSharpFunc.FromFunc<string, bool>(p => new PurePathFactory().TryCreate(p, out _)),
+                        Arb.Default.String())
+                    .Convert(s => new PurePathFactory().Create(s), path => path.ToString());
+            }
+
 
             public class TestHash : Hash
             {
