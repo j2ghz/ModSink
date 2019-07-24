@@ -7,6 +7,12 @@
     <Nullable>enable</Nullable>
     <PackAsTool>true</PackAsTool>
     <ToolCommandName>modsink</ToolCommandName>
+    <Authors>J2ghz</Authors>
+    <Description>CLI version of ModSink, a modpack distribution and download tool. Space efficient, chunked, hash-based storage. Work in progress.</Description>
+    <PackageLicenseExpression>AGPL-3.0-only</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/j2ghz/ModSink</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/j2ghz/ModSink.git</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
   </PropertyGroup>
 
   <ItemGroup>
