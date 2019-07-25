@@ -13,10 +13,6 @@
 
   <ItemGroup>
     <PackageReference Include="DynamicData" Version="6.12.9" />
-    <PackageReference Include="GitVersionTask" Version="5.0.0-beta5.44">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
     <PackageReference Include="Microsoft.Extensions.Options" Version="3.0.0-preview6.19304.6" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
     <PackageReference Include="Roslyn.System.IO.Abstractions.Analyzers" Version="4.0.3">
@@ -25,9 +21,6 @@
     </PackageReference>
     <PackageReference Include="System.Reactive" Version="4.1.5" />
     <PackageReference Include="xxHash4net" Version="1.1.6" />
-    <PackageReference Include="GitVersionTask" Version="5.0.0-beta*">
-      <PrivateAssets>All</PrivateAssets>
-    </PackageReference>
   </ItemGroup>
 
   <ItemGroup>
