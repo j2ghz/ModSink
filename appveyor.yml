@@ -36,5 +36,7 @@ artifacts:
 deploy:
   provider: NuGet
   api_key:
-    secure: 0qma94N6qhtA51t5XjDxMZlZl0asYFwqbLugZi7dO5taQZoqLohzmd55EJWH87FL
+    secure: fjBIR3on0h9DhbjsADq4JmfReuYticuhhcbm8/HTsC9Jah8tu5MZPJukBKWLeO0Z
   skip_symbols: false
+  server: https://www.myget.org/F/modsink/api/v2/package
+  symbol_server: https://www.myget.org/F/modsink/symbols/api/v2/package
