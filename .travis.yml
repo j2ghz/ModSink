@@ -10,4 +10,5 @@ mono: none
 script:
   - sudo snap alias dotnet-sdk.dotnet dotnet
   - dotnet --info
+  - dotnet restore -c Release
   - dotnet test --configuration Release /p:AltCover=true /p:AltCoverForce=true
