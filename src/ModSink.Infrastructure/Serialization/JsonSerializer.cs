@@ -8,6 +8,12 @@ namespace ModSink.Infrastructure.Serialization
 {
     public class JsonSerializer : Newtonsoft.Json.JsonSerializer, IFormatter
     {
+        public JsonSerializer()
+        {
+            TypeNameHandling = TypeNameHandling.All;
+            TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Full;
+        }
+
         public Stream Serialize<T>(T o)
         {
             var stream = new MemoryStream();

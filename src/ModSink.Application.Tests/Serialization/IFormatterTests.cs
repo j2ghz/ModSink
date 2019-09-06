@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using FluentAssertions;
 using FsCheck;
@@ -8,11 +9,19 @@ using FSharpx;
 using ModSink.Application.Serialization;
 using ModSink.Domain.Entities.File;
 using PathLib;
+using Xunit.Abstractions;
 
 namespace ModSink.Application.Tests.Serialization
 {
     public abstract class IFormatterTests
     {
+        private readonly ITestOutputHelper _testOutputHelper;
+
+        protected IFormatterTests(ITestOutputHelper testOutputHelper)
+        {
+            _testOutputHelper = testOutputHelper;
+        }
+
         protected abstract IFormatter formatter { get; }
 
 
@@ -40,6 +49,8 @@ namespace ModSink.Application.Tests.Serialization
         public void RoundTripRepo(Domain.Entities.Repo.Repo o)
         {
             var stream = formatter.Serialize(o);
+            _testOutputHelper.WriteLine(new StreamReader(stream).ReadToEnd());
+            stream.Position = 0;
             formatter.Deserialize<Domain.Entities.Repo.Repo>(stream).Should().BeEquivalentTo(o);
         }
 
