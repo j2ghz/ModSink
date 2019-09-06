@@ -26,7 +26,7 @@ namespace ModSink.Domain.Entities.File
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
-            return string.Equals(HashId, other.HashId) && Value.SequenceEqual(other.Value);
+            return string.Equals(HashId, other.HashId) && ( (Value==null && other.Value == null) || Value.SequenceEqual(other.Value));
         }
 
         public override bool Equals(object obj)
