@@ -16,9 +16,9 @@ namespace ModSink.Domain.Entities.File
             Value = value;
         }
 
-        public virtual string HashId { get; }
+        public virtual string HashId { get; private set; }
 
-        public byte[] Value { get; }
+        public byte[] Value { get; private set; }
 
         #region Generated
 
