@@ -5,6 +5,7 @@ using FluentAssertions;
 using FsCheck;
 using FsCheck.Xunit;
 using FSharpx;
+using Microsoft.FSharp.Core;
 using ModSink.Application.Serialization;
 using ModSink.Domain.Entities.File;
 using PathLib;
@@ -57,8 +58,27 @@ namespace ModSink.Application.Tests.Serialization
             formatter.Deserialize<ChunkSignature>(stream).Should().BeEquivalentTo(o);
         }
 
+        [Property(Arbitrary = new[] {typeof(RepoGenerators)})]
+        public void RoundTripHash(Hash o)
+        {
+            var stream = formatter.Serialize(o);
+            formatter.Deserialize<ChunkSignature>(stream).Should().BeEquivalentTo(o);
+        }
+
         public static class RepoGenerators
         {
+            public static Arbitrary<Hash> Hash()
+            {
+                var id = Arb.Default.String().Filter(s => !string.IsNullOrEmpty(s));
+                var value = Arb.Default.Array<byte>().Filter(a => a != null && a.Length > 0);
+
+                return Gen.Zip(id.Generator, value.Generator)
+                    .ToArbitrary(FSharpFunc.FromFunc<Tuple<string, byte[]>, IEnumerable<Tuple<string, byte[]>>>(t =>
+                        id.Shrinker(t.Item1).Zip(value.Shrinker(t.Item2))
+                            .Select(tt => new Tuple<string, byte[]>(tt.First, tt.Second)))).Convert(
+                        t => new Hash(t.Item1, t.Item2), h => new Tuple<string, byte[]>(h.HashId, h.Value));
+            }
+
             public static Arbitrary<IReadOnlyCollection<T>> IReadOnlyCollection<T>()
             {
                 return Arb.Convert(FSharpFunc.FromFunc((ICollection<T> c) => (IReadOnlyCollection<T>) c),
