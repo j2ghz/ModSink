@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using Dawn;
 
 namespace ModSink.Domain.Entities.File
 {
-    public sealed class Hash : IEquatable<Hash>
+    //[DebuggerDisplay("({HashId},{Value})")]
+    public class Hash : IEquatable<Hash>
     {
         public Hash(string id, byte[] value)
         {
@@ -63,5 +65,7 @@ namespace ModSink.Domain.Entities.File
             result = Value.Aggregate(result, (current, b) => current.Append(b));
             return result.ToArray();
         }
+
+        public override string ToString() => $"Hash(Id='{HashId}',Value='{string.Join(",",Value)}')";
     }
 }
