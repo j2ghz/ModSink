@@ -50,6 +50,13 @@ namespace ModSink.Application.Tests.Serialization
             formatter.Deserialize<FileSignature>(stream).Should().BeEquivalentTo(o);
         }
 
+        [Property(Arbitrary = new[] {typeof(RepoGenerators)})]
+        public void RoundTripChunkSignature(ChunkSignature o)
+        {
+            var stream = formatter.Serialize(o);
+            formatter.Deserialize<ChunkSignature>(stream).Should().BeEquivalentTo(o);
+        }
+
         public static class RepoGenerators
         {
             public static Arbitrary<IReadOnlyCollection<T>> IReadOnlyCollection<T>()
