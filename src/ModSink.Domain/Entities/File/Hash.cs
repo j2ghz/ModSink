@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Dawn;
 
 namespace ModSink.Domain.Entities.File
 {
@@ -8,6 +9,8 @@ namespace ModSink.Domain.Entities.File
     {
         public Hash(string id, byte[] value)
         {
+            Guard.Argument(id, nameof(id)).NotNull().NotEmpty();
+            Guard.Argument(value, nameof(value)).NotNull().NotEmpty();
             HashId = id;
             Value = value;
         }
