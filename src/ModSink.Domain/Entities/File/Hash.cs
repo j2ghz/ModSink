@@ -6,19 +6,18 @@ using Dawn;
 
 namespace ModSink.Domain.Entities.File
 {
-    //[DebuggerDisplay("({HashId},{Value})")]
     public class Hash : IEquatable<Hash>
     {
-        public Hash(string id, byte[] value)
+        public Hash(string hashId, byte[] value)
         {
-            Guard.Argument(id, nameof(id)).NotNull().NotEmpty();
-            Guard.Argument(value, nameof(value)).NotNull().NotEmpty();
-            HashId = id;
+            //Guard.Argument(hashId, nameof(hashId)).NotNull().NotEmpty();
+            //Guard.Argument(value, nameof(value)).NotNull().NotEmpty();
+            HashId = hashId;
             Value = value;
         }
        
 
-        public  string HashId { get;  }
+        public string HashId { get;  }
 
         public byte[] Value { get;  }
 
