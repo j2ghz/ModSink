@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Text;
 using ModSink.Application.Serialization;
-using MsgPack;
 using MsgPack.Serialization;
 
 namespace ModSink.Infrastructure.Serialization
@@ -30,7 +27,8 @@ namespace ModSink.Infrastructure.Serialization
 
         public bool CanDeserialize(string extension)
         {
-            throw new NotImplementedException();
+            if (extension == null) throw new ArgumentNullException(nameof(extension));
+            return extension.EndsWith("msgpack");
         }
     }
 }
