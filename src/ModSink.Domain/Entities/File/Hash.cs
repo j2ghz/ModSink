@@ -4,21 +4,18 @@ using System.Linq;
 
 namespace ModSink.Domain.Entities.File
 {
-    public class Hash : IEquatable<Hash>
+    public sealed class Hash : IEquatable<Hash>
     {
-        //TODO: Should be abstract
-        public Hash()
+        public Hash(string id, byte[] value)
         {
-            
-        }
-        protected Hash(byte[] value)
-        {
+            HashId = id;
             Value = value;
         }
+       
 
-        public virtual string HashId { get; private set; }
+        public  string HashId { get;  }
 
-        public byte[] Value { get; private set; }
+        public byte[] Value { get;  }
 
         #region Generated
 
