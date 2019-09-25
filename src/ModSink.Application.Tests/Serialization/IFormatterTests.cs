@@ -83,15 +83,6 @@ namespace ModSink.Application.Tests.Serialization
             }
 
 
-            public class TestHash : Hash
-            {
-                public TestHash(string id, byte[] value) : base(value)
-                {
-                    HashId = id;
-                }
-
-                public override string HashId { get; }
-            }
         }
     }
 }

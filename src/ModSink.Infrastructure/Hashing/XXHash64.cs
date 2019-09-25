@@ -16,13 +16,13 @@ namespace ModSink.Infrastructure.Hashing
         public int HashSize { get; } = 64;
         public Hash CreateHash(byte[] rawBytes)
         {
-            return new XXHash64Hash(rawBytes);
+            return new Hash("XXHash64",rawBytes);
         }
 
         public Hash ComputeHash(Stream data, CancellationToken cancellationToken)
         {
             var bytes = xxHash64.Create().ComputeHash(data);
-			return new XXHash64Hash(bytes);
+            return CreateHash(bytes);
         }
 
         public Task<Hash> ComputeHashAsync(Stream data, CancellationToken cancellationToken)
@@ -35,13 +35,6 @@ namespace ModSink.Infrastructure.Hashing
             return  xxHash64.Create();
         }
 
-        public class XXHash64Hash : Hash
-        {
-            public XXHash64Hash(byte[] value) : base(value)
-            {
-            }
 
-            public override string HashId { get; } = "XXHash64";
-        }
     }
 }
