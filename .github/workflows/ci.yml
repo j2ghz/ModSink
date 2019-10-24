@@ -1,4 +1,4 @@
-name: .NET Core
+name: Build, Test, NuGet
 
 on: [push]
 
@@ -24,6 +24,6 @@ jobs:
     - name: CodeCov publish test coverage
       run: Get-ChildItem src/*Tests | foreach { dotnet codecov -t 78e056d7-ce59-4f6d-b177-85fa3501d898 -f $_"\coverage.xml" }
     - name: Pack
-      run: dotnet publish --configuration Release
+      run: dotnet pack --configuration Release
     - name: Push NuGet Packages
       run: Get-ChildItem -Recurse *.nupkg | ForEach { dotnet nuget push -s "https://nuget.pkg.github.com/j2ghz/index.json" -k {{ secrets.GITHUB_TOKEN }} $_ }
