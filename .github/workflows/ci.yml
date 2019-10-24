@@ -15,9 +15,13 @@ jobs:
         dotnet-version: 3.0.100
     - name: Restore
       run: dotnet restore
+    - name: Restore tools
+      run: dotnet tool restore
     - name: Build
       run: dotnet build --configuration Release
     - name: Test
-      run: dotnet test --configuration Release
+      run: dotnet test --configuration Release /p:AltCover=true /p:AltCoverForce=true
+    - name: CodeCov publish test coverage
+      run: Get-ChildItem src/*Tests | foreach { dotnet codecov -f $_"\coverage.xml" }
     - name: Publish
       run: dotnet publish --configuration Release
