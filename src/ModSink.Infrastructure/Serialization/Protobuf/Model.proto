@@ -1,0 +1,18 @@
+﻿syntax = "proto3";
+
+package ModSink.Infrastructure.Serialization.Protobuf.Model;
+
+message Modpack {
+
+}
+
+message SourceFilePath {
+	
+}
+
+
+message Repo {
+	string Name = 1;
+	repeated Modpack Modpacks=2;
+	repeated SourceFilePath SourceFiles=3;
+}
