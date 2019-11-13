@@ -12,6 +12,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="9.0.0" />
     <PackageReference Include="DynamicData" Version="6.12.9" />
     <PackageReference Include="GitVersionTask" Version="5.0.0-beta5.44">
       <PrivateAssets>all</PrivateAssets>

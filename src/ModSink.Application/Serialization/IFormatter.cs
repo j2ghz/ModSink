@@ -5,16 +5,14 @@ namespace ModSink.Application.Serialization
 {
     public interface IFormatter
     {
-        bool CanDeserialize(string extension);
         FileChunks DeserializeFileChunks(Stream stream);
         Domain.Entities.Repo.Repo DeserializeRepo(Stream stream);
         Stream SerializeFileChunks(FileChunks fileChunks);
-        Stream SerializeRepo(Domain.Entities.Repo.Repo repoRoot);
+        Stream SerializeRepo(Domain.Entities.Repo.Repo repo);
     }
 
     public abstract class GenericFormatter : IFormatter
     {
-        public abstract bool CanDeserialize(string extension);
 
         public FileChunks DeserializeFileChunks(Stream stream)
         {
@@ -31,9 +29,9 @@ namespace ModSink.Application.Serialization
             return Serialize(fileChunks);
         }
 
-        public Stream SerializeRepo(Domain.Entities.Repo.Repo repoRoot)
+        public Stream SerializeRepo(Domain.Entities.Repo.Repo repo)
         {
-            return Serialize(repoRoot);
+            return Serialize(repo);
         }
 
 

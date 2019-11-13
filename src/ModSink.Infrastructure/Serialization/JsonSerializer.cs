@@ -10,12 +10,6 @@ namespace ModSink.Infrastructure.Serialization
     {
         private readonly Newtonsoft.Json.JsonSerializer Serializer = new Newtonsoft.Json.JsonSerializer();
 
-        public override bool CanDeserialize(string extension)
-        {
-            if (extension == null) throw new ArgumentNullException(nameof(extension));
-            return extension.EndsWith("json");
-        }
-
         public override T Deserialize<T>(Stream stream)
         {
             using var sr = new StreamReader(stream, Encoding.UTF8);

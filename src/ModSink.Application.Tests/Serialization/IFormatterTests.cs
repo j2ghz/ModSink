@@ -17,7 +17,7 @@ namespace ModSink.Application.Tests.Serialization
         protected abstract IFormatter formatter { get; }
 
 
-        [Property]
+/*        [Property]
         public void CanDeserialize(string ext)
         {
             try
@@ -28,7 +28,7 @@ namespace ModSink.Application.Tests.Serialization
             {
                 //Exception expected
             }
-        }
+        }*/
 
         [Property(Arbitrary = new[] {typeof(RepoGenerators)})]
         public void RoundTripRepo(Domain.Entities.Repo.Repo o)

@@ -1,5 +1,4 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using ModSink.Application.Serialization;
 using MsgPack.Serialization;
 
@@ -7,12 +6,6 @@ namespace ModSink.Infrastructure.Serialization
 {
     public class MsgPackCliSerializer : GenericFormatter
     {
-        public override bool CanDeserialize(string extension)
-        {
-            if (extension == null) throw new ArgumentNullException(nameof(extension));
-            return extension.EndsWith("msgpack");
-        }
-
         public override T Deserialize<T>(Stream stream)
         {
             return MessagePackSerializer.Get<T>().Unpack(stream);
