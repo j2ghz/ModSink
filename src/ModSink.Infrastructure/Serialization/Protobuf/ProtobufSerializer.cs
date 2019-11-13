@@ -1,7 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Text;
+using AutoMapper;
+using Google.Protobuf;
 using ModSink.Application.Serialization;
 using ModSink.Domain.Entities.File;
 using ModSink.Domain.Entities.Repo;
@@ -10,9 +10,17 @@ namespace ModSink.Infrastructure.Serialization.Protobuf
 {
     public class ProtobufSerializer : IFormatter
     {
-        public bool CanDeserialize(string extension)
+        private readonly Mapper mapper;
+
+        public ProtobufSerializer()
         {
-            throw new NotImplementedException();
+            var mapperConfig = new MapperConfiguration(cfg =>
+            {
+                cfg.CreateMap<Repo, Model.Repo>();
+                cfg.CreateMap<Model.Repo, Repo>();
+            });
+            mapperConfig.AssertConfigurationIsValid();
+            mapper = new Mapper(mapperConfig);
         }
 
         public FileChunks DeserializeFileChunks(Stream stream)
@@ -22,7 +30,8 @@ namespace ModSink.Infrastructure.Serialization.Protobuf
 
         public Repo DeserializeRepo(Stream stream)
         {
-            throw new NotImplementedException();
+            var intermediate = Model.Repo.Parser.ParseFrom(stream);
+            return mapper.Map<Repo>(intermediate);
         }
 
         public Stream SerializeFileChunks(FileChunks fileChunks)
@@ -30,9 +39,12 @@ namespace ModSink.Infrastructure.Serialization.Protobuf
             throw new NotImplementedException();
         }
 
-        public Stream SerializeRepo(Repo repoRoot)
+        public Stream SerializeRepo(Repo repo)
         {
-            throw new NotImplementedException();
+            var result = new MemoryStream();
+            var intermediate = mapper.Map<Model.Repo>(repo);
+            intermediate.WriteTo(new CodedOutputStream(result, true));
+            return result;
         }
     }
 }
