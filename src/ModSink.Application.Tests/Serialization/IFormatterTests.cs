@@ -30,40 +30,33 @@ namespace ModSink.Application.Tests.Serialization
             }
         }
 
-        [Property]
-        public void RoundTripString(string o)
-        {
-            var stream = formatter.Serialize(o);
-            formatter.Deserialize<string>(stream).Should().BeEquivalentTo(o);
-        }
-
         [Property(Arbitrary = new[] {typeof(RepoGenerators)})]
         public void RoundTripRepo(Domain.Entities.Repo.Repo o)
         {
-            var stream = formatter.Serialize(o);
-            formatter.Deserialize<Domain.Entities.Repo.Repo>(stream).Should().BeEquivalentTo(o);
+            var stream = formatter.SerializeRepo(o);
+            formatter.DeserializeRepo(stream).Should().BeEquivalentTo(o);
         }
 
-        [Property(Arbitrary = new[] {typeof(RepoGenerators)})]
-        public void RoundTripFS(FileSignature o)
-        {
-            var stream = formatter.Serialize(o);
-            formatter.Deserialize<FileSignature>(stream).Should().BeEquivalentTo(o);
-        }
+//        [Property(Arbitrary = new[] {typeof(RepoGenerators)})]
+//        public void RoundTripFS(FileSignature o)
+//        {
+//            var stream = formatter.Serialize(o);
+//            formatter.Deserialize<FileSignature>(stream).Should().BeEquivalentTo(o);
+//        }
 
-        [Property(Arbitrary = new[] {typeof(RepoGenerators)})]
-        public void RoundTripChunkSignature(ChunkSignature o)
-        {
-            var stream = formatter.Serialize(o);
-            formatter.Deserialize<ChunkSignature>(stream).Should().BeEquivalentTo(o);
-        }
+//        [Property(Arbitrary = new[] {typeof(RepoGenerators)})]
+//        public void RoundTripChunkSignature(ChunkSignature o)
+//        {
+//            var stream = formatter.Serialize(o);
+//            formatter.Deserialize<ChunkSignature>(stream).Should().BeEquivalentTo(o);
+//        }
 
-        [Property(Arbitrary = new[] {typeof(RepoGenerators)})]
-        public void RoundTripHash(Hash o)
-        {
-            var stream = formatter.Serialize(o);
-            formatter.Deserialize<ChunkSignature>(stream).Should().BeEquivalentTo(o);
-        }
+//        [Property(Arbitrary = new[] {typeof(RepoGenerators)})]
+//        public void RoundTripHash(Hash o)
+//        {
+//            var stream = formatter.Serialize(o);
+//            formatter.Deserialize<ChunkSignature>(stream).Should().BeEquivalentTo(o);
+//        }
 
         public static class RepoGenerators
         {

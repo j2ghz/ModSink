@@ -5,9 +5,20 @@ using MsgPack.Serialization;
 
 namespace ModSink.Infrastructure.Serialization
 {
-    public class MsgPackCliSerializer : IFormatter
+    public class MsgPackCliSerializer : GenericFormatter
     {
-        public Stream Serialize<T>(T o)
+        public override bool CanDeserialize(string extension)
+        {
+            if (extension == null) throw new ArgumentNullException(nameof(extension));
+            return extension.EndsWith("msgpack");
+        }
+
+        public override T Deserialize<T>(Stream stream)
+        {
+            return MessagePackSerializer.Get<T>().Unpack(stream);
+        }
+
+        public override Stream Serialize<T>(T o)
         {
             var stream = new MemoryStream();
             Serialize(o, stream);
@@ -17,18 +28,7 @@ namespace ModSink.Infrastructure.Serialization
 
         public void Serialize<T>(T o, Stream stream)
         {
-            MessagePackSerializer.Get<T>().Pack(stream,o);
-        }
-
-        public T Deserialize<T>(Stream stream)
-        {
-            return MessagePackSerializer.Get<T>().Unpack(stream);
-        }
-
-        public bool CanDeserialize(string extension)
-        {
-            if (extension == null) throw new ArgumentNullException(nameof(extension));
-            return extension.EndsWith("msgpack");
+            MessagePackSerializer.Get<T>().Pack(stream, o);
         }
     }
 }
