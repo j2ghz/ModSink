@@ -27,6 +27,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModSink.Infrastructure.Test
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModSink.Application.Tests", "src\ModSink.Application.Tests\ModSink.Application.Tests.csproj", "{590FE0EA-A769-4BF7-A58F-20F02668EBDB}"
 EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "ModSink.Domain.FSharp", "src\ModSink.Domain.FSharp\ModSink.Domain.FSharp.fsproj", "{ACECBEB1-CF11-4465-A235-96184391FD07}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -61,6 +63,10 @@ Global
 		{590FE0EA-A769-4BF7-A58F-20F02668EBDB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{590FE0EA-A769-4BF7-A58F-20F02668EBDB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{590FE0EA-A769-4BF7-A58F-20F02668EBDB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ACECBEB1-CF11-4465-A235-96184391FD07}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ACECBEB1-CF11-4465-A235-96184391FD07}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ACECBEB1-CF11-4465-A235-96184391FD07}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ACECBEB1-CF11-4465-A235-96184391FD07}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -76,6 +82,7 @@ Global
 		{EF70A097-5787-43F0-B25F-CB22361A8EFE} = {B38F5199-34B7-49C4-8F39-7579CBC4C4AA}
 		{4F315D45-898C-4CF1-B0B5-53D3F57EE58F} = {AC3FC6CE-7228-419F-A577-32E963128FF4}
 		{590FE0EA-A769-4BF7-A58F-20F02668EBDB} = {AC3FC6CE-7228-419F-A577-32E963128FF4}
+		{ACECBEB1-CF11-4465-A235-96184391FD07} = {6370BC28-0E04-4D34-B6FA-83EFADBB086A}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {8A162A5F-03F2-428E-8951-FD2FBE565EA5}
