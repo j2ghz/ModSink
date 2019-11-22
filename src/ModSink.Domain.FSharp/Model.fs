@@ -2,8 +2,7 @@
 
 open PathLib
 
-type RelativePath =
-    | RelativePath of p:IPurePath
+type RelativePath = RelativePath of p:IPurePath
 
 let c (p:IPurePath) = 
     match p.IsAbsolute() with
