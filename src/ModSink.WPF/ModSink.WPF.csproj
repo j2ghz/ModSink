@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk" ToolsVersion="15.0">
   <PropertyGroup>
-    <LanguageTargets>$(MSBuildExtensionsPath)\$(VisualStudioVersion)\Bin\Microsoft.CSharp.targets</LanguageTargets>
-    <TargetFramework>net462</TargetFramework>
+    <LanguageTargets>$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Bin\Microsoft.CSharp.targets</LanguageTargets>
+    <TargetFramework>net48</TargetFramework>
     <OutputType>WinExe</OutputType>
     <StartupObject>ModSink.WPF.App</StartupObject>
     <Authors>J2ghz</Authors>
@@ -60,9 +60,9 @@
     <PackageReference Include="Serilog.Sinks.Trace" Version="2.1.0" />
     <PackageReference Include="Splat.Serilog" Version="2.0.0" />
     <PackageReference Include="System.Net.Http" Version="4.3.3" />
-    <PackageReference Include="GitVersionTask" Version="4.0.0-beta*">
+    <!--PackageReference Include="GitVersionTask" Version="4.0.0-beta*">
       <PrivateAssets>All</PrivateAssets>
-    </PackageReference>
+    </PackageReference-->
   </ItemGroup>
   <ItemGroup>
     <Reference Include="PresentationCore" />

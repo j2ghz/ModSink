@@ -18,8 +18,7 @@ namespace ModSink.WPF.Model
                 .Subscribe();
 
             // Temporary to ease testing
-            RxApp.TaskpoolScheduler.Schedule(() =>
-                client.GroupUrls.AddOrUpdate(@"https://files.417rct.org/Swifty_repos/modsink/group.bin"));
+            //RxApp.TaskpoolScheduler.Schedule(() => client.GroupUrls.AddOrUpdate(@"https://files.417rct.org/Swifty_repos/modsink/group.bin"));
         }
 
         public ClientService Client { get; }
