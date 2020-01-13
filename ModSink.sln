@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.28621.142
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModSink.Domain", "src\ModSink.Domain\ModSink.Domain.csproj", "{657B5757-2FBD-46D6-B2B4-493589FFDD6B}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Domain", "Domain", "{6370BC28-0E04-4D34-B6FA-83EFADBB086A}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Test", "Test", "{AC3FC6CE-7228-419F-A577-32E963128FF4}"
@@ -27,7 +25,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModSink.Infrastructure.Test
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModSink.Application.Tests", "src\ModSink.Application.Tests\ModSink.Application.Tests.csproj", "{590FE0EA-A769-4BF7-A58F-20F02668EBDB}"
 EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "ModSink.Domain.FSharp", "src\ModSink.Domain.FSharp\ModSink.Domain.FSharp.fsproj", "{ACECBEB1-CF11-4465-A235-96184391FD07}"
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "ModSink.Domain", "src\ModSink.Domain\ModSink.Domain.fsproj", "{ACECBEB1-CF11-4465-A235-96184391FD07}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
