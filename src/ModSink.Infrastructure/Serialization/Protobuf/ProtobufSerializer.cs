@@ -5,6 +5,7 @@ using Google.Protobuf;
 using ModSink.Application.Serialization;
 using ModSink.Domain.Entities.File;
 using ModSink.Domain.Entities.Repo;
+using PathLib;
 
 namespace ModSink.Infrastructure.Serialization.Protobuf
 {
@@ -19,7 +20,8 @@ namespace ModSink.Infrastructure.Serialization.Protobuf
                 cfg.CreateMap<Repo, Model.Repo>();
                 cfg.CreateMap<Modpack, Model.Modpack>();
                 cfg.CreateMap<Mod, Model.Mod>();
-                cfg.CreateMap<RelativePathFile, Model.RelativePathFileSignature>();
+                cfg.CreateMap<RelativePathFile, Model.RelativePathFile>();
+                cfg.CreateMap<IPurePath, Model.RelativePath>();
                 //cfg.CreateMap<Model.Repo, Repo>();
             });
             mapperConfig.CompileMappings();
