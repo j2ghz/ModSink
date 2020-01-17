@@ -6,11 +6,11 @@ namespace ModSink.Domain.Entities.Repo
 {
 
     /// <summary>
-    /// <see cref="FileSignature"/> with <see cref="IPurePath"/> to the file
+    /// <see cref="File.Signature"/> with <see cref="IPurePath"/> to the file
     /// </summary>
     public class RelativePathFile : IEquatable<RelativePathFile>
     {
-        public FileSignature Signature { get; set; }
+        public Signature Signature { get; set; }
         public IPurePath RelativePath { get; set; }
 
         public RelativePathFile InDirectory( IPurePath dir)

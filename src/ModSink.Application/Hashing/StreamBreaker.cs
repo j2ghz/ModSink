@@ -107,7 +107,7 @@ namespace ModSink.Application.Hashing
 
             public Chunk ToChunk()
             {
-                return new Chunk {Position = Offset, Signature = new ChunkSignature(Hash, Length)}
+                return new Chunk {Position = Offset, Signature = new Signature(Hash, Length)}
                     ;
             }
         }
