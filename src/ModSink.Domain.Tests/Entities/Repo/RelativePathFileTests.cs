@@ -14,7 +14,7 @@ namespace ModSink.Domain.Tests.Entities.Repo
             var ruf1 = new RelativePathFile
             {
                 RelativePath = PurePath.Create("mod1\\a.txt"),
-                Signature = new FileSignature(
+                Signature = new Signature(
                     new Hash("test",new byte[]
                     {
                         0xCA, 0x97, 0x81, 0x12, 0xCA, 0x1B, 0xBD, 0xCA, 0xFA, 0xC2, 0x31, 0xB3, 0x9A, 0x23, 0xDC,
@@ -27,7 +27,7 @@ namespace ModSink.Domain.Tests.Entities.Repo
             var ruf2 = new RelativePathFile
             {
                 RelativePath = PurePath.Create("mod1\\a.txt"),
-                Signature = new FileSignature(
+                Signature = new Signature(
                     new Hash("test",new byte[]
                     {
                         0xCA, 0x97, 0x81, 0x12, 0xCA, 0x1B, 0xBD, 0xCA, 0xFA, 0xC2, 0x31, 0xB3, 0x9A, 0x23, 0xDC,

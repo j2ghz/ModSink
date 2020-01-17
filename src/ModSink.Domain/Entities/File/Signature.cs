@@ -4,9 +4,9 @@ using System.IO;
 namespace ModSink.Domain.Entities.File
 {
     [Equals]
-    public class FileSignature
+    public class Signature
     {
-        public FileSignature(Hash hash, long length)
+        public Signature(Hash hash, long length)
         {
             Hash = hash;
             Length = length;

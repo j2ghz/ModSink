@@ -35,7 +35,7 @@ namespace ModSink.Application.Repo.Builder
                             root.GetDirectories().Select(d => d.Name).ToList())
                     });
 
-            var repoFiles = new Dictionary<FileSignature, IPurePath>();
+            var repoFiles = new Dictionary<Signature, IPurePath>();
             var repoChunks = new HashSet<FileChunks>();
             var allModNames = config.Modpacks.SelectMany(m => m.Mods).Distinct();
             var builtMods = new List<Mod>();

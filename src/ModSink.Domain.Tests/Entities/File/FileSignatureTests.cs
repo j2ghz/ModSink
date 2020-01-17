@@ -12,15 +12,15 @@ namespace ModSink.Domain.Tests.Entities.File
         [Property]
         public Property SameEqualsProperty(string id, byte[] value, long length)
         {
-            return new Func<bool>(() => new FileSignature(new Hash(id, value), length) ==
-                    new FileSignature(new Hash($"{id}", value), length))
+            return new Func<bool>(() => new Signature(new Hash(id, value), length) ==
+                    new Signature(new Hash($"{id}", value), length))
                 .When(!string.IsNullOrEmpty(id) && !(value is null) && value.Length > 0);
         }
 
         [Fact]
         public void SameEquals()
         {
-            var fs1 = new FileSignature(
+            var fs1 = new Signature(
                 new Hash("test", new byte[]
                 {
                     0xCA, 0x97, 0x81, 0x12, 0xCA, 0x1B, 0xBD, 0xCA, 0xFA, 0xC2, 0x31, 0xB3, 0x9A, 0x23, 0xDC,
@@ -29,7 +29,7 @@ namespace ModSink.Domain.Tests.Entities.File
                 }),
                 1L);
 
-            var fs2 = new FileSignature(
+            var fs2 = new Signature(
                 new Hash("test", new byte[]
                 {
                     0xCA, 0x97, 0x81, 0x12, 0xCA, 0x1B, 0xBD, 0xCA, 0xFA, 0xC2, 0x31, 0xB3, 0x9A, 0x23, 0xDC,
