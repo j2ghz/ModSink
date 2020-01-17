@@ -1,14 +1,11 @@
-dist: xenial
-addons:
-  snaps:
-  - name: dotnet-sdk
-    classic: true
-    channel: latest/beta
 sudo: required
 language: csharp
 mono: none
+dotnet: 3.1.101
 script:
-  - sudo snap alias dotnet-sdk.dotnet dotnet
   - dotnet --info
   - dotnet restore
-  - dotnet test --configuration Release /p:UpdateAssemblyInfo=false /p:AltCover=true
+  - dotnet tool restore
+  - dotnet build
+  - dotnet test --configuration Release /p:AltCover=true /p:AltCoverForce=true"
+  - dotnet pack
