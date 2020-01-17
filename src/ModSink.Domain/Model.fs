@@ -1,36 +1,32 @@
 ﻿module Model
 
-open PathLib
+type RelativePath = RelativePath of string
 
-type RelativePath = RelativePath of p:IPurePath
+type Hash =
+    { HashId: string
+      Value: byte list }
 
-let c (p:IPurePath) = 
-    match p.IsAbsolute() with
-    | true -> Error ""
-    | false -> Ok (RelativePath p)
+type Signature =
+    { Hash: Hash
+      Length: int64 }
 
-type FileSignature = {
-    Hash: Hash;
-    Length: int64;
-}
+type Chunk =
+    { Signature: Signature
+      Position: int64 }
 
-type Mod = {
-    Name: string;
-    Files: Map<RelativePath,FileSignature>
-}
+type FileChunks =
+    { File: Signature
+      Chunks: Chunk list }
 
-type Modpack = {
-    Name: string;
-    Mods: Mod Set;
-}
+type Mod =
+    { Name: string
+      Files: Map<RelativePath, Signature> }
 
-type Hash = {
-    Algo: string;
-    Value: byte list
-}
+type Modpack =
+    { Name: string
+      Mods: Mod Set }
 
-type Repo = {
-    Name: string;
-    Modpacks: Modpack Set;
-    Files: Map<FileSignature,IPurePath>;
-}
+type Repo =
+    { Name: string
+      Modpacks: Modpack Set
+      Files: Map<Signature, RelativePath> }
