@@ -21,7 +21,10 @@ namespace ModSink.Infrastructure.Serialization.Protobuf
                 cfg.CreateMap<Modpack, Model.Modpack>();
                 cfg.CreateMap<Mod, Model.Mod>();
                 cfg.CreateMap<RelativePathFile, Model.RelativePathFile>();
-                cfg.CreateMap<IPurePath, Model.RelativePath>();
+                cfg.CreateMap<IPurePath, Model.RelativePath>().ForMember(p => p.SerializedRelativeUri, p=> p.MapFrom(x=>x.ToUri().ToSerializableString()));
+                cfg.CreateMap<Signature, Model.Signature>();
+                cfg.CreateMap<Hash, Model.Hash>();
+                cfg.CreateMap<byte[], ByteString>();
                 //cfg.CreateMap<Model.Repo, Repo>();
             });
             mapperConfig.CompileMappings();
