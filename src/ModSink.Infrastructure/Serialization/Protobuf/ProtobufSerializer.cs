@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using AutoMapper;
 using Google.Protobuf;
 using ModSink.Application.Serialization;
@@ -17,16 +18,17 @@ namespace ModSink.Infrastructure.Serialization.Protobuf
         {
             var mapperConfig = new MapperConfiguration(cfg =>
             {
-                cfg.CreateMap<Repo, Model.Repo>();//.ForMember(r=>r.Name,c=>c.MapFrom(r=>r.Name));
+                cfg.CreateMap<Repo, Model.Repo>().ForMember(r => r.Name, c => c.MapFrom(r => r.Name));
                 cfg.CreateMap<Modpack, Model.Modpack>();
                 cfg.CreateMap<Mod, Model.Mod>();
                 cfg.CreateMap<RelativePathFile, Model.RelativePathFile>();
-                cfg.CreateMap<IPurePath, Model.RelativePath>().ForMember(p => p.SerializedRelativeUri, p=> p.MapFrom(x=>x.ToUri().ToSerializableString()));
+                cfg.CreateMap<IPurePath, Model.RelativePath>().ForMember(p => p.SerializedRelativeUri, p => p.MapFrom(x => x.ToUri().ToSerializableString()));
                 cfg.CreateMap<Signature, Model.Signature>();
                 cfg.CreateMap<Hash, Model.Hash>();
                 cfg.CreateMap<byte[], ByteString>();
 
-                cfg.CreateMap<Model.Repo, Repo>();
+                cfg.CreateMap<Model.Repo, Repo>().ConstructUsing((r, ctx) => new Repo(r.Name,
+                    r.Modpacks.Select(m => ctx.Mapper.Map<Modpack>(m)).ToList(), r.ChunksPath));
             });
             mapperConfig.CompileMappings();
             mapperConfig.AssertConfigurationIsValid();
