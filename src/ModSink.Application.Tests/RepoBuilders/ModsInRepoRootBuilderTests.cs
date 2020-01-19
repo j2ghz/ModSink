@@ -91,21 +91,7 @@ namespace ModSink.Application.Tests.RepoBuilders
                                 }
                             }
                         }
-                    }, new Dictionary<Signature, IPurePath>
-                    {
-                        {
-                            fileA,
-                            PurePath.Create("mod1\\a.txt")
-                        },
-                        {
-                            fileB,
-                            PurePath.Create("mod1\\b.txt")
-                        },
-                        {
-                            fileC,
-                            PurePath.Create("mod2\\c.txt")
-                        }
-                    }),
+                    }, "a"),
                 new List<FileChunks>
                 {
                     new FileChunks(

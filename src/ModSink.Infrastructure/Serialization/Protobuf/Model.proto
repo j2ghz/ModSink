@@ -30,13 +30,9 @@ message Modpack {
 	repeated Mod Mods = 2;
 }
 
-message SourceFilePath {
-	
-}
-
 
 message Repo {
 	string Name = 1;
 	repeated Modpack Modpacks=2;
-	repeated SourceFilePath SourceFiles=3;
+	string ChunksPath=3;
 }

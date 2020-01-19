@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO.Abstractions;
 using System.Linq;
 using System.Threading;
@@ -35,6 +36,7 @@ namespace ModSink.Application.Repo.Builder
                             root.GetDirectories().Select(d => d.Name).ToList())
                     });
 
+            throw new NotImplementedException("Use chunks");
             var repoFiles = new Dictionary<Signature, IPurePath>();
             var repoChunks = new HashSet<FileChunks>();
             var allModNames = config.Modpacks.SelectMany(m => m.Mods).Distinct();
@@ -63,7 +65,7 @@ namespace ModSink.Application.Repo.Builder
                 Mods = modpack.Mods.Select(modName => builtMods.First(mod => mod.Name == modName)).ToList()
             });
 
-            var repo = new Domain.Entities.Repo.Repo(config.Name, modpacks.ToList(), repoFiles);
+            var repo = new Domain.Entities.Repo.Repo(config.Name, modpacks.ToList(), null);
             return new RepoWithFileChunks(repo,repoChunks);
         }
     }

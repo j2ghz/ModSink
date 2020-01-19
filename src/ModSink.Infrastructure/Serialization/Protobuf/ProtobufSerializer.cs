@@ -17,7 +17,7 @@ namespace ModSink.Infrastructure.Serialization.Protobuf
         {
             var mapperConfig = new MapperConfiguration(cfg =>
             {
-                cfg.CreateMap<Repo, Model.Repo>();
+                cfg.CreateMap<Repo, Model.Repo>();//.ForMember(r=>r.Name,c=>c.MapFrom(r=>r.Name));
                 cfg.CreateMap<Modpack, Model.Modpack>();
                 cfg.CreateMap<Mod, Model.Mod>();
                 cfg.CreateMap<RelativePathFile, Model.RelativePathFile>();
@@ -25,7 +25,8 @@ namespace ModSink.Infrastructure.Serialization.Protobuf
                 cfg.CreateMap<Signature, Model.Signature>();
                 cfg.CreateMap<Hash, Model.Hash>();
                 cfg.CreateMap<byte[], ByteString>();
-                //cfg.CreateMap<Model.Repo, Repo>();
+
+                cfg.CreateMap<Model.Repo, Repo>();
             });
             mapperConfig.CompileMappings();
             mapperConfig.AssertConfigurationIsValid();
