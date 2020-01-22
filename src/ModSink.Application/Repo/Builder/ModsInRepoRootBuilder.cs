@@ -56,7 +56,7 @@ namespace ModSink.Application.Repo.Builder
                     repoChunks.Add(new FileChunks(file.Signature, chunks));
                 }
 
-                builtMods.Add(new Mod {Files = modFiles.Select(t => t.Result.File).ToList(), Name = modName});
+                builtMods.Add(new Mod { Files = modFiles.Select(t => t.Result.File).ToList(), Name = modName });
             }
 
             var modpacks = config.Modpacks.Select(modpack => new Modpack
@@ -66,7 +66,7 @@ namespace ModSink.Application.Repo.Builder
             });
 
             var repo = new Domain.Entities.Repo.Repo(config.Name, modpacks.ToList(), null);
-            return new RepoWithFileChunks(repo,repoChunks);
+            return new RepoWithFileChunks(repo, repoChunks);
         }
     }
 

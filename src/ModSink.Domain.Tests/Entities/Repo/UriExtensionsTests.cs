@@ -13,7 +13,7 @@ namespace ModSink.Domain.Tests.Entities.Repo
         [InlineData("Mod/a.b")]
         public void GetSerializableUriString(string input)
         {
-            var uri = new Uri(input,UriKind.Relative);
+            var uri = new Uri(input, UriKind.Relative);
             UriExtensions.ToSerializableString(uri).Should().BeEquivalentTo(input);
         }
     }

@@ -12,7 +12,7 @@ namespace ModSink.Infrastructure.Hashing
     {
         public Hash CreateHash(byte[] rawBytes)
         {
-            return new Hash("SHA256",rawBytes);
+            return new Hash("SHA256", rawBytes);
         }
 
         public Hash ComputeHash(Stream data, CancellationToken cancellationToken)
@@ -36,6 +36,6 @@ namespace ModSink.Infrastructure.Hashing
 
         public Hash HashOfEmpty => throw new NotImplementedException();
         public int HashSize { get; } = 256;
-        
+
     }
 }

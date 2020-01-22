@@ -9,8 +9,8 @@ namespace ModSink.Domain.Entities.Repo
     {
         public static string ToSerializableString(this Uri uri)
         {
-            var si = new SerializationInfo(typeof(Uri),new FormatterConverter());
-            ((ISerializable)uri).GetObjectData(si,new StreamingContext());
+            var si = new SerializationInfo(typeof(Uri), new FormatterConverter());
+            ((ISerializable)uri).GetObjectData(si, new StreamingContext());
             return si.GetString("RelativeUri");
         }
 

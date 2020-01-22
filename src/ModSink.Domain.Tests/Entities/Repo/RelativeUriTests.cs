@@ -60,10 +60,10 @@ namespace ModSink.Domain.Tests.Entities.Repo
             var d = fileSystem.DirectoryInfo.FromDirectoryName("d");
             d.FullName.Should().NotEndWith("/", "because paths to directories should end with /, but for some reason they don't");
 
-            var wrongUri = RelativeUri.FromAbsolute(new Uri(d.FullName),new Uri(d.GetFiles().Single().FullName) );
+            var wrongUri = RelativeUri.FromAbsolute(new Uri(d.FullName), new Uri(d.GetFiles().Single().FullName));
             wrongUri.ToString().Should().Be("d/a.txt");
 
-            var correctUri = RelativeUri.FromAbsolute(new Uri(d.FullName+"/"), new Uri(d.GetFiles().Single().FullName));
+            var correctUri = RelativeUri.FromAbsolute(new Uri(d.FullName + "/"), new Uri(d.GetFiles().Single().FullName));
             correctUri.ToString().Should().Be("a.txt");
         }
 

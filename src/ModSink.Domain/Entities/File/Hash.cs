@@ -15,11 +15,11 @@ namespace ModSink.Domain.Entities.File
             HashId = hashId;
             Value = value;
         }
-       
 
-        public string HashId { get;  }
 
-        public byte[] Value { get;  }
+        public string HashId { get; }
+
+        public byte[] Value { get; }
 
         #region Generated
 
@@ -27,7 +27,7 @@ namespace ModSink.Domain.Entities.File
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
-            return string.Equals(HashId, other.HashId) && ( (Value==null && other.Value == null) || Value.SequenceEqual(other.Value));
+            return string.Equals(HashId, other.HashId) && ((Value == null && other.Value == null) || Value.SequenceEqual(other.Value));
         }
 
         public override bool Equals(object obj)
@@ -35,7 +35,7 @@ namespace ModSink.Domain.Entities.File
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
             if (obj.GetType() != GetType()) return false;
-            return Equals((Hash) obj);
+            return Equals((Hash)obj);
         }
 
         public override int GetHashCode()
@@ -60,11 +60,11 @@ namespace ModSink.Domain.Entities.File
 
         public byte[] RawForHashing()
         {
-            var result = HashId.Aggregate(new byte[0].AsEnumerable(), (current, t) => current.Append((byte) t));
+            var result = HashId.Aggregate(new byte[0].AsEnumerable(), (current, t) => current.Append((byte)t));
             result = Value.Aggregate(result, (current, b) => current.Append(b));
             return result.ToArray();
         }
 
-        public override string ToString() => $"Hash(Id='{HashId}',Value='{string.Join(",",Value)}')";
+        public override string ToString() => $"Hash(Id='{HashId}',Value='{string.Join(",", Value)}')";
     }
 }

@@ -16,7 +16,7 @@ namespace ModSink.Infrastructure.Hashing
         public int HashSize { get; } = 64;
         public Hash CreateHash(byte[] rawBytes)
         {
-            return new Hash("XXHash64",rawBytes);
+            return new Hash("XXHash64", rawBytes);
         }
 
         public Hash ComputeHash(Stream data, CancellationToken cancellationToken)
@@ -32,7 +32,7 @@ namespace ModSink.Infrastructure.Hashing
 
         public HashAlgorithm AsHashAlgorithm()
         {
-            return  xxHash64.Create();
+            return xxHash64.Create();
         }
 
 

@@ -53,7 +53,7 @@ namespace ModSink.Application.Hashing
             while (true)
             {
                 //--> Get some bytes to work on (don't let it read past length)
-                var bytesRead = stream.Read(buffer, 0, (int) Math.Min(bufferSize, length - pos));
+                var bytesRead = stream.Read(buffer, 0, (int)Math.Min(bufferSize, length - pos));
                 for (var i = 0; i < bytesRead; i++)
                 {
                     pos++;
@@ -107,7 +107,7 @@ namespace ModSink.Application.Hashing
 
             public Chunk ToChunk()
             {
-                return new Chunk {Position = Offset, Signature = new Signature(Hash, Length)}
+                return new Chunk { Position = Offset, Signature = new Signature(Hash, Length) }
                     ;
             }
         }

@@ -114,7 +114,7 @@ namespace ModSink.CLI.Verbs
                 uint b = 0;
                 for (var i = 0; i < a.Length; i++)
                     b = ((b << 23) | (b >> 9)) ^ a[i];
-                return unchecked((int) b);
+                return unchecked((int)b);
             }
         }
 
@@ -134,7 +134,7 @@ namespace ModSink.CLI.Verbs
         [Verb("dupl", HelpText = "Report duplicate chunk count, size")]
         public class Options
         {
-            [Option('c', "chunkSize", Default = (byte) 9, Required = false)]
+            [Option('c', "chunkSize", Default = (byte)9, Required = false)]
             public byte ChunkSize { get; set; }
 
             //[Option('b', "buffer", Default = 10 * 1024 * 1024)]

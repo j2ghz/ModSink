@@ -67,7 +67,7 @@ namespace ModSink.Infrastructure.Hashing
             var fileHash = await _hashFunction.ComputeHashAsync(chunkHashesStream, cancel);
             var fileSig = new Signature(fileHash, file.Length);
             var fileChunks = chunks.Select(c => new Chunk
-                {Signature = new Signature(c.Hash, c.Length), Position = c.Offset}).ToList();
+            { Signature = new Signature(c.Hash, c.Length), Position = c.Offset }).ToList();
             return (fileSig, fileChunks);
         }
 
