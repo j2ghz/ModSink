@@ -5,18 +5,14 @@ using ModSink.Domain.Entities.Repo;
 using PathLib;
 using Xunit;
 
-namespace ModSink.Domain.Tests.Entities.Repo
-{
-public class RepoTests
-{
+namespace ModSink.Domain.Tests.Entities.Repo {
+  public class RepoTests {
     [Fact]
-    public void RepoEquivalent()
-    {
-        var repo = new Domain.Entities.Repo.Repo("", new List<Modpack>(),
-                "");
-        var clone = new Domain.Entities.Repo.Repo("", new List<Modpack>(),
-                "");
-        repo.Should().BeEquivalentTo(clone);
+    public void
+    RepoEquivalent() {
+      var repo = new Domain.Entities.Repo.Repo("", new List<Modpack>(), "");
+      var clone = new Domain.Entities.Repo.Repo("", new List<Modpack>(), "");
+      repo.Should().BeEquivalentTo(clone);
     }
-}
+  }
 }
