@@ -7,14 +7,14 @@ using Xunit;
 
 namespace ModSink.Domain.Tests.Entities.Repo
 {
-    public class UriExtensionsTests
+public class UriExtensionsTests
+{
+    [Theory]
+    [InlineData("Mod/a.b")]
+    public void GetSerializableUriString(string input)
     {
-        [Theory]
-        [InlineData("Mod/a.b")]
-        public void GetSerializableUriString(string input)
-        {
-            var uri = new Uri(input, UriKind.Relative);
-            UriExtensions.ToSerializableString(uri).Should().BeEquivalentTo(input);
-        }
+        var uri = new Uri(input, UriKind.Relative);
+        UriExtensions.ToSerializableString(uri).Should().BeEquivalentTo(input);
     }
+}
 }

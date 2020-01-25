@@ -8,8 +8,8 @@ using ModSink.Infrastructure.Serialization.Protobuf;
 
 namespace ModSink.Infrastructure.Tests.Serialization
 {
-    public class ProtobufSerializerTests : IFormatterTests
-    {
-        protected override IFormatter formatter => new ProtobufSerializer();
-    }
+public class ProtobufSerializerTests : IFormatterTests
+{
+    protected override IFormatter formatter => new ProtobufSerializer();
+}
 }

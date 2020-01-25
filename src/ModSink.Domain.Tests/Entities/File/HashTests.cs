@@ -4,14 +4,14 @@ using Xunit;
 
 namespace ModSink.Domain.Tests.Entities.File
 {
-    public class HashTests
+public class HashTests
+{
+    [Fact]
+    public void SameEquals()
     {
-        [Fact]
-        public void SameEquals()
-        {
-            var h1 = new Hash("test", new byte[] { 0x00 });
-            var h2 = new Hash("test", new byte[] { 0x00 });
-            h1.Should().Be(h2);
-        }
+        var h1 = new Hash("test", new byte[] { 0x00 });
+        var h2 = new Hash("test", new byte[] { 0x00 });
+        h1.Should().Be(h2);
     }
+}
 }
