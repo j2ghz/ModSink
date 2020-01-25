@@ -32,7 +32,7 @@ namespace ModSink.Infrastructure.Serialization.Protobuf
                     nModpack.Mods.AddRange(modpack.Mods.Select(mod =>
                     {
                         var nMod = new Model.Mod() { Name = mod.Name };
-                        nMod.Files.AddRange(mod.Files.Select(f => new Model.RelativePathFile() { RelativePath = new Model.RelativePath() { SerializedRelativeUri = f.RelativePath.ToUri().ToSerializableString() }, Signature = new Model.Signature() { Length = f.Signature.Length, Hash = new Model.Hash() { Value = ByteString.CopyFrom(f.Signature.Hash.Value), HashId = f.Signature.Hash.HashId } } }));
+                        nMod.Files.AddRange(mod.Files.Select(f => new Model.RelativePathFile() { RelativePath = f.RelativePath.ToString(), Signature = new Model.Signature() { Length = f.Signature.Length, Hash = new Model.Hash() { Value = ByteString.CopyFrom(f.Signature.Hash.Value), HashId = f.Signature.Hash.HashId } } }));
                         return nMod;
                     }));
                     return nModpack;
@@ -43,7 +43,7 @@ namespace ModSink.Infrastructure.Serialization.Protobuf
         private Repo MapBack(Model.Repo repo)
         {
             return new Repo(repo.Name,
-                repo.Modpacks.Select(mp => new Modpack() { Name = mp.Name, Mods = mp.Mods.Select(m => new Mod() { Name = m.Name, Files = m.Files.Select(f => new RelativePathFile() { RelativePath = PurePath.Create(""), Signature = new Signature(new Hash(f.Signature.Hash.HashId, f.Signature.Hash.Value.ToByteArray()), f.Signature.Length) }).ToList() }).ToList() }).ToList(),
+                repo.Modpacks.Select(mp => new Modpack() { Name = mp.Name, Mods = mp.Mods.Select(m => new Mod() { Name = m.Name, Files = m.Files.Select(f => new RelativePathFile() { RelativePath = PurePath.Create(f.RelativePath), Signature = new Signature(new Hash(f.Signature.Hash.HashId, f.Signature.Hash.Value.ToByteArray()), f.Signature.Length) }).ToList() }).ToList() }).ToList(),
                 repo.ChunksPath);
         }
 

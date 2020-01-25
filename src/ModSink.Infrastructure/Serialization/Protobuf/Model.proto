@@ -12,12 +12,8 @@ message Signature {
 	int64 Length = 2;
 }
 
-message RelativePath {
-	string SerializedRelativeUri = 1;
-}
-
 message RelativePathFile {
-	RelativePath RelativePath = 1;
+	string RelativePath = 1;
 	Signature Signature = 2;
 }
 
