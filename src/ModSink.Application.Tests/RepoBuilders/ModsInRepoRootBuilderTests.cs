@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO.Abstractions.TestingHelpers;
 using System.Threading;
 using System.Threading.Tasks;
@@ -16,7 +16,7 @@ namespace ModSink.Application.Tests.RepoBuilders
 {
     public class ModsInRepoRootBuilderTests
     {
-        [Fact]
+        [Fact(Skip = "Use chunks")]
         public async Task WithoutConfig()
         {
             //Prepare env
