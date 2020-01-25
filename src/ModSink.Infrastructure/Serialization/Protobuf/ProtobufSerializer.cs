@@ -18,7 +18,10 @@ namespace ModSink.Infrastructure.Serialization.Protobuf
         {
             var mapperConfig = new MapperConfiguration(cfg =>
             {
-                cfg.CreateMap<Repo, Model.Repo>().ForMember(r => r.Name, c => c.MapFrom(r => r.Name));
+                cfg.CreateMap<Repo, Model.Repo>()
+                .ForMember(r => r.Name, c => c.MapFrom(r => r.Name))
+                .ForMember(r=>r.ChunksPath,c=>c.MapFrom(r=>r.ChunksPath))
+                .ForMember(r=>r.Modpacks,c=>c.MapFrom(r=>r.Modpacks));
                 cfg.CreateMap<Modpack, Model.Modpack>();
                 cfg.CreateMap<Mod, Model.Mod>();
                 cfg.CreateMap<RelativePathFile, Model.RelativePathFile>();
@@ -46,6 +49,12 @@ namespace ModSink.Infrastructure.Serialization.Protobuf
             return mapper.Map<Repo>(intermediate);
         }
 
+        public Repo MapAndBack(Repo repo)
+        {
+            var mapped = mapper.Map<Model.Repo>(repo);
+            return mapper.Map<Repo>(mapped);
+        }
+
         public Stream SerializeFileChunks(FileChunks fileChunks)
         {
             throw new NotImplementedException();
@@ -55,7 +64,8 @@ namespace ModSink.Infrastructure.Serialization.Protobuf
         {
             var result = new MemoryStream();
             var intermediate = mapper.Map<Model.Repo>(repo);
-            intermediate.WriteTo(new CodedOutputStream(result, true));
+            using var cos = new CodedOutputStream(result, true);
+            intermediate.WriteTo(cos);
             return result;
         }
     }

@@ -19,8 +19,16 @@ namespace ModSink.Application.Tests.Serialization
         [Property(Arbitrary = new[] { typeof(RepoGenerators) })]
         public void RoundTripRepo(Domain.Entities.Repo.Repo o)
         {
-            var stream = formatter.SerializeRepo(o);
-            formatter.DeserializeRepo(stream).Should().BeEquivalentTo(o);
+            using var stream = formatter.SerializeRepo(o);
+            stream.Position = 0;
+            var deserialized = formatter.DeserializeRepo(stream);
+            deserialized.Should().BeEquivalentTo(o);
+        }
+
+        [Property(Arbitrary = new[] { typeof(RepoGenerators) })]
+        public void RoundTripRepoMapOnly(Domain.Entities.Repo.Repo o)
+        {
+            formatter.MapAndBack(o).Should().BeEquivalentTo(o);
         }
 
         public static class RepoGenerators

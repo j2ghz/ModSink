@@ -9,6 +9,7 @@ namespace ModSink.Application.Serialization
         Domain.Entities.Repo.Repo DeserializeRepo(Stream stream);
         Stream SerializeFileChunks(FileChunks fileChunks);
         Stream SerializeRepo(Domain.Entities.Repo.Repo repo);
+        Domain.Entities.Repo.Repo MapAndBack(Domain.Entities.Repo.Repo repo);
     }
 
     public abstract class GenericFormatter : IFormatter
@@ -37,5 +38,10 @@ namespace ModSink.Application.Serialization
 
         public abstract T Deserialize<T>(Stream stream);
         public abstract Stream Serialize<T>(T o);
+
+        public Domain.Entities.Repo.Repo MapAndBack(Domain.Entities.Repo.Repo repo)
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }
