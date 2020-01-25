@@ -12,30 +12,10 @@ namespace ModSink.Infrastructure.Serialization.Protobuf
 {
     public class ProtobufSerializer : IFormatter
     {
-        private readonly Mapper mapper;
 
         public ProtobufSerializer()
         {
-            var mapperConfig = new MapperConfiguration(cfg =>
-            {
-                cfg.CreateMap<Repo, Model.Repo>()
-                .ForMember(r => r.Name, c => c.MapFrom(r => r.Name))
-                .ForMember(r => r.ChunksPath, c => c.MapFrom(r => r.ChunksPath))
-                .ForMember(r => r.Modpacks, c => c.MapFrom(r => r.Modpacks));
-                cfg.CreateMap<Modpack, Model.Modpack>();
-                cfg.CreateMap<Mod, Model.Mod>();
-                cfg.CreateMap<RelativePathFile, Model.RelativePathFile>();
-                cfg.CreateMap<IPurePath, Model.RelativePath>().ForMember(p => p.SerializedRelativeUri, p => p.MapFrom(x => x.ToUri().ToSerializableString()));
-                cfg.CreateMap<Signature, Model.Signature>();
-                cfg.CreateMap<Hash, Model.Hash>();
-                cfg.CreateMap<byte[], ByteString>();
 
-                cfg.CreateMap<Model.Repo, Repo>().ConstructUsing((r, ctx) => new Repo(r.Name,
-                    r.Modpacks.Select(m => ctx.Mapper.Map<Modpack>(m)).ToList(), r.ChunksPath));
-            });
-            mapperConfig.CompileMappings();
-            mapperConfig.AssertConfigurationIsValid();
-            mapper = new Mapper(mapperConfig);
         }
 
         private Model.Repo Map(Repo repo)
@@ -60,6 +40,13 @@ namespace ModSink.Infrastructure.Serialization.Protobuf
             return nRepo;
         }
 
+        private Repo MapBack(Model.Repo repo)
+        {
+            return new Repo(repo.Name,
+                repo.Modpacks.Select(mp => new Modpack() { Name = mp.Name, Mods = mp.Mods.Select(m => new Mod() { Name = m.Name, Files = m.Files.Select(f => new RelativePathFile() { RelativePath = PurePath.Create(""), Signature = new Signature(new Hash(f.Signature.Hash.HashId, f.Signature.Hash.Value.ToByteArray()), f.Signature.Length) }).ToList() }).ToList() }).ToList(),
+                repo.ChunksPath);
+        }
+
         public FileChunks DeserializeFileChunks(Stream stream)
         {
             throw new NotImplementedException();
@@ -68,13 +55,15 @@ namespace ModSink.Infrastructure.Serialization.Protobuf
         public Repo DeserializeRepo(Stream stream)
         {
             var intermediate = Model.Repo.Parser.ParseFrom(stream);
-            return mapper.Map<Repo>(intermediate);
+            return MapBack(intermediate); //mapper.Map<Repo>(intermediate);
         }
 
         public Repo MapAndBack(Repo repo)
         {
-            var mapped = mapper.Map<Model.Repo>(repo);
-            return mapper.Map<Repo>(mapped);
+            //var mapped = mapper.Map<Model.Repo>(repo);
+            //return mapper.Map<Repo>(mapped);
+            var mapped = Map(repo);
+            return MapBack(mapped);
         }
 
         public Stream SerializeFileChunks(FileChunks fileChunks)
@@ -85,7 +74,7 @@ namespace ModSink.Infrastructure.Serialization.Protobuf
         public Stream SerializeRepo(Repo repo)
         {
             var result = new MemoryStream();
-            var intermediate = mapper.Map<Model.Repo>(repo);
+            var intermediate = Map(repo); //mapper.Map<Model.Repo>(repo);
             using var cos = new CodedOutputStream(result, true);
             intermediate.WriteTo(cos);
             return result;

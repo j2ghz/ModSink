@@ -14,6 +14,22 @@ namespace ModSink.Domain.Entities.Repo
             return si.GetString("RelativeUri");
         }
 
+        public static Uri ToUri(string serializedUri)
+        {
+            var si = new SerializationInfo(typeof(Uri), new FormatterConverter());
+            si.AddValue("RelativeUri", serializedUri);
+            var c = new StreamingContext();
+            return new SerializableUri(si, c);
+        }
+
+        private class SerializableUri : Uri
+        {
+            public SerializableUri(SerializationInfo serializationInfo, StreamingContext streamingContext) : base(serializationInfo, streamingContext)
+            {
+
+            }
+        }
+
         private class FormatterConverter : IFormatterConverter
         {
             public object Convert(object value, Type type)
