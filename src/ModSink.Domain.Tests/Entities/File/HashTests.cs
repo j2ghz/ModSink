@@ -9,16 +9,9 @@ namespace ModSink.Domain.Tests.Entities.File
         [Fact]
         public void SameEquals()
         {
-            var h1 = new TestHash(new byte[] { 0x00 }); var h2 = new TestHash(new byte[] { 0x00 });
+            var h1 = new Hash("test", new byte[] { 0x00 });
+            var h2 = new Hash("test", new byte[] { 0x00 });
             h1.Should().Be(h2);
-        }
-        class TestHash : Hash
-        {
-            public TestHash(byte[] value) : base(value)
-            {
-            }
-
-            public override string HashId { get; } = "TestHash";
         }
     }
 }

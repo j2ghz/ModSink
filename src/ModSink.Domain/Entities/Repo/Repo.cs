@@ -6,15 +6,15 @@ namespace ModSink.Domain.Entities.Repo
 {
     public class Repo
     {
-        public Repo(string name, IReadOnlyCollection<Modpack> modpacks, IReadOnlyDictionary<FileSignature, IPurePath> sourceFiles)
+        public Repo(string name, IReadOnlyCollection<Modpack> modpacks, string chunksPath)
         {
             Name = name;
             Modpacks = modpacks;
-            SourceFiles = sourceFiles;
+            ChunksPath = chunksPath;
         }
 
         public IReadOnlyCollection<Modpack> Modpacks { get; }
         public string Name { get; }
-        public IReadOnlyDictionary<FileSignature, IPurePath> SourceFiles { get; }
+        public string ChunksPath { get; }
     }
 }

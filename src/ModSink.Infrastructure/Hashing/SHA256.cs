@@ -12,21 +12,21 @@ namespace ModSink.Infrastructure.Hashing
     {
         public Hash CreateHash(byte[] rawBytes)
         {
-            return new SHA256Hash(rawBytes);
+            return new Hash("SHA256", rawBytes);
         }
 
         public Hash ComputeHash(Stream data, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
             var bytes = System.Security.Cryptography.SHA256.Create().ComputeHash(data);
-            return new SHA256Hash(bytes);
+            return CreateHash(bytes);
         }
 
         public Task<Hash> ComputeHashAsync(Stream data, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
             var bytes = System.Security.Cryptography.SHA256.Create().ComputeHash(data);
-            return Task.FromResult((Hash) new SHA256Hash(bytes));
+            return Task.FromResult(CreateHash(bytes));
         }
 
         public HashAlgorithm AsHashAlgorithm()
@@ -37,13 +37,5 @@ namespace ModSink.Infrastructure.Hashing
         public Hash HashOfEmpty => throw new NotImplementedException();
         public int HashSize { get; } = 256;
 
-        public class SHA256Hash : Hash
-        {
-            public SHA256Hash(byte[] bytes) : base(bytes)
-            {
-            }
-
-            public override string HashId { get; } = "SHA256";
-        }
     }
 }

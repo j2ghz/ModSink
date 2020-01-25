@@ -57,7 +57,7 @@ namespace ModSink.Infrastructure.Hashing
             }
         }
 
-        public async Task<(FileSignature fileSignature, List<Chunk> fileChunks)> GetFileHash(IFileInfo file,
+        public async Task<(Signature fileSignature, List<Chunk> fileChunks)> GetFileHash(IFileInfo file,
             CancellationToken cancel)
         {
             using var stream = _fileOpener.OpenRead(file);
@@ -65,9 +65,9 @@ namespace ModSink.Infrastructure.Hashing
             var chunkHashesStream =
                 new MemoryStream(CombineByteArrays(chunks.Select(c => c.Hash.RawForHashing()).ToArray()));
             var fileHash = await _hashFunction.ComputeHashAsync(chunkHashesStream, cancel);
-            var fileSig = new FileSignature(fileHash, file.Length);
+            var fileSig = new Signature(fileHash, file.Length);
             var fileChunks = chunks.Select(c => new Chunk
-                {Signature = new ChunkSignature(c.Hash, c.Length), Position = c.Offset}).ToList();
+            { Signature = new Signature(c.Hash, c.Length), Position = c.Offset }).ToList();
             return (fileSig, fileChunks);
         }
 

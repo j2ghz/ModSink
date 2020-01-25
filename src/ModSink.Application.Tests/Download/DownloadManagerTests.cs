@@ -20,14 +20,14 @@ namespace ModSink.Application.Tests.Download
             public async Task<Stream> DownloadAsync(Uri uri, CancellationToken cancellationToken)
             {
                 await Task.Delay(1, cancellationToken);
-                return new MemoryStream(new byte[] {0x00});
+                return new MemoryStream(new byte[] { 0x00 });
             }
         }
 
         [Fact(Skip = "WIP")]
         public async Task Start()
         {
-            
+
         }
     }
 }

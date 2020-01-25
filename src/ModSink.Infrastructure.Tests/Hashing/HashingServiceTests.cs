@@ -28,7 +28,7 @@ namespace ModSink.Infrastructure.Tests.Hashing
             var hashingService = new HashingService(hashFunction.Object,
                 Options.Create(new HashingService.Options()),
                 new FileStreamOpener(Options.Create(new FileStreamOpener.Options()),
-                    new MockFileStreamFactory(fs)),new StreamBreaker(new SHA256()));
+                    new MockFileStreamFactory(fs)), new StreamBreaker(new SHA256()));
 
             foreach (var relativeUriFile in hashingService.GetFileHashes(
                 fs.DirectoryInfo.FromDirectoryName(@"/repo/"), CancellationToken.None))
