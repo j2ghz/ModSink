@@ -4,6 +4,7 @@ package ModSink.Infrastructure.Serialization.Protobuf.Model;
 
 message Hash {
 	bytes Value = 1;
+	string HashId = 2;
 }
 
 message Signature {

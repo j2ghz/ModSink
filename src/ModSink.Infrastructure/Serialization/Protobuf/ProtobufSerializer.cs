@@ -20,8 +20,8 @@ namespace ModSink.Infrastructure.Serialization.Protobuf
             {
                 cfg.CreateMap<Repo, Model.Repo>()
                 .ForMember(r => r.Name, c => c.MapFrom(r => r.Name))
-                .ForMember(r=>r.ChunksPath,c=>c.MapFrom(r=>r.ChunksPath))
-                .ForMember(r=>r.Modpacks,c=>c.MapFrom(r=>r.Modpacks));
+                .ForMember(r => r.ChunksPath, c => c.MapFrom(r => r.ChunksPath))
+                .ForMember(r => r.Modpacks, c => c.MapFrom(r => r.Modpacks));
                 cfg.CreateMap<Modpack, Model.Modpack>();
                 cfg.CreateMap<Mod, Model.Mod>();
                 cfg.CreateMap<RelativePathFile, Model.RelativePathFile>();
@@ -36,6 +36,28 @@ namespace ModSink.Infrastructure.Serialization.Protobuf
             mapperConfig.CompileMappings();
             mapperConfig.AssertConfigurationIsValid();
             mapper = new Mapper(mapperConfig);
+        }
+
+        private Model.Repo Map(Repo repo)
+        {
+            var nRepo = new Model.Repo()
+            {
+                Name = repo.Name,
+                ChunksPath = repo.ChunksPath
+
+            };
+            nRepo.Modpacks.AddRange(repo.Modpacks.Select(modpack =>
+                {
+                    var nModpack = new Model.Modpack { Name = modpack.Name };
+                    nModpack.Mods.AddRange(modpack.Mods.Select(mod =>
+                    {
+                        var nMod = new Model.Mod() { Name = mod.Name };
+                        nMod.Files.AddRange(mod.Files.Select(f => new Model.RelativePathFile() { RelativePath = new Model.RelativePath() { SerializedRelativeUri = f.RelativePath.ToUri().ToSerializableString() }, Signature = new Model.Signature() { Length = f.Signature.Length, Hash = new Model.Hash() { Value = ByteString.CopyFrom(f.Signature.Hash.Value), HashId = f.Signature.Hash.HashId } } }));
+                        return nMod;
+                    }));
+                    return nModpack;
+                }));
+            return nRepo;
         }
 
         public FileChunks DeserializeFileChunks(Stream stream)
