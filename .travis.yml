@@ -8,4 +8,5 @@ script:
   - dotnet tool restore
   - dotnet build
   - dotnet test --configuration Release /p:AltCover=true /p:AltCoverForce=true
+  - for d in src/*.Tests; do dotnet codecov -f "$d/coverage.xml" --flag "travis"; done
   - dotnet pack
