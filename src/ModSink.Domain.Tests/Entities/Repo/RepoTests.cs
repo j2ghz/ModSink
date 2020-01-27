@@ -7,16 +7,16 @@ using Xunit;
 
 namespace ModSink.Domain.Tests.Entities.Repo
 {
-    public class RepoTests
+public class RepoTests
+{
+    [Fact]
+    public void RepoEquivalent()
     {
-        [Fact]
-        public void RepoEquivalent()
-        {
-            var repo = new Domain.Entities.Repo.Repo("", new List<Modpack>(),
+        var repo = new Domain.Entities.Repo.Repo("", new List<Modpack>(),
                 "");
-            var clone = new Domain.Entities.Repo.Repo("", new List<Modpack>(),
+        var clone = new Domain.Entities.Repo.Repo("", new List<Modpack>(),
                 "");
-            repo.Should().BeEquivalentTo(clone);
-        }
+        repo.Should().BeEquivalentTo(clone);
     }
+}
 }

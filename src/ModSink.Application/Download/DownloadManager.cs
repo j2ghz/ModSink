@@ -1,6 +1,6 @@
 ﻿namespace ModSink.Application.Download
 {
-    public class DownloadManager
-    {
-    }
+public class DownloadManager
+{
+}
 }

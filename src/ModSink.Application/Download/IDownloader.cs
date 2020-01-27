@@ -5,9 +5,9 @@ using System.Threading.Tasks;
 
 namespace ModSink.Application.Download
 {
-    public interface IDownloader
-    {
-        bool CanDownload(Uri uri);
-        Task<Stream> DownloadAsync(Uri uri, CancellationToken cancellationToken);
-    }
+public interface IDownloader
+{
+    bool CanDownload(Uri uri);
+    Task<Stream> DownloadAsync(Uri uri, CancellationToken cancellationToken);
+}
 }
