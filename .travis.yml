@@ -7,5 +7,5 @@ script:
   - dotnet tool restore
   - dotnet build --configuration Release
   - dotnet test --configuration Release /p:AltCover=true /p:AltCoverForce=true
-  - bash <(curl -s https://codecov.io/bash) -f src/*.Tests/coverage.xml -F travis
+  - bash <(curl -s https://codecov.io/bash) -s src -F travis
   - dotnet pack
