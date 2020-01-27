@@ -17,10 +17,10 @@ test_script:
   - dotnet test --configuration Release /p:AltCover=true /p:AltCoverForce=true"
 
 after_test:
-  - FOR /D /r %%G in ("src/*.Tests") DO dotnet codecov -f "src\%%~nxG\coverage.xml"
+  - FOR /D /r %%G in ("src/*.Tests") DO dotnet codecov -f "src\%%~nxG\coverage.xml" --flag "appveyor"
 
 on_failure:
-  - FOR /D /r %%G in ("src/*.Tests") DO dotnet codecov -f "src\%%~nxG\coverage.xml"
+  - FOR /D /r %%G in ("src/*.Tests") DO dotnet codecov -f "src\%%~nxG\coverage.xml" --flag "appveyor"
 
 before_package:
   - dotnet pack

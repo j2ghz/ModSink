@@ -343,3 +343,4 @@ tools/**
 
 # End of https://www.gitignore.io/api/linux,windows,visualstudio,visualstudiocode
 coverage.xml
+/.ionide/symbolCache.db

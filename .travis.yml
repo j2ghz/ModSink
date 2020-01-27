@@ -3,9 +3,9 @@ language: csharp
 mono: none
 dotnet: 3.1.101
 script:
-  - dotnet --info
   - dotnet restore
   - dotnet tool restore
-  - dotnet build
+  - dotnet build --configuration Release
   - dotnet test --configuration Release /p:AltCover=true /p:AltCoverForce=true
+  - bash <(curl -s https://codecov.io/bash) -s src -F travis
   - dotnet pack
