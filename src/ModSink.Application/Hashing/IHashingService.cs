@@ -5,11 +5,9 @@ using System.Threading.Tasks;
 using ModSink.Domain.Entities.File;
 using ModSink.Domain.Entities.Repo;
 
-namespace ModSink.Application.Hashing
-{
-public interface IHashingService
-{
-    IEnumerable<Task<(RelativePathFile File, List<Chunk> Chunks)>> GetFileHashes(IDirectoryInfo directory,
-            CancellationToken token);
-}
+namespace ModSink.Application.Hashing {
+  public interface IHashingService {
+    IEnumerable<Task<(RelativePathFile File, List<Chunk>Chunks)>>GetFileHashes(
+        IDirectoryInfo directory, CancellationToken token);
+  }
 }

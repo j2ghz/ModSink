@@ -2,19 +2,17 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace ModSink.Domain.Entities.File
-{
-[Equals]
-public struct Chunk
-{
+namespace ModSink.Domain.Entities.File {
+  [Equals]
+  public struct Chunk {
     public Signature Signature {
-        get;
-        set;
+      get;
+      set;
     }
     public long Position {
-        get;
-        set;
+      get;
+      set;
     }
     public long Length => Signature.Length;
-}
+  }
 }
