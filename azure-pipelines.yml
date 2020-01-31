@@ -46,4 +46,5 @@ steps:
 - task: DotNetCoreCLI@2
   inputs:
     command: 'custom'
-    custom: 'codecov -t $(codecov_token) -f src/*/coverage.xml --flag "azure"'
+    custom: 'codecov'
+    arguments: '-t $(codecov_token) -f src/*/coverage.xml --flag "azure"'
