@@ -22,6 +22,10 @@ pool:
   vmImage: $(imageName)
 
 steps:
+- task: UseDotNet@2
+  inputs:
+    packageType: 'sdk'
+    useGlobalJson: true
 - task: DotNetCoreCLI@2
   inputs:
     command: 'restore'
@@ -29,7 +33,8 @@ steps:
 - task: DotNetCoreCLI@2
   inputs:
     command: 'custom'
-    custom: 'tool restore'
+    custom: 'tool'
+    arguments: 'restore'
 - task: DotNetCoreCLI@2
   inputs:
     command: 'build'
