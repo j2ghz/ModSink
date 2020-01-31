@@ -12,6 +12,10 @@ jobs:
 
     steps:
     - uses: actions/checkout@v1
+    - name: Setup .NET Core 2 for codecov
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 2.1
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v1
       with:
@@ -28,5 +32,3 @@ jobs:
       run: dotnet codecov -t 78e056d7-ce59-4f6d-b177-85fa3501d898 -f src/*/coverage.xml --flag "github_ci-${{ matrix.os }}"
     - name: Pack
       run: dotnet pack --configuration Release
-#    - name: Push NuGet Packages
-#      run: Get-ChildItem -Recurse *.nupkg | ForEach { dotnet nuget push -s "https://nuget.pkg.github.com/j2ghz/index.json" -k ${{ secrets.token }} $_ }
