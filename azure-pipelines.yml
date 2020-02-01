@@ -6,9 +6,6 @@ pr:
     include:
       - "*"
 
-
-
-
 stages:
     - stage: Build
       jobs:
@@ -55,22 +52,6 @@ stages:
           pool:
             vmImage: $(imageName)
           steps:
-              - task: DotNetCoreCLI@2
-                displayName: Restore
-                inputs:
-                    command: "restore"
-                    verbosityRestore: "Normal"
-              - task: DotNetCoreCLI@2
-                displayName: Restore tools
-                inputs:
-                    command: "custom"
-                    custom: "tool"
-                    arguments: "restore"
-              - task: DotNetCoreCLI@2
-                displayName: Build
-                inputs:
-                    command: "build"
-                    arguments: "--configuration Release"
               - task: DotNetCoreCLI@2
                 displayName: Run tests
                 inputs:
