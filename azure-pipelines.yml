@@ -6,72 +6,105 @@ pr:
     include:
       - "*"
 
-strategy:
-  matrix:
-    linux:
-      imageName: "ubuntu-latest"
-    windows:
-      imageName: "windows-latest"
 
-pool:
-  vmImage: $(imageName)
 
-steps:
-  # - task: UseDotNet@2
-  #   inputs:
-  #     packageType: 'sdk'
-  #     useGlobalJson: true
-  - task: DotNetCoreCLI@2
-    displayName: Restore
-    inputs:
-      command: "restore"
-      verbosityRestore: "Normal"
-  - task: DotNetCoreCLI@2
-    displayName: Restore tools
-    inputs:
-      command: "custom"
-      custom: "tool"
-      arguments: "restore"
-  - task: DotNetCoreCLI@2
-    displayName: Build
-    inputs:
-      command: "build"
-      arguments: "--configuration Release"
-  - task: DotNetCoreCLI@2
-    displayName: Run tests
-    inputs:
-      command: "test"
-      arguments: "--configuration Release /p:AltCover=true /p:AltCoverForce=true /p:AltCoverCobertura=cobertura.xml"
-  - task: DotNetCoreCLI@2
-    displayName: Upload test coverage to codecov
-    inputs:
-      command: "custom"
-      custom: "codecov"
-      arguments: '-t $(codecov_token) -f src/*/coverage.xml --flag "azure-$(imageName)"'
-  - task: PublishCodeCoverageResults@1
-    displayName: Upload test coverage
-    inputs:
-      codeCoverageTool: 'Cobertura'
-      summaryFileLocation: 'src/*.Tests/cobertura.xml'
-      failIfCoverageEmpty: true
-  - task: DotNetCoreCLI@2
-    displayName: Dotnet publish
-    inputs:
-      command: 'publish'
-      publishWebProjects: false
-      projects: 'src/ModSink.UI.Avalonia/ModSink.UI.Avalonia.csproj'
-      arguments: '-c Release -r win10-x64 --self-contained -o $(Build.ArtifactStagingDirectory)/ModSink.UI.Avalonia-win10-x64-sfc'
-  - task: ArchiveFiles@2
-    displayName: Zip artifacts
-    inputs:
-        rootFolderOrFile: '$(Build.ArtifactStagingDirectory)/ModSink.UI.Avalonia-win10-x64-sfc'
-        includeRootFolder: false
-        archiveType: 'zip'
-        archiveFile: '$(Build.ArtifactStagingDirectory)/ModSink.UI.Avalonia-win10-x64-sfc.zip'
-        replaceExistingArchive: true
-  - task: PublishBuildArtifacts@1
-    displayName: Publish build artifacts
-    inputs:
-      PathtoPublish: '$(Build.ArtifactStagingDirectory)/ModSink.UI.Avalonia-win10-x64-sfc.zip'
-      ArtifactName: 'ModSink.UI.Avalonia-win10-x64-sfc.zip'
-      publishLocation: 'Container'
+
+stages:
+    - stage: Build
+      jobs:
+        - job: Build
+          strategy:
+            matrix:
+                linux:
+                    imageName: "ubuntu-latest"
+                windows:
+                    imageName: "windows-latest"
+          pool:
+            vmImage: $(imageName)
+          steps:
+            # - task: UseDotNet@2
+            #   inputs:
+            #     packageType: 'sdk'
+            #     useGlobalJson: true
+              - task: DotNetCoreCLI@2
+                displayName: Restore
+                inputs:
+                    command: "restore"
+                    verbosityRestore: "Normal"
+              - task: DotNetCoreCLI@2
+                displayName: Restore tools
+                inputs:
+                    command: "custom"
+                    custom: "tool"
+                    arguments: "restore"
+              - task: DotNetCoreCLI@2
+                displayName: Build
+                inputs:
+                    command: "build"
+                    arguments: "--configuration Release"
+    - stage: Test
+      dependsOn: Build
+      jobs:
+        - job: Test
+          strategy:
+            matrix:
+                linux:
+                    imageName: "ubuntu-latest"
+                windows:
+                    imageName: "windows-latest"
+          pool:
+            vmImage: $(imageName)
+          steps:
+              - task: DotNetCoreCLI@2
+                displayName: Restore
+                inputs:
+                    command: "restore"
+                    verbosityRestore: "Normal"
+              - task: DotNetCoreCLI@2
+                displayName: Restore tools
+                inputs:
+                    command: "custom"
+                    custom: "tool"
+                    arguments: "restore"
+              - task: DotNetCoreCLI@2
+                displayName: Build
+                inputs:
+                    command: "build"
+                    arguments: "--configuration Release"
+              - task: DotNetCoreCLI@2
+                displayName: Run tests
+                inputs:
+                    command: "test"
+                    arguments: "--configuration Release /p:AltCover=true /p:AltCoverForce=true /p:AltCoverCobertura=cobertura.xml"
+              - task: DotNetCoreCLI@2
+                displayName: Upload test coverage to codecov
+                inputs:
+                    command: "custom"
+                    custom: "codecov"
+                    arguments: '-t $(codecov_token) -f src/*/coverage.xml --flag "azure-$(imageName)"'
+              - task: PublishCodeCoverageResults@1
+                displayName: Upload test coverage
+                inputs:
+                    codeCoverageTool: 'Cobertura'
+                    summaryFileLocation: 'src/*.Tests/cobertura.xml'
+                    failIfCoverageEmpty: true
+    - stage: Publish
+      dependsOn: Build
+      jobs:
+        - job: Publish
+          pool:
+            vmImage: windows-latest
+          steps:
+              - task: DotNetCoreCLI@2
+                displayName: Dotnet publish
+                inputs:
+                  command: 'publish'
+                  publishWebProjects: false
+                  projects: 'src/ModSink.UI.Avalonia/ModSink.UI.Avalonia.csproj'
+                  arguments: '-c Release -r win10-x64 --self-contained -o $(Build.ArtifactStagingDirectory)/ModSink.UI.Avalonia-win10-x64-sfc'
+              - task: PublishBuildArtifacts@1
+                displayName: Publish build artifacts
+                inputs:
+                    PathtoPublish: '$(Build.ArtifactStagingDirectory)/ModSink.UI.Avalonia-win10-x64-sfc'
+                    ArtifactName: 'ModSink.UI.Avalonia-win10-x64-sfc'
+                    publishLocation: 'Container'
