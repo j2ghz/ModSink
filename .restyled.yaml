@@ -1,0 +1,9 @@
+enabled: true
+#restylers_version: "702b781d15f992cc3cb28925f592c1721ff68a19"
+restylers:
+  - astyle:
+      enabled: false
+  - clang-format:
+      enabled: false
+# - dotnet-format:
+#     enabled: true
