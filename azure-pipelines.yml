@@ -59,11 +59,19 @@ steps:
     inputs:
       command: 'publish'
       publishWebProjects: false
-      projects: 'src\ModSink.UI.Avalonia\ModSink.UI.Avalonia.csproj'
-      arguments: '-c Release -r win10-x64 --self-contained'
-  - task: PublishBuildArtifacts@1
-    displayName: Publish build artifact
+      projects: 'src/ModSink.UI.Avalonia/ModSink.UI.Avalonia.csproj'
+      arguments: '-c Release -r win10-x64 --self-contained -o $(Build.ArtifactStagingDirectory)/ModSink.UI.Avalonia-win10-x64-sfc'
+  - task: ArchiveFiles@2
+    displayName: Zip artifacts
     inputs:
-      PathtoPublish: '$(Build.ArtifactStagingDirectory)'
-      ArtifactName: 'drop'
+        rootFolderOrFile: '$(Build.ArtifactStagingDirectory)/ModSink.UI.Avalonia-win10-x64-sfc'
+        includeRootFolder: false
+        archiveType: 'zip'
+        archiveFile: '$(Build.ArtifactStagingDirectory)/ModSink.UI.Avalonia-win10-x64-sfc.zip'
+        replaceExistingArchive: true
+  - task: PublishBuildArtifacts@1
+    displayName: Publish build artifacts
+    inputs:
+      PathtoPublish: '$(Build.ArtifactStagingDirectory)/ModSink.UI.Avalonia-win10-x64-sfc.zip'
+      ArtifactName: 'ModSink.UI.Avalonia-win10-x64-sfc.zip'
       publishLocation: 'Container'
