@@ -6,7 +6,7 @@ namespace ModSink.Domain.Entities
 {
     public readonly struct DownloadProgress
     {
-                   public readonly ByteSize Downloaded;
+        public readonly ByteSize Downloaded;
         public readonly ByteSize Size;
         public readonly TransferState State;
         public readonly DateTimeOffset Timestamp;
