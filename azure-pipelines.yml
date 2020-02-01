@@ -8,7 +8,7 @@ pr:
 
 stages:
     - stage: Test
-      dependsOn: Build
+      dependsOn: []
       jobs:
         - job: Test
           strategy:
@@ -44,7 +44,7 @@ stages:
                     summaryFileLocation: 'src/*.Tests/cobertura.xml'
                     failIfCoverageEmpty: true
     - stage: Publish
-      dependsOn: Build
+      dependsOn: []
       jobs:
         - job: Publish
           pool:
