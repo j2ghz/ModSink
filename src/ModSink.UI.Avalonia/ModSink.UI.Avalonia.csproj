@@ -16,6 +16,10 @@
     <PackageReference Include="Avalonia" Version="0.9.2" />
     <PackageReference Include="Avalonia.Desktop" Version="0.9.2" />
     <PackageReference Include="Avalonia.ReactiveUI" Version="0.9.2" />
+    <PackageReference Include="Roslyn.System.IO.Abstractions.Analyzers" Version="6.0.32">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ModSink.UI\ModSink.UI.csproj" />

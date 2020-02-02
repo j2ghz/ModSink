@@ -17,9 +17,7 @@
 
   <ItemGroup>
     <PackageReference Include="CommandLineParser" Version="2.5.0" />
-    <PackageReference Include="MessagePack" Version="1.7.3.7" />
-    <PackageReference Include="MessagePackAnalyzer" Version="1.7.3.7" />
-    <PackageReference Include="Roslyn.System.IO.Abstractions.Analyzers" Version="4.0.3">
+    <PackageReference Include="Roslyn.System.IO.Abstractions.Analyzers" Version="6.0.32">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>

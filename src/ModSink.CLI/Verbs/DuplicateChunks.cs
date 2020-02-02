@@ -8,8 +8,6 @@ using System.Linq;
 using System.Text;
 using CommandLine;
 using Humanizer;
-using MessagePack;
-using MessagePack.Resolvers;
 using ModSink.Application.Hashing;
 using ModSink.Infrastructure.Hashing;
 using Newtonsoft.Json;
@@ -82,10 +80,10 @@ namespace ModSink.CLI.Verbs
                 using var b = new BrotliStream(compressedStream, CompressionLevel.Fastest);
                 b.Write(bytes);
                 sizes["JSON (Newtonsoft) (Brotli)"] += compressedStream.Length;
-                sizes["MessagePackSerializer"] += MessagePackSerializer
-                    .Serialize(metadata, ContractlessStandardResolver.Instance).Length;
-                sizes["MessagePackSerializer (LZ4)"] += LZ4MessagePackSerializer
-                    .Serialize(metadata, ContractlessStandardResolver.Instance).Length;
+                //sizes["MessagePackSerializer"] += MessagePackSerializer
+                //    .Serialize(metadata, ContractlessStandardResolver.Instance).Length;
+                //sizes["MessagePackSerializer (LZ4)"] += LZ4MessagePackSerializer
+                //    .Serialize(metadata, ContractlessStandardResolver.Instance).Length;
 
                 Console.WriteLine($"{Report()}\tProcessed file {file.FullName}");
             }
