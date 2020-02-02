@@ -36,7 +36,7 @@ stages:
                 inputs:
                     command: "custom"
                     custom: "codecov"
-                    arguments: '-t $(codecov_token) -f src/*/coverage.xml --flag "azure-$(imageName)"'
+                    arguments: '-t $(codecov_token) -f src/*/coverage.xml'
               - task: PublishCodeCoverageResults@1
                 displayName: Upload test coverage
                 inputs:
