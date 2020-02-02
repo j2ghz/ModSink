@@ -30,19 +30,13 @@ stages:
                 displayName: Run tests
                 inputs:
                     command: "test"
-                    arguments: "--configuration Release /p:AltCover=true /p:AltCoverForce=true /p:AltCoverCobertura=cobertura.xml"
+                    arguments: "--configuration Release /p:AltCover=true /p:AltCoverForce=true"
               - task: DotNetCoreCLI@2
                 displayName: Upload test coverage to codecov
                 inputs:
                     command: "custom"
                     custom: "codecov"
                     arguments: '-t $(codecov_token) -f src/*/coverage.xml'
-              - task: PublishCodeCoverageResults@1
-                displayName: Upload test coverage
-                inputs:
-                    codeCoverageTool: 'Cobertura'
-                    summaryFileLocation: 'src/*.Tests/cobertura.xml'
-                    failIfCoverageEmpty: true
     - stage: Publish
       dependsOn: []
       jobs:
