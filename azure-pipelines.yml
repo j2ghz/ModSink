@@ -27,6 +27,15 @@ stages:
                     custom: "tool"
                     arguments: "restore"
               - task: DotNetCoreCLI@2
+                displayName: Restore
+                inputs:
+                  command: 'restore'
+              - task: DotNetCoreCLI@2
+                displayName: Build
+                inputs:
+                  command: 'build'
+                  arguments: '--configuration Release'
+              - task: DotNetCoreCLI@2
                 displayName: Run tests
                 inputs:
                     command: "test"
