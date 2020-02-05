@@ -61,7 +61,6 @@ jobs:
               packagesToPack: 'src/ModSink.UI.Avalonia.nuspec'
               versioningScheme: 'byBuildNumber'
               basePath: '$(Build.ArtifactStagingDirectory)/ModSink.UI.Avalonia-win10-x64-sfc'
-              arguments: '-OutputFileNamesWithoutVersion'
         - task: PowerShell@2
           displayName: Download Squirrel
           inputs:
@@ -79,7 +78,7 @@ jobs:
           displayName: Run Squirrel --releasify
           inputs:
             targetType: 'inline'
-            script: '$(Build.ArtifactStagingDirectory)/Squirrel/Squirrel.exe --releasify=$(Build.ArtifactStagingDirectory)/ModSink.UI.Avalonia.nupkg -r $(Build.ArtifactStagingDirectory)/Release'
+            script: '$(Build.ArtifactStagingDirectory)/Squirrel/Squirrel.exe --releasify=$(@(gci ./ModSink.UI.Avalonia*.nupkg)[0]) -r $(Build.ArtifactStagingDirectory)/Release'
             pwsh: true
             workingDirectory: '$(Build.ArtifactStagingDirectory)'
         - task: PublishBuildArtifacts@1
