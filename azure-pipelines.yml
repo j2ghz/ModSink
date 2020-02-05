@@ -6,91 +6,85 @@ pr:
     include:
       - "*"
 
-stages:
-    - stage: Test
-      dependsOn: []
-      jobs:
-        - job: Test
-          strategy:
-            matrix:
-                linux:
-                    imageName: "ubuntu-latest"
-                windows:
-                    imageName: "windows-latest"
-          pool:
-            vmImage: $(imageName)
-          steps:
-              - task: DotNetCoreCLI@2
-                displayName: Restore tools
-                inputs:
-                    command: "custom"
-                    custom: "tool"
-                    arguments: "restore"
-              - task: DotNetCoreCLI@2
-                displayName: Restore
-                inputs:
-                  command: 'restore'
-              - task: DotNetCoreCLI@2
-                displayName: Build
-                inputs:
-                  command: 'build'
-                  arguments: '--configuration Release'
-              - task: DotNetCoreCLI@2
-                displayName: Run tests
-                inputs:
-                    command: "test"
-                    arguments: "--configuration Release /p:AltCover=true /p:AltCoverForce=true"
-              - task: DotNetCoreCLI@2
-                displayName: Upload test coverage to codecov
-                inputs:
-                    command: "custom"
-                    custom: "codecov"
-                    arguments: '-t $(codecov_token) -f src/*/coverage.xml'
-    - stage: Publish
-      dependsOn: []
-      jobs:
-        - job: Publish
-          pool:
-            vmImage: windows-latest
-          steps:
-              - task: DotNetCoreCLI@2
-                displayName: Dotnet publish
-                inputs:
-                  command: 'publish'
-                  publishWebProjects: false
-                  projects: 'src/ModSink.UI.Avalonia/ModSink.UI.Avalonia.csproj'
-                  arguments: '-c Release -r win10-x64 --self-contained -o $(Build.ArtifactStagingDirectory)/ModSink.UI.Avalonia-win10-x64-sfc'
-              - task: NuGetCommand@2
-                displayName: Pack files using .nuspec
-                inputs:
-                    command: 'pack'
-                    packagesToPack: 'src/ModSink.UI.Avalonia.nuspec'
-                    versioningScheme: 'byBuildNumber'
-                    basePath: '$(Build.ArtifactStagingDirectory)/ModSink.UI.Avalonia-win10-x64-sfc'
-                    arguments: '-OutputFileNamesWithoutVersion'
-              - task: PowerShell@2
-                displayName: Download Squirrel
-                inputs:
-                  targetType: 'inline'
-                  script: 'Invoke-WebRequest "https://github.com/Squirrel/Squirrel.Windows/releases/download/1.9.1/Squirrel.Windows-1.9.1.zip" -OutFile "Squirrel.zip"'
-                  pwsh: true
-                  workingDirectory: '$(Build.ArtifactStagingDirectory)'
-              - task: ExtractFiles@1
-                displayName: Extract Squirrel
-                inputs:
-                  archiveFilePatterns: '$(Build.ArtifactStagingDirectory)/Squirrel.zip'
-                  destinationFolder: '$(Build.ArtifactStagingDirectory)/Squirrel/'
-                  cleanDestinationFolder: true
-              - task: PowerShell@2
-                displayName: Run Squirrel --releasify
-                inputs:
-                  targetType: 'inline'
-                  script: '$(Build.ArtifactStagingDirectory)/Squirrel/Squirrel.exe --releasify=$(Build.ArtifactStagingDirectory)/ModSink.UI.Avalonia.nupkg -r $(Build.ArtifactStagingDirectory)/Release'
-                  pwsh: true
-                  workingDirectory: '$(Build.ArtifactStagingDirectory)'
-              - task: PublishBuildArtifacts@1
-                displayName: Publish build artifacts
-                inputs:
-                    PathtoPublish: '$(Build.ArtifactStagingDirectory)/'
-                    ArtifactName: 'ModSink.UI.Avalonia-win10-x64-sfc'
-                    publishLocation: 'Container'
+jobs:
+  - job: Test
+    strategy:
+      matrix:
+          linux:
+              imageName: "ubuntu-latest"
+          windows:
+              imageName: "windows-latest"
+    pool:
+      vmImage: $(imageName)
+    steps:
+        - task: DotNetCoreCLI@2
+          displayName: Restore tools
+          inputs:
+              command: "custom"
+              custom: "tool"
+              arguments: "restore"
+        - task: DotNetCoreCLI@2
+          displayName: Restore
+          inputs:
+            command: 'restore'
+        - task: DotNetCoreCLI@2
+          displayName: Build
+          inputs:
+            command: 'build'
+            arguments: '--configuration Release'
+        - task: DotNetCoreCLI@2
+          displayName: Run tests
+          inputs:
+              command: "test"
+              arguments: "--configuration Release /p:AltCover=true /p:AltCoverForce=true"
+        - task: DotNetCoreCLI@2
+          displayName: Upload test coverage to codecov
+          inputs:
+              command: "custom"
+              custom: "codecov"
+              arguments: '-t $(codecov_token) -f src/*/coverage.xml'
+  - job: Publish
+    pool:
+      vmImage: windows-latest
+    steps:
+        - task: DotNetCoreCLI@2
+          displayName: Dotnet publish
+          inputs:
+            command: 'publish'
+            publishWebProjects: false
+            projects: 'src/ModSink.UI.Avalonia/ModSink.UI.Avalonia.csproj'
+            arguments: '-c Release -r win10-x64 --self-contained -o $(Build.ArtifactStagingDirectory)/ModSink.UI.Avalonia-win10-x64-sfc'
+        - task: NuGetCommand@2
+          displayName: Pack files using .nuspec
+          inputs:
+              command: 'pack'
+              packagesToPack: 'src/ModSink.UI.Avalonia.nuspec'
+              versioningScheme: 'byBuildNumber'
+              basePath: '$(Build.ArtifactStagingDirectory)/ModSink.UI.Avalonia-win10-x64-sfc'
+              arguments: '-OutputFileNamesWithoutVersion'
+        - task: PowerShell@2
+          displayName: Download Squirrel
+          inputs:
+            targetType: 'inline'
+            script: 'Invoke-WebRequest "https://github.com/Squirrel/Squirrel.Windows/releases/download/1.9.1/Squirrel.Windows-1.9.1.zip" -OutFile "Squirrel.zip"'
+            pwsh: true
+            workingDirectory: '$(Build.ArtifactStagingDirectory)'
+        - task: ExtractFiles@1
+          displayName: Extract Squirrel
+          inputs:
+            archiveFilePatterns: '$(Build.ArtifactStagingDirectory)/Squirrel.zip'
+            destinationFolder: '$(Build.ArtifactStagingDirectory)/Squirrel/'
+            cleanDestinationFolder: true
+        - task: PowerShell@2
+          displayName: Run Squirrel --releasify
+          inputs:
+            targetType: 'inline'
+            script: '$(Build.ArtifactStagingDirectory)/Squirrel/Squirrel.exe --releasify=$(Build.ArtifactStagingDirectory)/ModSink.UI.Avalonia.nupkg -r $(Build.ArtifactStagingDirectory)/Release'
+            pwsh: true
+            workingDirectory: '$(Build.ArtifactStagingDirectory)'
+        - task: PublishBuildArtifacts@1
+          displayName: Publish build artifacts
+          inputs:
+              PathtoPublish: '$(Build.ArtifactStagingDirectory)/'
+              ArtifactName: 'ModSink.UI.Avalonia-win10-x64-sfc'
+              publishLocation: 'Container'
