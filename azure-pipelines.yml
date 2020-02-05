@@ -60,9 +60,32 @@ stages:
                   publishWebProjects: false
                   projects: 'src/ModSink.UI.Avalonia/ModSink.UI.Avalonia.csproj'
                   arguments: '-c Release -r win10-x64 --self-contained -o $(Build.ArtifactStagingDirectory)/ModSink.UI.Avalonia-win10-x64-sfc'
+              - task: NuGetCommand@2
+                inputs:
+                    command: 'pack'
+                    packagesToPack: 'src/ModSink.UI.Avalonia.nuspec'
+                    versioningScheme: 'byBuildNumber'
+                    basePath: '$(Build.ArtifactStagingDirectory)/ModSink.UI.Avalonia-win10-x64-sfc'
+              - task: PowerShell@2
+                inputs:
+                  targetType: 'inline'
+                  script: 'Invoke-WebRequest "https://github.com/Squirrel/Squirrel.Windows/releases/download/1.9.1/Squirrel.Windows-1.9.1.zip" -OutFile "Squirrel.zip"'
+                  pwsh: true
+                  workingDirectory: '$(Build.ArtifactStagingDirectory)'
+              - task: ExtractFiles@1
+                inputs:
+                  archiveFilePatterns: '$(Build.ArtifactStagingDirectory)/Squirrel.zip'
+                  destinationFolder: '$(Build.ArtifactStagingDirectory)/Squirrel/'
+                  cleanDestinationFolder: true
+              - task: PowerShell@2
+                inputs:
+                  targetType: 'inline'
+                  script: '$(Build.ArtifactStagingDirectory)/Squirrel/Squirrel.exe --releasify=./ModSink.UI.Avalonia*.nupkg'
+                  pwsh: true
+                  workingDirectory: '$(Build.ArtifactStagingDirectory)'
               - task: PublishBuildArtifacts@1
                 displayName: Publish build artifacts
                 inputs:
-                    PathtoPublish: '$(Build.ArtifactStagingDirectory)/ModSink.UI.Avalonia-win10-x64-sfc/ModSink.UI.Avalonia.zip'
+                    PathtoPublish: '$(Build.ArtifactStagingDirectory)/'
                     ArtifactName: 'ModSink.UI.Avalonia-win10-x64-sfc'
                     publishLocation: 'Container'
