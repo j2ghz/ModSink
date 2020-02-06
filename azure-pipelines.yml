@@ -54,6 +54,7 @@ jobs:
             publishWebProjects: false
             projects: 'src/ModSink.UI.Avalonia/ModSink.UI.Avalonia.csproj'
             arguments: '-c Release -r win10-x64 --self-contained -o $(Build.ArtifactStagingDirectory)/ModSink.UI.Avalonia-win10-x64-sfc'
+            zipAfterPublish: false
         - task: NuGetCommand@2
           displayName: Pack files using .nuspec
           inputs:
@@ -78,7 +79,7 @@ jobs:
           displayName: Run Squirrel --releasify
           inputs:
             targetType: 'inline'
-            script: '$(Build.ArtifactStagingDirectory)/Squirrel/Squirrel.exe --releasify=$(@(gci ./ModSink.UI.Avalonia*.nupkg)[0]) -r $(Build.ArtifactStagingDirectory)/Release'
+            script: '$(Build.ArtifactStagingDirectory)/Squirrel/Squirrel.exe --releasify=ModSink.UI.Avalonia.$(dotnet tool run nbgv -- get-version -v NuGetPackageVersion).nupkg -r $(Build.ArtifactStagingDirectory)/Release'
             pwsh: true
             workingDirectory: '$(Build.ArtifactStagingDirectory)'
         - task: PublishBuildArtifacts@1
