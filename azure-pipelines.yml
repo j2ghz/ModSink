@@ -69,6 +69,10 @@ jobs:
               versioningScheme: 'byBuildNumber'
               basePath: '$(Build.ArtifactStagingDirectory)/ModSink.UI.Avalonia-win10-x64-sfc/ModSink.UI.Avalonia'
         - task: PowerShell@2
+          inputs:
+            targetType: 'inline'
+            script: 'nuget pack ModSink.UI.Avalonia.nuspec -Verbosity detailed -BasePath $(Build.ArtifactStagingDirectory)/ModSink.UI.Avalonia-win10-x64-sfc/ModSink.UI.Avalonia/ -Version $(dotnet tool run nbgv -- get-version -v NuGetPackageVersion)'
+        - task: PowerShell@2
           displayName: Download Squirrel
           inputs:
             targetType: 'inline'
@@ -85,7 +89,7 @@ jobs:
           displayName: Run Squirrel --releasify
           inputs:
             targetType: 'inline'
-            script: '$(Build.ArtifactStagingDirectory)/Squirrel/Squirrel.exe --releasify=$(Build.ArtifactStagingDirectory)/ModSink.UI.Avalonia.$(dotnet tool run nbgv -- get-version -v NuGetPackageVersion).nupkg -r $(Build.ArtifactStagingDirectory)/Release'
+            script: '$(Build.ArtifactStagingDirectory)/Squirrel/Squirrel.exe --releasify=src/ModSink.UI.Avalonia/ModSink.UI.Avalonia.$(dotnet tool run nbgv -- get-version -v NuGetPackageVersion).nupkg -r $(Build.ArtifactStagingDirectory)/Release'
             pwsh: true
         - task: PublishBuildArtifacts@1
           displayName: Publish build artifacts
