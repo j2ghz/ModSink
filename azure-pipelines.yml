@@ -67,7 +67,7 @@ jobs:
               command: 'pack'
               packagesToPack: 'src/ModSink.UI.Avalonia.nuspec'
               versioningScheme: 'byBuildNumber'
-              basePath: '$(Build.ArtifactStagingDirectory)/ModSink.UI.Avalonia-win10-x64-sfc'
+              basePath: '$(Build.ArtifactStagingDirectory)/ModSink.UI.Avalonia-win10-x64-sfc/ModSink.UI.Avalonia'
         - task: PowerShell@2
           displayName: Download Squirrel
           inputs:
