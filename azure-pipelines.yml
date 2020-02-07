@@ -62,7 +62,9 @@ jobs:
             arguments: '-c Release -r win10-x64 --self-contained -o $(Build.ArtifactStagingDirectory)/ModSink.UI.Avalonia-win10-x64-sfc'
             zipAfterPublish: false
         - task: NuGetToolInstaller@1
+          displayName: Install NuGet
         - task: PowerShell@2
+          displayName: NuGet Pack
           inputs:
             targetType: 'inline'
             script: 'nuget pack src/ModSink.UI.Avalonia/ModSink.UI.Avalonia.nuspec -Verbosity detailed -BasePath $(Build.ArtifactStagingDirectory)/ModSink.UI.Avalonia-win10-x64-sfc/ModSink.UI.Avalonia/ -Version $(dotnet tool run nbgv -- get-version -v NuGetPackageVersion)'
@@ -83,7 +85,7 @@ jobs:
           displayName: Run Squirrel --releasify
           inputs:
             targetType: 'inline'
-            script: 'Start-Process -FilePath $(Build.ArtifactStagingDirectory)/Squirrel/Squirrel.exe --ArgumentList "--releasify=ModSink.UI.Avalonia.$(dotnet tool run nbgv -- get-version -v NuGetPackageVersion).nupkg -r $(Build.ArtifactStagingDirectory)/Release" -PassThru | Wait-Process'
+            script: 'Start-Process -FilePath $(Build.ArtifactStagingDirectory)/Squirrel/Squirrel.exe  -ArgumentList "--releasify=ModSink.UI.Avalonia.$(dotnet tool run nbgv -- get-version -v NuGetPackageVersion).nupkg -r $(Build.ArtifactStagingDirectory)/Release" -PassThru | Wait-Process; Get-Content "$(Build.ArtifactStagingDirectory)/Squirrel/SquirrelSetup.log"'
             pwsh: true
         - task: PublishBuildArtifacts@1
           displayName: Publish build artifacts
