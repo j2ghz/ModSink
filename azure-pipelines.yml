@@ -83,7 +83,7 @@ jobs:
           displayName: Run Squirrel --releasify
           inputs:
             targetType: 'inline'
-            script: 'Start-Process -FilePath $(Build.ArtifactStagingDirectory)/Squirrel/Squirrel.exe --arguments "--releasify=ModSink.UI.Avalonia.$(dotnet tool run nbgv -- get-version -v NuGetPackageVersion).nupkg -r $(Build.ArtifactStagingDirectory)/Release" -PassThru | Wait-Process'
+            script: 'Start-Process -FilePath $(Build.ArtifactStagingDirectory)/Squirrel/Squirrel.exe --ArgumentList "--releasify=ModSink.UI.Avalonia.$(dotnet tool run nbgv -- get-version -v NuGetPackageVersion).nupkg -r $(Build.ArtifactStagingDirectory)/Release" -PassThru | Wait-Process'
             pwsh: true
         - task: PublishBuildArtifacts@1
           displayName: Publish build artifacts
