@@ -65,7 +65,7 @@ jobs:
         - task: PowerShell@2
           inputs:
             targetType: 'inline'
-            script: 'nuget pack ModSink.UI.Avalonia.nuspec -Verbosity detailed -BasePath $(Build.ArtifactStagingDirectory)/ModSink.UI.Avalonia-win10-x64-sfc/ModSink.UI.Avalonia/ -Version $(dotnet tool run nbgv -- get-version -v NuGetPackageVersion)'
+            script: 'nuget pack src/ModSink.UI.Avalonia/ModSink.UI.Avalonia.nuspec -Verbosity detailed -BasePath $(Build.ArtifactStagingDirectory)/ModSink.UI.Avalonia-win10-x64-sfc/ModSink.UI.Avalonia/ -Version $(dotnet tool run nbgv -- get-version -v NuGetPackageVersion)'
         - task: PowerShell@2
           displayName: Download Squirrel
           inputs:
