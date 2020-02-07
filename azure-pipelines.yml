@@ -61,13 +61,7 @@ jobs:
             projects: 'src/ModSink.UI.Avalonia/ModSink.UI.Avalonia.csproj'
             arguments: '-c Release -r win10-x64 --self-contained -o $(Build.ArtifactStagingDirectory)/ModSink.UI.Avalonia-win10-x64-sfc'
             zipAfterPublish: false
-        - task: NuGetCommand@2
-          displayName: Pack files using .nuspec
-          inputs:
-              command: 'pack'
-              packagesToPack: 'src/ModSink.UI.Avalonia.nuspec'
-              versioningScheme: 'byBuildNumber'
-              basePath: '$(Build.ArtifactStagingDirectory)/ModSink.UI.Avalonia-win10-x64-sfc/ModSink.UI.Avalonia'
+        - task: NuGetToolInstaller@1
         - task: PowerShell@2
           inputs:
             targetType: 'inline'
