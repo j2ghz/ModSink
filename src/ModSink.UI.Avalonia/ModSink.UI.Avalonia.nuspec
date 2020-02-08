@@ -2,11 +2,10 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata>
     <id>ModSink.UI.Avalonia</id>
-    <!-- version will be replaced by MSBuild -->
     <version>0.0.0.0</version>
     <title>ModSink</title>
     <authors>J2ghz</authors>
-    <description>description</description>
+    <description>A modpack distribution and download tool with space efficient, hash-based storage</description>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <copyright>Copyright 2020</copyright>
     <dependencies />
