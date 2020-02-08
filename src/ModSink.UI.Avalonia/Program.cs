@@ -54,7 +54,7 @@ namespace ModSink.UI.Avalonia
         public static async Task Update()
         {
             var updateExe = "../Update.exe";
-            var UpdateUrl = "https://a3.417rct.org/modsink/refs/heads/feature/avalonia/";
+            var UpdateUrl = "https://a3.417rct.org/modsink/refs/heads/develop/";
             if (File.Exists(updateExe))
             {
 
