@@ -84,6 +84,6 @@ jobs:
           displayName: Run Squirrel --releasify
           inputs:
             targetType: 'inline'
-            script: 'Start-Process -FilePath $(Build.ArtifactStagingDirectory)/Squirrel/Squirrel.exe  -ArgumentList "--releasify=ModSink.UI.Avalonia.$(dotnet tool run nbgv -- get-version -v NuGetPackageVersion).nupkg -r $(Build.ArtifactStagingDirectory)/ModSink.UI.Avalonia-win10-x64-sfc-installer" -PassThru | Wait-Process; Get-Content "$(Build.ArtifactStagingDirectory)/Squirrel/SquirrelSetup.log"'
+            script: 'Start-Process -FilePath $(Build.ArtifactStagingDirectory)/Squirrel/Squirrel.exe  -ArgumentList "--releasify=ModSink.UI.Avalonia.$(dotnet tool run nbgv -- get-version -v NuGetPackageVersion).nupkg -r $(Build.ArtifactStagingDirectory)/ModSink.UI.Avalonia-win10-x64-sfc-installer --no-msi" -PassThru | Wait-Process; Get-Content "$(Build.ArtifactStagingDirectory)/Squirrel/SquirrelSetup.log"'
         - publish: $(Build.ArtifactStagingDirectory)/ModSink.UI.Avalonia-win10-x64-sfc-installer
           artifact: ModSink.UI.Avalonia-win10-x64-sfc-installer
