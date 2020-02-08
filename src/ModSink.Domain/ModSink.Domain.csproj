@@ -12,9 +12,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Dawn.Guard" Version="1.9.0" />
-    <PackageReference Include="Equals.Fody" Version="2.0.1" />
-    <PackageReference Include="Humanizer.Core" Version="2.6.2" />
+    <PackageReference Include="Dawn.Guard" Version="1.10.0" />
+    <PackageReference Include="Equals.Fody" Version="4.0.1" />
+    <PackageReference Include="Humanizer.Core" Version="2.7.9" />
     <PackageReference Include="PathLib" Version="0.9.6" />
     <PackageReference Include="Roslyn.System.IO.Abstractions.Analyzers" Version="6.0.32">
       <PrivateAssets>all</PrivateAssets>

@@ -13,20 +13,20 @@
 
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="9.0.0" />
-    <PackageReference Include="DynamicData" Version="6.12.9" />
-    <PackageReference Include="Google.Protobuf" Version="3.10.1" />
-    <PackageReference Include="Grpc.Tools" Version="2.25.0">
+    <PackageReference Include="DynamicData" Version="6.14.8" />
+    <PackageReference Include="Google.Protobuf" Version="3.11.3" />
+    <PackageReference Include="Grpc.Tools" Version="2.27.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.Extensions.Options" Version="3.0.0-preview6.19304.6" />
+    <PackageReference Include="Microsoft.Extensions.Options" Version="3.1.1" />
     <PackageReference Include="MsgPack.Cli" Version="1.0.1" />
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
     <PackageReference Include="Roslyn.System.IO.Abstractions.Analyzers" Version="6.0.32">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="System.Reactive" Version="4.1.5" />
+    <PackageReference Include="System.Reactive" Version="4.3.2" />
     <PackageReference Include="xxHash4net" Version="1.2.0" />
   </ItemGroup>
 
