@@ -85,5 +85,16 @@ jobs:
           inputs:
             targetType: 'inline'
             script: 'Start-Process -FilePath $(Build.ArtifactStagingDirectory)/Squirrel/Squirrel.exe  -ArgumentList "--releasify=ModSink.UI.Avalonia.$(dotnet tool run nbgv -- get-version -v NuGetPackageVersion).nupkg -r $(Build.ArtifactStagingDirectory)/ModSink.UI.Avalonia-win10-x64-sfc-installer --no-msi" -PassThru | Wait-Process; Get-Content "$(Build.ArtifactStagingDirectory)/Squirrel/SquirrelSetup.log"'
-        - publish: $(Build.ArtifactStagingDirectory)/ModSink.UI.Avalonia-win10-x64-sfc-installer
+        - publish: 
           artifact: ModSink.UI.Avalonia-win10-x64-sfc-installer
+        - task: FtpUpload@2
+          inputs:
+            credentialsOption: 'serviceEndpoint'
+            serverEndpoint: 'A417-FTP'
+            rootDirectory: '$(Build.ArtifactStagingDirectory)/ModSink.UI.Avalonia-win10-x64-sfc-installer'
+            filePatterns: '**'
+            remoteDirectory: '$(Build.SourceBranch)'
+            clean: false
+            cleanContents: false
+            preservePaths: true
+            trustSSL: false
