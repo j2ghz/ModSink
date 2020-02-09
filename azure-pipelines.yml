@@ -17,6 +17,11 @@ jobs:
     pool:
       vmImage: $(imageName)
     steps:
+        - task: UseDotNet@2
+          inputs:
+            packageType: 'sdk'
+            version: '3.x'
+            performMultiLevelLookup: true
         - task: DotNetCoreCLI@2
           displayName: Restore tools
           inputs:
@@ -47,6 +52,11 @@ jobs:
     pool:
       vmImage: windows-latest
     steps:
+        - task: UseDotNet@2
+          inputs:
+            packageType: 'sdk'
+            version: '3.x'
+            performMultiLevelLookup: true
         - task: NuGetToolInstaller@1
           displayName: Install NuGet
         - task: DotNetCoreCLI@2
