@@ -16,6 +16,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Anotar.Serilog.Fody" Version="5.1.0" />
     <PackageReference Include="CommandLineParser" Version="2.7.82" />
     <PackageReference Include="Roslyn.System.IO.Abstractions.Analyzers" Version="6.0.32">
       <PrivateAssets>all</PrivateAssets>

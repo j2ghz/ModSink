@@ -16,6 +16,7 @@
     <AvaloniaResource Include="Assets\**" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="Anotar.Serilog.Fody" Version="5.1.0" />
     <PackageReference Include="Avalonia" Version="0.9.3" />
     <PackageReference Include="Avalonia.Desktop" Version="0.9.3" />
     <PackageReference Include="Avalonia.ReactiveUI" Version="0.9.3" />

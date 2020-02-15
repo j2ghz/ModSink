@@ -3,7 +3,6 @@ using System.IO;
 
 namespace ModSink.Domain.Entities.File
 {
-    [Equals]
     public class Signature
     {
         public Signature(Hash hash, long length)
@@ -19,5 +18,6 @@ namespace ModSink.Domain.Entities.File
         /// </summary>
         [Obsolete]
         public long Length { get; }
+        
     }
 }
