@@ -6,6 +6,11 @@
 
   <ItemGroup>
     <PackageReference Include="Anotar.Serilog.Fody" Version="5.1.0" />
+    <PackageReference Include="ConfigureAwait.Fody" Version="3.3.1" />
+    <PackageReference Include="Fody" Version="6.1.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="ReactiveUI" Version="11.1.23" />
     <PackageReference Include="ReactiveUI.Fody" Version="11.1.23" />
     <PackageReference Include="Roslyn.System.IO.Abstractions.Analyzers" Version="6.0.32">
