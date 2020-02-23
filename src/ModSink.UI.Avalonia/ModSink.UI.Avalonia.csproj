@@ -21,7 +21,7 @@
     <PackageReference Include="Avalonia.Desktop" Version="0.9.3" />
     <PackageReference Include="Avalonia.ReactiveUI" Version="0.9.3" />
     <PackageReference Include="ConfigureAwait.Fody" Version="3.3.1" />
-    <PackageReference Include="Fody" Version="6.1.0">
+    <PackageReference Include="Fody" Version="6.1.1">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>

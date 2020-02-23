@@ -12,8 +12,8 @@ namespace ModSink.Domain.Tests.Entities.File
         [Property]
         public Property SameEqualsProperty(string id, byte[] value, long length)
         {
-            return new Func<bool>(() => new Signature(new Hash(id, value), length) ==
-                    new Signature(new Hash($"{id}", value), length))
+            return new Func<bool>(() => new Signature(new Hash($"{id}", value), length)
+                .Equals(new Signature(new Hash($"{id}", value), length)))
                 .When(!string.IsNullOrEmpty(id) && !(value is null) && value.Length > 0);
         }
 
@@ -39,6 +39,7 @@ namespace ModSink.Domain.Tests.Entities.File
                 1L);
 
 
+            fs1.Should().BeEquivalentTo(fs2);
             fs1.Should().Be(fs2);
         }
     }

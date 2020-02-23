@@ -37,6 +37,7 @@ namespace ModSink.Domain.Tests.Entities.Repo
                     1L)
             };
 
+            ruf1.Should().BeEquivalentTo(ruf2);
             ruf1.Should().Be(ruf2);
         }
     }

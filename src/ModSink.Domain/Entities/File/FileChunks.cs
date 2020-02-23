@@ -5,6 +5,7 @@ namespace ModSink.Domain.Entities.File
     /// <summary>
     /// <see cref="Signature"/> with a collection of <see cref="Chunk"/>s
     /// </summary>
+    [Equals]
     public class FileChunks
     {
         public FileChunks(Signature file, IReadOnlyCollection<Chunk> chunks)

@@ -17,6 +17,7 @@ namespace ModSink.Domain.Tests.Entities.Repo
             var clone = new Domain.Entities.Repo.Repo("", new List<Modpack>(),
                 "");
             repo.Should().BeEquivalentTo(clone);
+            repo.Should().Be(clone);
         }
     }
 }

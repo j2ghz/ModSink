@@ -3,11 +3,12 @@ using System.IO;
 
 namespace ModSink.Domain.Entities.File
 {
+    [Equals]
     public class Signature
     {
         public Signature(Hash hash, long length)
         {
-            Hash = hash;
+            Hash = hash; 
             Length = length;
         }
 

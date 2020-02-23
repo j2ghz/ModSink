@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO.Abstractions.TestingHelpers;
 using System.Linq;
@@ -70,7 +70,10 @@ namespace ModSink.Domain.Tests.Entities.Repo
         [Fact]
         public void EqualsSame()
         {
-            new RelativeUri("mod1/a.txt").Should().Be(new RelativeUri("mod1/a.txt"));
+            var u1 = new RelativeUri("mod1/a.txt");
+            var u2 = new RelativeUri("mod1/a.txt");
+            u1.Should().BeEquivalentTo(u2);
+            u1.Should().Be(u2);
         }
     }
 }
