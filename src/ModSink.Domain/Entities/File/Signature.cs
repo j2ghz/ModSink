@@ -8,7 +8,7 @@ namespace ModSink.Domain.Entities.File
     {
         public Signature(Hash hash, long length)
         {
-            Hash = hash; 
+            Hash = hash;
             Length = length;
         }
 
@@ -19,6 +19,8 @@ namespace ModSink.Domain.Entities.File
         /// </summary>
         [Obsolete]
         public long Length { get; }
-        
+
+        public static bool operator ==(Signature left, Signature right) => Operator.Weave(left, right);
+        public static bool operator !=(Signature left, Signature right) => Operator.Weave(left, right);
     }
 }

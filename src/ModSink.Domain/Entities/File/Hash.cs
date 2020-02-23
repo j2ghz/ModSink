@@ -7,7 +7,7 @@ using Dawn;
 namespace ModSink.Domain.Entities.File
 {
     [Equals]
-    public class Hash 
+    public class Hash
     {
         public Hash(string hashId, byte[] value)
         {
@@ -29,5 +29,8 @@ namespace ModSink.Domain.Entities.File
         }
 
         public override string ToString() => $"Hash(Id='{HashId}',Value='{string.Join(",", Value)}')";
+
+        public static bool operator ==(Hash left, Hash right) => Operator.Weave(left, right);
+        public static bool operator !=(Hash left, Hash right) => Operator.Weave(left, right);
     }
 }

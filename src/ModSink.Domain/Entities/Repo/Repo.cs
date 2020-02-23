@@ -4,6 +4,7 @@ using PathLib;
 
 namespace ModSink.Domain.Entities.Repo
 {
+    [Equals]
     public class Repo
     {
         public Repo(string name, IReadOnlyCollection<Modpack> modpacks, string chunksPath)
@@ -16,5 +17,7 @@ namespace ModSink.Domain.Entities.Repo
         public IReadOnlyCollection<Modpack> Modpacks { get; }
         public string Name { get; }
         public string ChunksPath { get; }
+        public static bool operator ==(Repo left, Repo right) => Operator.Weave(left, right);
+        public static bool operator !=(Repo left, Repo right) => Operator.Weave(left, right);
     }
 }

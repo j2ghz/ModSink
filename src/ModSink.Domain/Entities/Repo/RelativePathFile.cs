@@ -19,5 +19,8 @@ namespace ModSink.Domain.Entities.Repo
             return new RelativePathFile() { Signature = Signature, RelativePath = dir.Join(RelativePath) };
         }
 
+        public static bool operator ==(RelativePathFile left, RelativePathFile right) => Operator.Weave(left, right);
+        public static bool operator !=(RelativePathFile left, RelativePathFile right) => Operator.Weave(left, right);
+
     }
 }

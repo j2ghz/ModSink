@@ -17,5 +17,7 @@ namespace ModSink.Domain.Entities.File
         public IReadOnlyCollection<Chunk> Chunks { get; }
 
         public Signature File { get; }
+        public static bool operator ==(FileChunks left, FileChunks right) => Operator.Weave(left, right);
+        public static bool operator !=(FileChunks left, FileChunks right) => Operator.Weave(left, right);
     }
 }
