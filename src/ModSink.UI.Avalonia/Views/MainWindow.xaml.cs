@@ -1,4 +1,5 @@
-﻿using Avalonia.Controls;
+﻿using Avalonia;
+using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 
 namespace ModSink.UI.Avalonia.Views
@@ -8,6 +9,9 @@ namespace ModSink.UI.Avalonia.Views
         public MainWindow()
         {
             InitializeComponent();
+#if DEBUG
+            this.AttachDevTools();
+#endif
         }
 
         private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
