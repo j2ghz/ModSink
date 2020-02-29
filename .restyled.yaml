@@ -1,3 +1,7 @@
 enabled: true
 restylers:
  - dotnet-format
+ - jq
+ - prettier-markdown
+ - prettier-yaml
+ - whitespace
