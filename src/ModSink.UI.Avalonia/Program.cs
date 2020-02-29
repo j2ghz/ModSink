@@ -36,7 +36,10 @@ namespace ModSink.UI.Avalonia
                     .Enrich.WithExceptionDetails()
                     .MinimumLevel.Verbose()
                     .WriteTo.Async(c => c.File(new CompactJsonFormatter(), Path.Combine(Path.GetTempPath(), nameof(ModSink) + "Log", "log-.clef"), buffered: true, rollingInterval: RollingInterval.Day, rollOnFileSizeLimit: true), blockWhenFull: true)
+#if DEBUG
                     .WriteTo.Debug()
+#endif
+                    .WriteTo.Seq("http://192.168.0.2:5341", apiKey: "mmPOEH67IfZoFAXwHCce")
                     .CreateLogger();
                 SerilogLogger.Initialize(Log.Logger);
 
