@@ -1,13 +1,20 @@
-<Application xmlns="https://github.com/avaloniaui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:local="clr-namespace:ModSink.UI.Avalonia"
-             x:Class="ModSink.UI.Avalonia.App">
+<Application
+    x:Class="ModSink.UI.Avalonia.App"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="clr-namespace:ModSink.UI.Avalonia">
     <Application.DataTemplates>
-        <local:ViewLocator/>
+        <local:ViewLocator />
     </Application.DataTemplates>
 
     <Application.Styles>
-        <StyleInclude Source="avares://Avalonia.Themes.Default/DefaultTheme.xaml"/>
-        <StyleInclude Source="avares://Avalonia.Themes.Default/Accents/BaseLight.xaml"/>
+        <StyleInclude Source="avares://Avalonia.Themes.Default/DefaultTheme.xaml" />
+        <StyleInclude Source="avares://Avalonia.Themes.Default/Accents/BaseLight.xaml" />
     </Application.Styles>
+
+    <NativeMenu.Menu>
+        <NativeMenu>
+            <NativeMenuItem Command="{Binding AboutCommand}" Header="About MyApp" />
+        </NativeMenu>
+    </NativeMenu.Menu>
 </Application>
