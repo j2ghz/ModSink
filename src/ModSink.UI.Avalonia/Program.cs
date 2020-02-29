@@ -85,7 +85,7 @@ namespace ModSink.UI.Avalonia
             var UpdateUrl = "https://a3.417rct.org/modsink/refs/heads/develop/";
             if (File.Exists(updateExe))
             {
-                var pi = new ProcessStartInfo(updateExe, $"--update={UpdateUrl}") {RedirectStandardOutput = true};
+                var pi = new ProcessStartInfo(updateExe, $"--update={UpdateUrl}") { RedirectStandardOutput = true };
                 var p = new Process();
                 pi.UseShellExecute = false;
                 p.StartInfo = pi;
