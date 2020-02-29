@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
+using System.Reactive.Concurrency;
 using System.Threading;
-using System.Threading.Tasks;
 using Anotar.Serilog;
 using Avalonia;
 using Avalonia.Logging.Serilog;
@@ -64,8 +64,11 @@ namespace ModSink.UI.Avalonia
 
                 if (!Debugger.IsAttached)
                 {
-                    Update().ContinueWith(t => LogTo.Error(t.Exception, "Update failed"),
-                        TaskContinuationOptions.OnlyOnFaulted);
+                    NewThreadScheduler.Default.Catch((Exception e) =>
+                    {
+                        LogTo.Error(e, "Update failed");
+                        return true;
+                    }).Schedule(() => Update());
                 }
 
 
@@ -79,7 +82,7 @@ namespace ModSink.UI.Avalonia
             }
         }
 
-        public static async Task Update()
+        public static void Update()
         {
             var updateExe = "../Update.exe";
             var UpdateUrl = "https://a3.417rct.org/modsink/refs/heads/develop/";
