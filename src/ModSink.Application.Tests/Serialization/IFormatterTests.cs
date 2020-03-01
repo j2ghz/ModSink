@@ -5,7 +5,6 @@ using FluentAssertions;
 using FsCheck;
 using FsCheck.Xunit;
 using FSharpx;
-using Microsoft.FSharp.Core;
 using ModSink.Application.Serialization;
 using ModSink.Domain.Entities.File;
 using PathLib;
@@ -16,27 +15,29 @@ namespace ModSink.Application.Tests.Serialization
     {
         protected abstract IFormatter formatter { get; }
 
-        [Property(Arbitrary = new[] { typeof(RepoGenerators) })]
+        [Property(Arbitrary = new[] {typeof(RepoGenerators)}, Verbose = true)]
         public void RoundTripRepo(Domain.Entities.Repo.Repo o)
         {
             using var stream = formatter.SerializeRepo(o);
             stream.Position = 0;
             var deserialized = formatter.DeserializeRepo(stream);
-            deserialized.Should().BeEquivalentTo(o);
+            deserialized.Should().BeEquivalentTo(o,
+                c => c.ComparingByMembers<Domain.Entities.Repo.Repo>().WithTracing(),
+                "serialization roundtrip should not change the repo");
+            deserialized.Should().Be(o, "equivalence succeeded");
         }
 
-        [Property(Arbitrary = new[] { typeof(RepoGenerators) })]
+        [Property(Arbitrary = new[] {typeof(RepoGenerators)}, Verbose = true)]
         public void RoundTripRepoMapOnly(Domain.Entities.Repo.Repo o)
         {
-            formatter.MapAndBack(o).Should().BeEquivalentTo(o);
+            var mapped = formatter.MapAndBack(o);
+            mapped.Should().BeEquivalentTo(o, c => c.ComparingByMembers<Domain.Entities.Repo.Repo>().WithTracing(),
+                "mapping should not change the repo");
+            mapped.Should().Be(o, "equivalence succeeded");
         }
 
-        public static class RepoGenerators
+        private static class RepoGenerators
         {
-            public static Arbitrary<string> String()
-            {
-                return Arb.Default.String().Filter(s => !string.IsNullOrEmpty(s));
-            }
             public static Arbitrary<Hash> Hash()
             {
                 var id = Arb.Default.String().Filter(s => !string.IsNullOrEmpty(s));
@@ -49,30 +50,24 @@ namespace ModSink.Application.Tests.Serialization
                         t => new Hash(t.Item1, t.Item2), h => new Tuple<string, byte[]>(h.HashId, h.Value));
             }
 
-            public static Arbitrary<IReadOnlyCollection<T>> IReadOnlyCollection<T>()
-            {
-                return Arb.Convert(FSharpFunc.FromFunc((ICollection<T> c) => (IReadOnlyCollection<T>)c),
+            public static Arbitrary<IPurePath> IPurePath() =>
+                Arb.Filter(FSharpFunc.FromFunc<string, bool>(p => new PurePathFactory().TryCreate(p, out _)),
+                        Arb.Default.String())
+                    .Convert(s => new PurePathFactory().Create(s), path => path.ToString());
+
+            public static Arbitrary<IReadOnlyCollection<T>> IReadOnlyCollection<T>() =>
+                Arb.Convert(FSharpFunc.FromFunc((ICollection<T> c) => (IReadOnlyCollection<T>)c),
                     FSharpFunc.FromFunc((IReadOnlyCollection<T> c) => (ICollection<T>)c.ToList()),
                     Arb.Default.ICollection<T>());
-            }
 
-            public static Arbitrary<IReadOnlyDictionary<TKey, TValue>> IReadOnlyDictionary<TKey, TValue>()
-            {
-                return Arb.Convert(
+            public static Arbitrary<IReadOnlyDictionary<TKey, TValue>> IReadOnlyDictionary<TKey, TValue>() =>
+                Arb.Convert(
                     FSharpFunc.FromFunc((IDictionary<TKey, TValue> c) => (IReadOnlyDictionary<TKey, TValue>)c),
                     FSharpFunc.FromFunc((IReadOnlyDictionary<TKey, TValue> c) =>
                         (IDictionary<TKey, TValue>)c.ToList()),
                     Arb.Default.IDictionary<TKey, TValue>());
-            }
 
-            public static Arbitrary<IPurePath> IPurePath()
-            {
-                return Arb.Filter(FSharpFunc.FromFunc<string, bool>(p => new PurePathFactory().TryCreate(p, out _)),
-                        Arb.Default.String())
-                    .Convert(s => new PurePathFactory().Create(s), path => path.ToString());
-            }
-
-
+            public static Arbitrary<string> String() => Arb.Default.String().Filter(s => !string.IsNullOrEmpty(s));
         }
     }
 }
