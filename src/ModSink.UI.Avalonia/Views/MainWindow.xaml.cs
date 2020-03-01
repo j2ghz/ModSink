@@ -1,4 +1,6 @@
-﻿using Avalonia;
+﻿using System;
+using Anotar.Serilog;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 
@@ -15,5 +17,9 @@ namespace ModSink.UI.Avalonia.Views
         }
 
         private void InitializeComponent() => AvaloniaXamlLoader.Load(this);
+
+        protected override void OnOpened(EventArgs e) => LogTo.Information(
+            "{Name} opened, time since startup: {SinceStartup}", nameof(MainWindow),
+            DateTimeOffset.Now - Program.StartTime);
     }
 }

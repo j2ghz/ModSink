@@ -20,6 +20,8 @@ namespace ModSink.UI.Avalonia
 {
     internal class Program
     {
+        public static DateTimeOffset StartTime = DateTimeOffset.Now;
+
         // Avalonia configuration, don't remove; also used by visual designer.
         public static AppBuilder BuildAvaloniaApp(ILogger logger)
             => AppBuilder.Configure<App>()
