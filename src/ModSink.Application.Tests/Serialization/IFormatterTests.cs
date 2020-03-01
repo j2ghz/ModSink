@@ -17,37 +17,37 @@ namespace ModSink.Application.Tests.Serialization
         protected abstract IFormatter formatter { get; }
 
 
-        [Property(Arbitrary = new[] {typeof(RepoGenerators)})]
+        [Property(Arbitrary = new[] { typeof(RepoGenerators) })]
         public void RoundtripMapIPurePath(IPurePath p)
         {
             var str = TypeDescriptor.GetConverter(typeof(IPurePath)).ConvertToInvariantString(p);
             var res = (IPurePath)TypeDescriptor.GetConverter(typeof(IPurePath))
                 .ConvertFromInvariantString(str);
-            res.Should().BeEquivalentTo(str, c => c.WithTracing());
+            res.Should().Be(p);
         }
 
-        [Property(Arbitrary = new[] {typeof(RepoGenerators)})]
+        [Property(Arbitrary = new[] { typeof(RepoGenerators) })]
         public void RoundTripRepo(Domain.Entities.Repo.Repo o)
         {
             using var stream = formatter.SerializeRepo(o);
             stream.Position = 0;
             var deserialized = formatter.DeserializeRepo(stream);
             deserialized.Should().BeEquivalentTo(o,
-                c => c.WithTracing(),
+                c => c.WithTracing().ComparingByValue<IPurePath>(),
                 "serialization roundtrip should not change the repo");
             //deserialized.Should().Be(o, "equivalence succeeded");
         }
 
-        [Property(Arbitrary = new[] {typeof(RepoGenerators)})]
+        [Property(Arbitrary = new[] { typeof(RepoGenerators) })]
         public void RoundTripRepoMapOnly(Domain.Entities.Repo.Repo o)
         {
             var mapped = formatter.MapAndBack(o);
-            mapped.Should().BeEquivalentTo(o, c => c.WithTracing(),
+            mapped.Should().BeEquivalentTo(o, c => c.WithTracing().ComparingByValue<IPurePath>(),
                 "mapping should not change the repo");
             var mappedTwice = formatter.MapAndBack(mapped);
-            mappedTwice.Should().BeEquivalentTo(mappedTwice, c => c.WithTracing(),
+            mappedTwice.Should().BeEquivalentTo(mappedTwice, c => c.WithTracing().ComparingByValue<IPurePath>(),
                 "mapping a mapped repo should not change it");
-            mappedTwice.Should().BeEquivalentTo(o, c => c.WithTracing(),
+            mappedTwice.Should().BeEquivalentTo(o, c => c.WithTracing().ComparingByValue<IPurePath>(),
                 "mapping a mapped repo should not change it");
             //mapped.Should().Be(o, "equivalence succeeded");
         }
