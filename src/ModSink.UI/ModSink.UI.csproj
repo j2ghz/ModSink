@@ -10,8 +10,8 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="ReactiveUI" Version="11.1.23" />
-    <PackageReference Include="ReactiveUI.Fody" Version="11.1.23" />
+    <PackageReference Include="ReactiveUI" Version="11.2.1" />
+    <PackageReference Include="ReactiveUI.Fody" Version="11.2.1" />
     <PackageReference Include="Roslyn.System.IO.Abstractions.Analyzers" Version="6.0.32">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

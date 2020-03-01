@@ -5,6 +5,6 @@ namespace ModSink.Domain.Entities.Repo
     public class Modpack
     {
         public string Name { get; set; }
-        public ICollection<Mod> Mods { get; set; }
+        public IReadOnlyCollection<Mod> Mods { get; set; }
     }
 }

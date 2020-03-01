@@ -1,6 +1,4 @@
 ﻿using System.Collections.Generic;
-using ModSink.Domain.Entities.File;
-using PathLib;
 
 namespace ModSink.Domain.Entities.Repo
 {
@@ -14,9 +12,10 @@ namespace ModSink.Domain.Entities.Repo
             ChunksPath = chunksPath;
         }
 
+        public string ChunksPath { get; }
+
         public IReadOnlyCollection<Modpack> Modpacks { get; }
         public string Name { get; }
-        public string ChunksPath { get; }
         public static bool operator ==(Repo left, Repo right) => Operator.Weave(left, right);
         public static bool operator !=(Repo left, Repo right) => Operator.Weave(left, right);
     }
