@@ -16,9 +16,7 @@ namespace ModSink.Domain.Entities.Repo
             return new RelativeUri(relative.ToString());
         }
 
-        public RelativeUri InDirectory(params string[] dir)
-        {
-            return new RelativeUri(Path.Combine(dir.Concat(new[] { ToString() }).ToArray()));
-        }
+        public RelativeUri InDirectory(params string[] dir) =>
+            new RelativeUri(Path.Combine(dir.Concat(new[] {ToString()}).ToArray()));
     }
 }

@@ -39,7 +39,7 @@ namespace ModSink.Infrastructure.Serialization.Protobuf
             return result;
         }
 
-        private Model.Repo Map(Repo repo)
+        private static Model.Repo Map(Repo repo)
         {
             var nRepo = new Model.Repo { Name = repo.Name, ChunksPath = repo.ChunksPath };
             nRepo.Modpacks.AddRange(repo.Modpacks.Select(modpack =>
@@ -69,7 +69,7 @@ namespace ModSink.Infrastructure.Serialization.Protobuf
             return nRepo;
         }
 
-        private Repo MapBack(Model.Repo repo) =>
+        private static Repo MapBack(Model.Repo repo) =>
             new Repo(repo.Name,
                 repo.Modpacks.Select(mp => new Modpack
                 {

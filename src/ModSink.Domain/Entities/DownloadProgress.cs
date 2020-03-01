@@ -32,11 +32,8 @@ namespace ModSink.Domain.Entities
             Finished
         }
 
-        public override string ToString()
-        {
-            return
-                $"{State.Humanize(LetterCasing.Sentence)} {Downloaded.Humanize("G03")} out of {Size.Humanize("G03")}";
-        }
+        public override string ToString() =>
+            $"{State.Humanize(LetterCasing.Sentence)} {Downloaded.Humanize("G03")} out of {Size.Humanize("G03")}";
 
         public ByteSize Remaining => Size.Subtract(Downloaded);
     }
