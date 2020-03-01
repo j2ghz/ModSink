@@ -15,7 +15,7 @@ namespace ModSink.Application.Tests.Serialization
     {
         protected abstract IFormatter formatter { get; }
 
-        [Property(Arbitrary = new[] {typeof(RepoGenerators)}, Verbose = true)]
+        [Property(Arbitrary = new[] { typeof(RepoGenerators) }, Verbose = true)]
         public void RoundTripRepo(Domain.Entities.Repo.Repo o)
         {
             using var stream = formatter.SerializeRepo(o);
@@ -27,7 +27,7 @@ namespace ModSink.Application.Tests.Serialization
             deserialized.Should().Be(o, "equivalence succeeded");
         }
 
-        [Property(Arbitrary = new[] {typeof(RepoGenerators)}, Verbose = true)]
+        [Property(Arbitrary = new[] { typeof(RepoGenerators) }, Verbose = true)]
         public void RoundTripRepoMapOnly(Domain.Entities.Repo.Repo o)
         {
             var mapped = formatter.MapAndBack(o);
