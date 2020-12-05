@@ -3,13 +3,13 @@
   "isRoot": true,
   "tools": {
     "codecov.tool": {
-      "version": "1.7.2",
+      "version": "1.12.3",
       "commands": [
         "codecov"
       ]
     },
     "nbgv": {
-      "version": "3.0.50",
+      "version": "3.3.37",
       "commands": [
         "nbgv"
       ]
