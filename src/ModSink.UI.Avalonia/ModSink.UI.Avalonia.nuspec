@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <id>ModSink.UI.Avalonia</id>
+    <version>0.0.0.0</version>
+    <title>ModSink</title>
+    <authors>J2ghz</authors>
+    <description>A modpack distribution and download tool with space efficient, hash-based storage</description>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <copyright>Copyright 2020</copyright>
+    <dependencies />
+  </metadata>
+  <files>
+    <file src="*.*" target="lib\net45\" exclude="*.nupkg;*.vshost.*"/>
+  </files>
+</package>

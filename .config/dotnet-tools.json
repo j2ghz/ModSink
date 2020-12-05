@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "isRoot": true,
+  "tools": {
+    "codecov.tool": {
+      "version": "1.7.2",
+      "commands": [
+        "codecov"
+      ]
+    },
+    "nbgv": {
+      "version": "3.0.50",
+      "commands": [
+        "nbgv"
+      ]
+    }
+  }
+}

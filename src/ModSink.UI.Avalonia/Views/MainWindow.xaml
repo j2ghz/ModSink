@@ -1,0 +1,67 @@
+<Window
+    x:Class="ModSink.UI.Avalonia.Views.MainWindow"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:vm="clr-namespace:ModSink.UI.ViewModels;assembly=ModSink.UI"
+    Title="{Binding Title}"
+    d:DesignHeight="450"
+    d:DesignWidth="800"
+    Icon="/Assets/modsink_x3S_icon.ico"
+    mc:Ignorable="d">
+
+    <Design.DataContext>
+        <vm:MainWindowViewModel />
+    </Design.DataContext>
+
+
+    <TabControl>
+        <TabItem VerticalContentAlignment="Center" Header="Main">
+            <TextBlock
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                Text="{Binding Greeting}" />
+        </TabItem>
+        <TabItem VerticalContentAlignment="Center" Header="Settings">
+            <TextBlock
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                Text="{Binding Greeting}" />
+        </TabItem>
+        <TabItem VerticalContentAlignment="Center" Header="About">
+            <TextBlock
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                Text="{Binding Greeting}" />
+        </TabItem>
+        <TabItem>
+            <TabItem.Header>
+                <TextBlock VerticalAlignment="Center">Triangle</TextBlock>
+            </TabItem.Header>
+            <StackPanel>
+                <TextBlock
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Center"
+                    Text="I am in the triangle page ! I'll put a button to show you that each page contains what you want." />
+                <Button>A button in the triangle page !</Button>
+            </StackPanel>
+        </TabItem>
+        <TabItem>
+            <TabItem.Header>
+                <TextBlock VerticalAlignment="Center">Square</TextBlock>
+            </TabItem.Header>
+            <StackPanel Orientation="Horizontal">
+                <TextBlock
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Center"
+                    Text="Square : " />
+                <Rectangle
+                    Width="63"
+                    Height="41"
+                    Fill="Blue" />
+            </StackPanel>
+        </TabItem>
+    </TabControl>
+
+</Window>

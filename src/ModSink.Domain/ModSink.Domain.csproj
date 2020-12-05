@@ -1,0 +1,35 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <LangVersion>8.0</LangVersion>
+    <Nullable>enable</Nullable>
+    <Authors>J2ghz</Authors>
+    <PackageLicenseExpression>AGPL-3.0-only</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/j2ghz/ModSink</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/j2ghz/ModSink.git</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Anotar.Serilog.Fody" Version="5.1.0" />
+    <PackageReference Include="ConfigureAwait.Fody" Version="3.3.1" />
+    <PackageReference Include="Dawn.Guard" Version="1.12.0" />
+    <PackageReference Include="Fody" Version="6.1.1">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Humanizer.Core" Version="2.7.9" />
+    <PackageReference Include="PathLib" Version="0.9.6" />
+    <PackageReference Include="Roslyn.System.IO.Abstractions.Analyzers" Version="6.0.32">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="SerilogAnalyzer" Version="0.15.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Update="Nerdbank.GitVersioning" Version="3.1.74" />
+  </ItemGroup>
+
+</Project>

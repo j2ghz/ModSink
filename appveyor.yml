@@ -1,41 +1,39 @@
-version: '{build}'
+version: "{build}"
 skip_tags: true
-image: Visual Studio 2019 Preview
+image: Visual Studio 2019
 configuration: Release
 
 install:
   - dotnet --info
-  - choco install gitversion.portable -pre -y
-  - choco install codecov
 
 before_build:
-  - gitversion /l console /output buildserver /updateAssemblyInfo /diag
-  - msbuild /t:Clean /v:m
-  - msbuild /t:Restore /v:m
+  - dotnet restore
+  - dotnet tool restore
 
 build:
   verbosity: minimal
 
-after_build:
-  - dotnet publish -c Release -o ./singleExe .\src\ModSink.WPF\ModSink.WPF.csproj
+test_script:
+  - dotnet test --configuration Release /p:AltCover=true /p:AltCoverForce=true"
+
+after_test:
+  - FOR /D /r %%G in ("src/*.Tests") DO dotnet codecov -f "src\%%~nxG\coverage.xml" --flag "appveyor"
+
+on_failure:
+  - FOR /D /r %%G in ("src/*.Tests") DO dotnet codecov -f "src\%%~nxG\coverage.xml" --flag "appveyor"
+
+before_package:
+  - dotnet pack
 
 artifacts:
-  - path: src/ModSink.WPF/bin/Release/netcoreapp3.0
-    name: ModSink.WPF
-  - path: singleExe/ModSink.WPF.exe
-    name: ModSink.WPF.exe
-
-test_script:
-  - dotnet test "src\ModSink.Common.Tests\ModSink.Common.Tests.csproj" --configuration Release /p:AltCover=true /p:AltCoverForce=true
-  - codecov -f "src\ModSink.Common.Tests\coverage.xml"
-  - dotnet test "src\ModSink.UI.Tests\ModSink.UI.Tests.csproj" --configuration Release /p:AltCover=true /p:AltCoverForce=true
-  - codecov -f "src\ModSink.UI.Tests\coverage.xml"
+  - path: "src/**/*.nupkg"
+    name: NuGet
+    type: NuGetPackage
 
 deploy:
-  - provider: GitHub
-    auth_token:
-      secure: TLChfAMJcjhyw7dQ6WNllA/sc420Hq4fk9V9/VUD1kFOm4ZJpfiBlwaqdVRPbQeP
-    artifact: ModSink.WPF,ModSink.WPF.exe
-    prerelease: true
-    on:
-      branch: master
+  provider: NuGet
+  api_key:
+    secure: fjBIR3on0h9DhbjsADq4JmfReuYticuhhcbm8/HTsC9Jah8tu5MZPJukBKWLeO0Z
+  skip_symbols: false
+  server: https://www.myget.org/F/modsink/api/v2/package
+  symbol_server: https://www.myget.org/F/modsink/symbols/api/v2/package
