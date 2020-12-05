@@ -12,6 +12,6 @@ namespace ModSink.Domain.Entities.Repo
         public Signature Signature { get; set; }
 
         public RelativePathFile InDirectory(IPurePath dir) =>
-            new RelativePathFile {Signature = Signature, RelativePath = dir.Join(RelativePath)};
+            new RelativePathFile { Signature = Signature, RelativePath = dir.Join(RelativePath) };
     }
 }
