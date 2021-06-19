@@ -5,7 +5,6 @@ using System.Reactive.Concurrency;
 using System.Threading;
 using Anotar.Serilog;
 using Avalonia;
-using Avalonia.Logging.Serilog;
 using Avalonia.ReactiveUI;
 using Serilog;
 using Serilog.Debugging;
@@ -62,7 +61,8 @@ namespace ModSink.UI.Avalonia
                         restrictedToMinimumLevel: LogEventLevel.Information)
                     .CreateLogger();
 
-                SerilogLogger.Initialize(Log.Logger.ForContext<global::Avalonia.Application>());
+                // TODO: forward avalonia logs to serilog
+                //SerilogLogger.Initialize(Log.Logger.ForContext<global::Avalonia.Application>());
 
                 if (!Debugger.IsAttached)
                 {
