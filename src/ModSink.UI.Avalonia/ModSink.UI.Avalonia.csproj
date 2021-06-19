@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net5.0</TargetFramework>
     <ApplicationIcon>Assets\modsink_x3S_icon.ico</ApplicationIcon>
     <ProductName>ModSink</ProductName>
     <Product>ModSink</Product>
