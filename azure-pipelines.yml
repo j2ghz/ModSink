@@ -7,47 +7,6 @@ pr:
       - "*"
 
 jobs:
-  - job: Test
-    strategy:
-      matrix:
-        linux:
-          imageName: "ubuntu-latest"
-        windows:
-          imageName: "windows-latest"
-    pool:
-      vmImage: $(imageName)
-    steps:
-      - task: UseDotNet@2
-        inputs:
-          packageType: "sdk"
-          version: "3.x"
-          performMultiLevelLookup: true
-      - task: DotNetCoreCLI@2
-        displayName: Restore tools
-        inputs:
-          command: "custom"
-          custom: "tool"
-          arguments: "restore"
-      - task: DotNetCoreCLI@2
-        displayName: Restore
-        inputs:
-          command: "restore"
-      - task: DotNetCoreCLI@2
-        displayName: Build
-        inputs:
-          command: "build"
-          arguments: "--configuration Release"
-      - task: DotNetCoreCLI@2
-        displayName: Run tests
-        inputs:
-          command: "test"
-          arguments: "--configuration Release /p:AltCover=true /p:AltCoverForce=true"
-      - task: DotNetCoreCLI@2
-        displayName: Upload test coverage to codecov
-        inputs:
-          command: "custom"
-          custom: "codecov"
-          arguments: "-t $(codecov_token) -f src/*/coverage.xml"
   - job: Publish
     pool:
       vmImage: windows-latest
@@ -55,7 +14,7 @@ jobs:
       - task: UseDotNet@2
         inputs:
           packageType: "sdk"
-          version: "3.x"
+          version: "5.x"
           performMultiLevelLookup: true
       - task: NuGetToolInstaller@1
         displayName: Install NuGet
