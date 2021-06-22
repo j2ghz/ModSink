@@ -7,8 +7,11 @@ on:
     branches: [master, develop]
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
+  dotnet:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
 
     steps:
       - uses: actions/checkout@v2
@@ -25,3 +28,5 @@ jobs:
       - name: Test
         run: dotnet test --no-build --verbosity normal --configuration Release /p:AltCover=true /p:AltCoverForce=true
       - uses: codecov/codecov-action@v1
+        with:
+          flags: ${{ matrix.os }}
