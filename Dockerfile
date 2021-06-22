@@ -1,9 +1,9 @@
-FROM mcr.microsoft.com/dotnet/core/sdk:3.1 AS build
+FROM mcr.microsoft.com/dotnet/core/sdk:5 AS build
 COPY . /p
 WORKDIR "/p/"
 RUN dotnet publish "src/ModSink.CLI/ModSink.CLI.csproj" -c Release -o /app
 
-FROM mcr.microsoft.com/dotnet/core/runtime:3.0-alpine
+FROM mcr.microsoft.com/dotnet/core/runtime:5
 COPY --from=build /app .
 ENTRYPOINT ["dotnet", "ModSink.CLI.dll"]
 CMD ["--help"]
