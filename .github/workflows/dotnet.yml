@@ -81,10 +81,10 @@ jobs:
       - name: Extract squirrel
         uses: ihiroky/extract-action@v1
         with:
-          file_path: ${{ steps.download-poetry.outputs.file-path }}
+          file_path: ${{ steps.download-squirrel.outputs.file-path }}
           extract_dir: squirrel
       - name: Make squirrel release
-        run: squirrel/Squirrel.exe --releasify=ModSink.UI.Avalonia.$(dotnet tool run nbgv -- get-version -v NuGetPackageVersion).nupkg -r out/ModSink.UI.Avalonia-win-x64-sfc-installer --no-msi
+        run: ./squirrel/Squirrel.exe --releasify=ModSink.UI.Avalonia.$(dotnet tool run nbgv -- get-version -v NuGetPackageVersion).nupkg -r out/ModSink.UI.Avalonia-win-x64-sfc-installer --no-msi
       - uses: actions/upload-artifact@v2
         with:
           name: ModSink.UI.Avalonia-win-x64-sfc-installer
