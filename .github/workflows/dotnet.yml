@@ -54,3 +54,36 @@ jobs:
         run: dotnet nuget add source --username j2ghz --password ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text --name github "https://nuget.pkg.github.com/j2ghz/index.json"
       - name: Push to Github Packages
         run: dotnet nuget push nupkgs/*.nupkg --api-key ${{ secrets.GITHUB_TOKEN }} --source "github"
+
+  installer:
+    runs-on: windows-latest
+    needs: dotnet
+    if: ${{ github.event_name != 'pull_request' }}
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 5.0.x
+      - name: Download squirrel
+        uses: carlosperate/download-file-action@v1.0.3
+        id: download-squirrel
+        with:
+          file-url: "https://github.com/Squirrel/Squirrel.Windows/releases/download/1.9.1/Squirrel.Windows-1.9.1.zip"
+      - name: Extract squirrel
+        uses: ihiroky/extract-action@v1
+        with:
+          file_path: ${{ steps.download-poetry.outputs.file-path }}
+          extract_dir: squirrel
+      - name: Publish
+        run: dotnet publish src/ModSink.UI.Avalonia/ModSink.UI.Avalonia.csproj -c Release -r win-x64 --self-contained -o out/ModSink.UI.Avalonia-win-x64-sfc
+      - name: Pack for squirrel
+        run: nuget pack src/ModSink.UI.Avalonia/ModSink.UI.Avalonia.nuspec -Verbosity detailed -BasePath out/ModSink.UI.Avalonia-win-x64-sfc/ModSink.UI.Avalonia/ -Version $(dotnet tool run nbgv -- get-version -v NuGetPackageVersion)
+      - name: Make squirrel release
+        run: squirrel/Squirrel.exe --releasify=ModSink.UI.Avalonia.$(dotnet tool run nbgv -- get-version -v NuGetPackageVersion).nupkg -r out/ModSink.UI.Avalonia-win-x64-sfc-installer --no-msi
+      - uses: actions/upload-artifact@v2
+        with:
+          name: ModSink.UI.Avalonia-win-x64-sfc-installer
+          path: out/ModSink.UI.Avalonia-win-x64-sfc-installer
