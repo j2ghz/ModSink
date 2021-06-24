@@ -85,6 +85,7 @@ jobs:
           extract_dir: squirrel
       - name: Make squirrel release
         run: ./squirrel/Squirrel.exe --releasify=ModSink.UI.Avalonia.$(dotnet tool run nbgv -- get-version -v NuGetPackageVersion).nupkg -r out/ModSink.UI.Avalonia-win-x64-sfc-installer-squirrel --no-msi
+      - run: cat ./squirrel/SquirrelSetup.log
       - name: Upload to ftp
         uses: SamKirkland/FTP-Deploy-Action@4.1.0
         with:
