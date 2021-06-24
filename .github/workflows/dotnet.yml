@@ -91,7 +91,7 @@ jobs:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
-          localDir: "out/ModSink.UI.Avalonia-win-x64-sfc-installer-squirrel"
+          local-dir: "out/ModSink.UI.Avalonia-win-x64-sfc-installer-squirrel"
           server-dir: "${{github.ref}}/"
           protocol: ftps
           port: 4179
