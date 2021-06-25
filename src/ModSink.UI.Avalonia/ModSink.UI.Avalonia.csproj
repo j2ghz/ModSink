@@ -47,6 +47,6 @@
     <ProjectReference Include="..\ModSink.UI\ModSink.UI.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Update="Nerdbank.GitVersioning" Version="3.4.216" />
+    <PackageReference Update="Nerdbank.GitVersioning" Version="3.4.220" />
   </ItemGroup>
 </Project>
