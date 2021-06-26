@@ -91,7 +91,7 @@ jobs:
       - run: tree .
       - run: ls out-squirrel
       - name: Upload to ftp
-        uses: genietim/ftp-action@releases/v4
+        uses: GenieTim/ftp-action@v4.0.1
         with:
           host: ${{ secrets.FTP_SERVER }}:4179
           user: ${{ secrets.FTP_USERNAME }}
