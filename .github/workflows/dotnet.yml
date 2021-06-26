@@ -88,14 +88,14 @@ jobs:
       - name: Make squirrel release
         run: ./squirrel/Squirrel.exe --releasify=ModSink.UI.AvaloniaUI.$(dotnet tool run nbgv -- get-version -v NuGetPackageVersion).nupkg -r out-squirrel --no-msi
       - run: cat ./squirrel/SquirrelSetup.log
-      - run: tree .
+      - run: tree /f .
       - run: ls out-squirrel
-      - name: Upload to ftp
-        uses: GenieTim/ftp-action@v4.0.1
-        with:
-          host: ${{ secrets.FTP_SERVER }}:4179
-          user: ${{ secrets.FTP_USERNAME }}
-          password: ${{ secrets.FTP_PASSWORD }}
-          localDir: "out-squirrel/"
-          remoteDir: "${{github.ref}}/"
-          forceSsl: true
+      - run: |
+          $client = New-Object -TypeName System.Net.WebClient
+          $dest = ftp://${{ secrets.FTP_USERNAME }}:${{ secrets.FTP_PASSWORD }}@${{ secrets.FTP_SERVER }}:4179
+          $files = Get-ChildItem out-squirrel
+          foreach ($file in $files)
+          {
+              Write-Host "Uploading $file"
+              $client.UploadFile("$dest/$file", $file.FullName)
+          }
