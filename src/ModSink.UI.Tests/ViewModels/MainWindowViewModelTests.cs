@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using FluentAssertions;
-using ModSink.UI.Avalonia.ViewModels;
+using ModSink.UI.AvaloniaUI.ViewModels;
 using Xunit;
 
 namespace ModSink.UI.Tests.ViewModels

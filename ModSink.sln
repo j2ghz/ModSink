@@ -29,7 +29,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModSink.Application.Tests",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModSink.UI", "src\ModSink.UI\ModSink.UI.csproj", "{390C6475-4B4F-41C5-8A54-8038A368A7D7}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModSink.UI.Avalonia", "src\ModSink.UI.Avalonia\ModSink.UI.Avalonia.csproj", "{FC182193-E741-4A05-8103-0D76E7062C16}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModSink.UI.AvaloniaUI", "src\ModSink.UI.AvaloniaUI\ModSink.UI.AvaloniaUI.csproj", "{FC182193-E741-4A05-8103-0D76E7062C16}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModSink.UI.Tests", "src\ModSink.UI.Tests\ModSink.UI.Tests.csproj", "{54A56086-5834-4D91-A855-483F4E8AAA16}"
 EndProject

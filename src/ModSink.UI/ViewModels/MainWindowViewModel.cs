@@ -1,7 +1,7 @@
 ﻿using System.Reflection;
 using System.Runtime.InteropServices;
 
-namespace ModSink.UI.Avalonia.ViewModels
+namespace ModSink.UI.AvaloniaUI.ViewModels
 {
     public class MainWindowViewModel : ViewModelBase
     {

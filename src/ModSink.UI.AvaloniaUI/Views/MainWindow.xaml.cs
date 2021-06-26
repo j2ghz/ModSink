@@ -4,7 +4,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 
-namespace ModSink.UI.Avalonia.Views
+namespace ModSink.UI.AvaloniaUI.Views
 {
     public class MainWindow : Window
     {
@@ -20,6 +20,6 @@ namespace ModSink.UI.Avalonia.Views
 
         protected override void OnOpened(EventArgs e) => LogTo.Information(
             "{Name} opened, time since startup: {SinceStartup}", nameof(MainWindow),
-            DateTimeOffset.Now - Program.StartTime);
+            Program.StartTime.Elapsed);
     }
 }

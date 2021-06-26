@@ -1,10 +1,10 @@
 ﻿using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
-using ModSink.UI.Avalonia.ViewModels;
-using ModSink.UI.Avalonia.Views;
+using ModSink.UI.AvaloniaUI.ViewModels;
+using ModSink.UI.AvaloniaUI.Views;
 
-namespace ModSink.UI.Avalonia
+namespace ModSink.UI.AvaloniaUI
 {
     public class App : global::Avalonia.Application
     {
