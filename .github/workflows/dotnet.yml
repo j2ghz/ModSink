@@ -83,16 +83,19 @@ jobs:
         with:
           file_path: ${{ steps.download-squirrel.outputs.file-path }}
           extract_dir: squirrel
+      - run: ls
+      - run: ls out
       - name: Make squirrel release
-        run: ./squirrel/Squirrel.exe --releasify=ModSink.UI.AvaloniaUI.$(dotnet tool run nbgv -- get-version -v NuGetPackageVersion).nupkg -r out/ModSink.UI.AvaloniaUI-win-x64-sfc-installer-squirrel --no-msi
+        run: ./squirrel/Squirrel.exe --releasify=ModSink.UI.AvaloniaUI.$(dotnet tool run nbgv -- get-version -v NuGetPackageVersion).nupkg -r out-squirrel --no-msi
       - run: cat ./squirrel/SquirrelSetup.log
+      - run: tree .
       - name: Upload to ftp
         uses: SamKirkland/FTP-Deploy-Action@4.1.0
         with:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
-          local-dir: "out/ModSink.UI.AvaloniaUI-win-x64-sfc-installer-squirrel/"
+          local-dir: "out-squirrel/"
           server-dir: "${{github.ref}}/"
           protocol: ftps
           port: 4179
