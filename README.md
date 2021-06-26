@@ -1,12 +1,11 @@
-# ModSink [![GitHub release](https://img.shields.io/github/release-pre/j2ghz/ModSink.svg)](https://github.com/j2ghz/ModSink/releases) [![MicroBadger](https://images.microbadger.com/badges/image/j2ghz/modsink.svg)](https://microbadger.com/images/j2ghz/modsink)
+# ModSink [![GitHub release](https://img.shields.io/github/release-pre/j2ghz/ModSink.svg)](https://github.com/j2ghz/ModSink/releases)
 
 A modpack distribution and download tool. Space efficient, hash-based storage. Work in progress.
 
 ***
 
-[![AppVeyor branch](https://img.shields.io/appveyor/ci/j2ghz/modsink/master.svg)](https://ci.appveyor.com/project/j2ghz/modsink)
-[![Docker Cloud Build Status](https://img.shields.io/docker/cloud/build/j2ghz/modsink.svg)](https://hub.docker.com/r/j2ghz/modsink)
-[![AppVeyor tests branch](https://img.shields.io/appveyor/tests/j2ghz/modsink/master.svg)](https://ci.appveyor.com/project/j2ghz/modsink/build/tests)
-[![codecov](https://img.shields.io/codecov/c/github/j2ghz/modsink/master.svg)](https://codecov.io/gh/j2ghz/ModSink)
-
-[![Build history](https://buildstats.info/appveyor/chart/j2ghz/modsink?branch=master)](https://ci.appveyor.com/project/j2ghz/modsink/history)
+|               | [master](https://github.com/j2ghz/ModSink/tree/master) (stable)                                                                                                               | [develop](https://github.com/j2ghz/ModSink/tree/develop) (beta)                                                                                                                 |
+| ------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| .NET build    | [![](https://img.shields.io/github/workflow/status/j2ghz/ModSink/.NET/master)](https://github.com/j2ghz/ModSink/actions/workflows/dotnet.yml?query=branch%3Amaster)           | [![](https://img.shields.io/github/workflow/status/j2ghz/ModSink/.NET/develop)](https://github.com/j2ghz/ModSink/actions/workflows/dotnet.yml?query=branch%3Adevelop)           |
+| Docker build  | [![](https://img.shields.io/github/workflow/status/j2ghz/ModSink/Docker/master)](https://github.com/j2ghz/ModSink/actions/workflows/docker-publish.yml?query=branch%3Amaster) | [![](https://img.shields.io/github/workflow/status/j2ghz/ModSink/Docker/develop)](https://github.com/j2ghz/ModSink/actions/workflows/docker-publish.yml?query=branch%3Adevelop) |
+| Test coverage | [![codecov](https://img.shields.io/codecov/c/github/j2ghz/modsink/master.svg)](https://app.codecov.io/gh/j2ghz/ModSink/branch/master)                                         | [![codecov](https://img.shields.io/codecov/c/github/j2ghz/modsink/develop.svg)](https://app.codecov.io/gh/j2ghz/ModSink/branch/develop)                                         |
