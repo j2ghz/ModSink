@@ -92,7 +92,7 @@ jobs:
       - run: ls out-squirrel
       - run: |
           $client = New-Object -TypeName System.Net.WebClient
-          $dest = ftp://${{ secrets.FTP_USERNAME }}:${{ secrets.FTP_PASSWORD }}@${{ secrets.FTP_SERVER }}:4179
+          $dest = "ftp://${{ secrets.FTP_USERNAME }}:${{ secrets.FTP_PASSWORD }}@${{ secrets.FTP_SERVER }}:4179"
           $files = Get-ChildItem out-squirrel
           foreach ($file in $files)
           {
