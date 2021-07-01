@@ -86,8 +86,8 @@ jobs:
       - name: Make squirrel release
         run: |
           ./squirrel/Squirrel.exe --releasify=ModSink.UI.AvaloniaUI.$(dotnet tool run nbgv -- get-version -v NuGetPackageVersion).nupkg -r out-squirrel --no-msi
-          cat ./squirrel/SquirrelSetup.log
           tree /f .
+          cat ./squirrel/SquirrelSetup.log
       - run: |
           $client = New-Object -TypeName System.Net.WebClient
           $dest = "ftp://${{ secrets.FTP_USERNAME }}:${{ secrets.FTP_PASSWORD }}@${{ secrets.FTP_SERVER }}:4179"
