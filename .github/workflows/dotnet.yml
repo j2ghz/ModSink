@@ -83,11 +83,11 @@ jobs:
         with:
           file_path: ${{ steps.download-squirrel.outputs.file-path }}
           extract_dir: squirrel
-      - name: Make squirrel release
-        run: |
-          ./squirrel/Squirrel.exe --releasify=ModSink.UI.AvaloniaUI.$(dotnet tool run nbgv -- get-version -v NuGetPackageVersion).nupkg -r out-squirrel --no-msi
-          tree /f .
+      - name: Make Squirrel release
+        run: ./squirrel/Squirrel.exe --releasify=ModSink.UI.AvaloniaUI.$(dotnet tool run nbgv -- get-version -v NuGetPackageVersion).nupkg -r out-squirrel --no-msi
+      - name: Check Squirrel logs
           cat ./squirrel/SquirrelSetup.log
+      - run: tree /f .
       - run: |
           $client = New-Object -TypeName System.Net.WebClient
           $dest = "ftp://${{ secrets.FTP_USERNAME }}:${{ secrets.FTP_PASSWORD }}@${{ secrets.FTP_SERVER }}:4179"
