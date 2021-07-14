@@ -24,7 +24,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="SerilogAnalyzer" Version="0.15.0" />
-    <PackageReference Include="System.IO.Abstractions" Version="13.2.38" />
+    <PackageReference Include="System.IO.Abstractions" Version="13.2.39" />
     <PackageReference Include="System.Reactive" Version="5.0.0" />
   </ItemGroup>
 
