@@ -1,0 +1,99 @@
+name: .NET
+
+on:
+  push:
+    branches: [master, develop]
+  pull_request:
+    branches: [master, develop]
+
+jobs:
+  dotnet:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 5.0.x
+      - name: Restore dependencies
+        run: dotnet restore
+      - name: Build
+        run: dotnet build --no-restore --configuration Release
+      - name: Test
+        run: dotnet test --no-build --verbosity normal --configuration Release /p:AltCover=true /p:AltCoverForce=true
+      - uses: codecov/codecov-action@v1
+        with:
+          flags: ${{ matrix.os }}
+
+  nuget:
+    runs-on: ubuntu-latest
+    needs: dotnet
+    if: ${{ github.event_name != 'pull_request' }}
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 5.0.x
+      - name: Pack
+        run: dotnet pack -o nupkgs
+      - name: Authenticate to Github Packages
+        run: dotnet nuget add source --username j2ghz --password ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text --name github "https://nuget.pkg.github.com/j2ghz/index.json"
+      - name: Push to Github Packages
+        run: dotnet nuget push nupkgs/*.nupkg --api-key ${{ secrets.GITHUB_TOKEN }} --source "github"
+
+  installer:
+    runs-on: windows-latest
+    #needs: dotnet
+    if: ${{ github.event_name != 'pull_request' }}
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 5.0.x
+      - name: Restore dotnet tools
+        run: dotnet tool restore
+      - name: Publish
+        run: dotnet publish src/ModSink.UI.AvaloniaUI/ModSink.UI.AvaloniaUI.csproj -c Release -r win-x64 --self-contained -o out/ModSink.UI.AvaloniaUI-win-x64-sfc
+      - name: Pack for squirrel
+        run: nuget pack src/ModSink.UI.AvaloniaUI/ModSink.UI.AvaloniaUI.nuspec -Verbosity detailed -BasePath out/ModSink.UI.AvaloniaUI-win-x64-sfc -Version $(dotnet tool run nbgv -- get-version -v NuGetPackageVersion)
+      - name: Download squirrel
+        uses: carlosperate/download-file-action@v1.0.3
+        id: download-squirrel
+        with:
+          file-url: "https://github.com/Squirrel/Squirrel.Windows/releases/download/1.9.1/Squirrel.Windows-1.9.1.zip"
+      - name: Extract squirrel
+        uses: ihiroky/extract-action@v1
+        with:
+          file_path: ${{ steps.download-squirrel.outputs.file-path }}
+          extract_dir: squirrel
+      - name: Make Squirrel release
+        run: ./squirrel/Squirrel.exe --releasify=ModSink.UI.AvaloniaUI.$(dotnet tool run nbgv -- get-version -v NuGetPackageVersion).nupkg -r out-squirrel --no-msi
+      - name: Check Squirrel logs
+        run: cat ./squirrel/SquirrelSetup.log
+      - run: tree /f .
+      - run: |
+          $client = New-Object -TypeName System.Net.WebClient
+          $dest = "ftp://${{ secrets.FTP_USERNAME }}:${{ secrets.FTP_PASSWORD }}@${{ secrets.FTP_SERVER }}:4179"
+          $files = Get-ChildItem out-squirrel
+          foreach ($file in $files)
+          {
+              Write-Host "Uploading $file"
+              $client.UploadFile("$dest/$file", $file.FullName)
+          }

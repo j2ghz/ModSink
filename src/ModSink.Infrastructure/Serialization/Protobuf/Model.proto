@@ -1,0 +1,35 @@
+﻿syntax = "proto3";
+
+package ModSink.Infrastructure.Serialization.Protobuf.Model;
+
+message Hash {
+	bytes Value = 1;
+	string HashId = 2;
+}
+
+message Signature {
+	Hash Hash = 1;
+	int64 Length = 2;
+}
+
+message RelativePathFile {
+	string RelativePath = 1;
+	Signature Signature = 2;
+}
+
+message Mod {
+	string Name = 1;
+	repeated RelativePathFile Files = 2;
+}
+
+message Modpack {
+	string Name = 1;
+	repeated Mod Mods = 2;
+}
+
+
+message Repo {
+	string Name = 1;
+	repeated Modpack Modpacks=2;
+	string ChunksPath=3;
+}
